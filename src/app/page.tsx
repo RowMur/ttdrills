@@ -1,11 +1,11 @@
 "use client";
 
-import { DRILLS } from "@/data";
+import { DRILLS, shotTypeShorthand } from "@/data";
 import { Fragment, useState } from "react";
 
 export default function Home() {
   const [activeShotIndex, setActiveShotIndex] = useState(0);
-  const drill = DRILLS[0];
+  const drill = DRILLS[1];
   return (
     <>
       <h2 className="text-center">{drill.name}</h2>
@@ -27,8 +27,20 @@ export default function Home() {
               ? 150
               : 100;
           const startY = 315;
+          const isActive = shotIndex === activeShotIndex;
           return (
             <Fragment key={shotIndex}>
+              {isActive && (
+                <text
+                  x={startX}
+                  y={startY + 14}
+                  textAnchor="middle"
+                  fontSize="14"
+                  fill="black"
+                >
+                  {shotTypeShorthand[shot.type]}
+                </text>
+              )}
               <line
                 x1={startX}
                 y1={startY}

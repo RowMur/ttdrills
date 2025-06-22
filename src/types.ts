@@ -9,7 +9,10 @@ type Placement = {
   direction: Direction;
 };
 
+export type ShotType = "forehand" | "backhand";
+
 type Shot = {
+  type: ShotType;
   spin: Spin;
   from: Placement;
 };
