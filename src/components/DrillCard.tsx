@@ -1,4 +1,5 @@
 import { RenderedDrill } from "@/components/RenderedDrill";
+import { Tag } from "@/components/Tag";
 import { Drill } from "@/types";
 import { modulo } from "@/utils/modulo";
 import { useState } from "react";
@@ -10,8 +11,11 @@ type Props = {
 export const DrillCard = ({ drill }: Props) => {
   const [activeShotIndex, setActiveShotIndex] = useState(0);
   return (
-    <div className="shadow-lg p-4 rounded-lg w-fit bg-grey">
-      <h2 className="text-center">{drill.name}</h2>
+    <div className="shadow-lg p-4 rounded-lg bg-grey">
+      <h2 className="font-semibold mb-2 text-wrap">{drill.name}</h2>
+      <div className="flex flex-wrap gap-2 mb-4">
+        <Tag text={drill.loopBehavior} />
+      </div>
       <RenderedDrill drill={drill} activeShotIndex={activeShotIndex} />
       <div className="flex justify-center">
         <button
