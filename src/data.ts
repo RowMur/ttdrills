@@ -51,4 +51,44 @@ export const DRILLS: Drill[] = [
       },
     ],
   },
+  {
+    name: "1 Backhand, 1 Forehand",
+    shots: [
+      {
+        spin: "top",
+        type: "backhand",
+        from: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        type: "forehand",
+        from: { depth: "long", direction: "forehand" },
+      },
+    ],
+  },
+  {
+    name: "Backhand, Middle, Backhand, Wide",
+    shots: [
+      {
+        spin: "top",
+        type: "backhand",
+        from: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        type: "forehand",
+        from: { depth: "long", direction: "middle" },
+      },
+      {
+        spin: "top",
+        type: "backhand",
+        from: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        type: "forehand",
+        from: { depth: "long", direction: "forehand" },
+      },
+    ],
+  },
 ];
