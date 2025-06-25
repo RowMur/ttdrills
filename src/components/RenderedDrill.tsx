@@ -1,8 +1,11 @@
 import { shotTypeShorthand } from "@/data";
-import { Drill } from "@/types";
+import { Drill, Placement } from "@/types";
 import { getRepetitionDisplay } from "@/utils/getRepetitionDisplay";
 import { modulo } from "@/utils/modulo";
 import { Fragment } from "react";
+
+const WIDTH = 200;
+const HEIGHT = 360;
 
 type Props = {
   drill: Drill;
@@ -12,23 +15,21 @@ type Props = {
 export const RenderedDrill = ({ drill, activeShotIndex }: Props) => {
   return (
     <svg
-      width={200}
-      height={360}
+      width={WIDTH}
+      height={HEIGHT}
       xmlns="http://www.w3.org/2000/svg"
       className="mx-auto"
     >
       <rect width="100%" height="100%" className="fill-white" />
       {drill.shots.map((shot, shotIndex) => {
-        const yPosition = 45;
-        const xPosition = 150;
-
-        const startX =
-          shot.from.direction === "backhand"
-            ? 50
-            : shot.from.direction === "forehand"
-            ? 150
-            : 100;
-        const startY = 315;
+        const [startX, startY] = getCoords(shot.from, false);
+        const [endX, endY] = getCoords(
+          {
+            depth: "long",
+            direction: "backhand",
+          },
+          true
+        );
         const isActive = shotIndex === activeShotIndex;
         const isNextShot =
           shotIndex === modulo(activeShotIndex + 1, drill.shots.length);
@@ -78,16 +79,16 @@ export const RenderedDrill = ({ drill, activeShotIndex }: Props) => {
             <line
               x1={startX}
               y1={startY}
-              x2={xPosition}
-              y2={yPosition}
+              x2={endX}
+              y2={endY}
               className={`stroke-slate stroke-2 ${
                 isActive ? "" : isNextShot ? "opacity-25" : "opacity-0"
               }`}
               strokeDasharray={isActive ? "none" : "5,5"}
             />
             <circle
-              cx={xPosition}
-              cy={yPosition}
+              cx={endX}
+              cy={endY}
               r="12"
               fill={
                 shot.spin === "top"
@@ -97,10 +98,33 @@ export const RenderedDrill = ({ drill, activeShotIndex }: Props) => {
                   : "white"
               }
             />
-            <circle cx={xPosition} cy={yPosition} r="8" fill="white" />
+            <circle cx={endX} cy={endY} r="8" fill="white" />
           </Fragment>
         );
       })}
     </svg>
   );
+};
+
+const getCoords = (
+  placement: Placement,
+  isOpponent: boolean
+): [number, number] => {
+  let x =
+    placement.direction === "forehand"
+      ? 150
+      : placement.direction === "middle"
+      ? 100
+      : 50;
+  let y =
+    placement.depth === "long"
+      ? 315
+      : placement.depth === "halflong"
+      ? 270
+      : 225;
+  if (isOpponent) {
+    x = WIDTH - x;
+    y = HEIGHT - y;
+  }
+  return [x, y];
 };

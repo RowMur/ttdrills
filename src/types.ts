@@ -4,7 +4,7 @@ type Depth = "short" | "halflong" | "long";
 
 type Direction = "forehand" | "backhand" | "middle";
 
-type Placement = {
+export type Placement = {
   depth: Depth;
   direction: Direction;
 };
