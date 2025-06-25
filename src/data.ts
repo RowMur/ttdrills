@@ -13,21 +13,13 @@ export const DRILLS: Drill[] = [
         spin: "top",
         type: "backhand",
         from: { depth: "long", direction: "backhand" },
-      },
-      {
-        spin: "top",
-        type: "backhand",
-        from: { depth: "long", direction: "backhand" },
+        repetition: 2,
       },
       {
         spin: "top",
         type: "forehand",
         from: { depth: "long", direction: "forehand" },
-      },
-      {
-        spin: "top",
-        type: "forehand",
-        from: { depth: "long", direction: "forehand" },
+        repetition: 2,
       },
     ],
   },
@@ -88,6 +80,39 @@ export const DRILLS: Drill[] = [
         spin: "top",
         type: "forehand",
         from: { depth: "long", direction: "forehand" },
+      },
+    ],
+  },
+  {
+    name: "1/2 Backhand, 1 Forehand",
+    shots: [
+      {
+        spin: "top",
+        type: "backhand",
+        from: { depth: "long", direction: "backhand" },
+        repetition: { min: 1, max: 2 },
+      },
+      {
+        spin: "top",
+        type: "forehand",
+        from: { depth: "long", direction: "forehand" },
+      },
+    ],
+  },
+  {
+    name: "1/2 Backhand, 1/2 Forehand",
+    shots: [
+      {
+        spin: "top",
+        type: "backhand",
+        from: { depth: "long", direction: "backhand" },
+        repetition: { min: 1, max: 2 },
+      },
+      {
+        spin: "top",
+        type: "forehand",
+        from: { depth: "long", direction: "forehand" },
+        repetition: { min: 1, max: 2 },
       },
     ],
   },

@@ -11,10 +11,18 @@ type Placement = {
 
 export type ShotType = "forehand" | "backhand";
 
+export type Repetition =
+  | number
+  | {
+      min: number;
+      max: number;
+    };
+
 type Shot = {
   type: ShotType;
   spin: Spin;
   from: Placement;
+  repetition?: Repetition;
 };
 
 export type Drill = {

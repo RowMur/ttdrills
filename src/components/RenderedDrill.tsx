@@ -1,5 +1,6 @@
 import { shotTypeShorthand } from "@/data";
 import { Drill } from "@/types";
+import { getRepetitionDisplay } from "@/utils/getRepetitionDisplay";
 import { Fragment } from "react";
 
 type Props = {
@@ -38,6 +39,9 @@ export const RenderedDrill = ({ drill, activeShotIndex }: Props) => {
                 fontSize="14"
                 fill="black"
               >
+                {shot.repetition && (
+                  <>{getRepetitionDisplay(shot.repetition)} </>
+                )}
                 {shotTypeShorthand[shot.type]}
               </text>
             )}

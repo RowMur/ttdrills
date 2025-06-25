@@ -9,7 +9,7 @@ export default function Home() {
       <h1 className="text-3xl font-bold text-center mb-8">
         Table Tennis Drills
       </h1>
-      <div className="flex gap-4">
+      <div className="flex gap-4 flex-wrap justify-stretch">
         {DRILLS.map((drill) => (
           <DrillCard key={drill.name} drill={drill} />
         ))}
