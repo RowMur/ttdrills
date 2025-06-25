@@ -22,6 +22,7 @@ export const DRILLS: Drill[] = [
         repetition: 2,
       },
     ],
+    loopBehavior: "continuous",
   },
   {
     name: "Falkenberg",
@@ -42,6 +43,7 @@ export const DRILLS: Drill[] = [
         from: { depth: "long", direction: "forehand" },
       },
     ],
+    loopBehavior: "continuous",
   },
   {
     name: "1 Backhand, 1 Forehand",
@@ -57,6 +59,7 @@ export const DRILLS: Drill[] = [
         from: { depth: "long", direction: "forehand" },
       },
     ],
+    loopBehavior: "continuous",
   },
   {
     name: "Backhand, Middle, Backhand, Wide",
@@ -82,6 +85,7 @@ export const DRILLS: Drill[] = [
         from: { depth: "long", direction: "forehand" },
       },
     ],
+    loopBehavior: "continuous",
   },
   {
     name: "1/2 Backhand, 1 Forehand",
@@ -98,6 +102,7 @@ export const DRILLS: Drill[] = [
         from: { depth: "long", direction: "forehand" },
       },
     ],
+    loopBehavior: "continuous",
   },
   {
     name: "1/2 Backhand, 1/2 Forehand",
@@ -115,5 +120,6 @@ export const DRILLS: Drill[] = [
         repetition: { min: 1, max: 2 },
       },
     ],
+    loopBehavior: "continuous",
   },
 ];

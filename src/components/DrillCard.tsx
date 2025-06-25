@@ -1,5 +1,6 @@
 import { RenderedDrill } from "@/components/RenderedDrill";
 import { Drill } from "@/types";
+import { modulo } from "@/utils/modulo";
 import { useState } from "react";
 
 type Props = {
@@ -14,9 +15,8 @@ export const DrillCard = ({ drill }: Props) => {
       <RenderedDrill drill={drill} activeShotIndex={activeShotIndex} />
       <div className="flex justify-center">
         <button
-          disabled={activeShotIndex === 0}
           onClick={() =>
-            setActiveShotIndex((prev) => (prev - 1) % drill.shots.length)
+            setActiveShotIndex((prev) => modulo(prev - 1, drill.shots.length))
           }
         >
           Prev
@@ -25,9 +25,8 @@ export const DrillCard = ({ drill }: Props) => {
           {activeShotIndex + 1} / {drill.shots.length}
         </span>
         <button
-          disabled={activeShotIndex === drill.shots.length - 1}
           onClick={() =>
-            setActiveShotIndex((prev) => (prev + 1) % drill.shots.length)
+            setActiveShotIndex((prev) => modulo(prev + 1, drill.shots.length))
           }
         >
           Next

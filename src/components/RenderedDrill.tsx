@@ -1,6 +1,7 @@
 import { shotTypeShorthand } from "@/data";
 import { Drill } from "@/types";
 import { getRepetitionDisplay } from "@/utils/getRepetitionDisplay";
+import { modulo } from "@/utils/modulo";
 import { Fragment } from "react";
 
 type Props = {
@@ -29,7 +30,8 @@ export const RenderedDrill = ({ drill, activeShotIndex }: Props) => {
             : 100;
         const startY = 315;
         const isActive = shotIndex === activeShotIndex;
-        const isNextShot = shotIndex === activeShotIndex + 1;
+        const isNextShot =
+          shotIndex === modulo(activeShotIndex + 1, drill.shots.length);
         return (
           <Fragment key={shotIndex}>
             <line

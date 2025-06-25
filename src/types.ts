@@ -25,7 +25,10 @@ type Shot = {
   repetition?: Repetition;
 };
 
+type LoopBehavior = "continuous" | "free" | "stop";
+
 export type Drill = {
   name: string;
   shots: Shot[];
+  loopBehavior: LoopBehavior;
 };
