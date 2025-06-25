@@ -16,7 +16,7 @@ export const RenderedDrill = ({ drill, activeShotIndex }: Props) => {
       xmlns="http://www.w3.org/2000/svg"
       className="mx-auto"
     >
-      <rect width="100%" height="100%" fill="#f0f0f0" />
+      <rect width="100%" height="100%" className="fill-white" />
       {drill.shots.map((shot, shotIndex) => {
         const yPosition = 45;
         const xPosition = 150;
@@ -29,8 +29,36 @@ export const RenderedDrill = ({ drill, activeShotIndex }: Props) => {
             : 100;
         const startY = 315;
         const isActive = shotIndex === activeShotIndex;
+        const isNextShot = shotIndex === activeShotIndex + 1;
         return (
           <Fragment key={shotIndex}>
+            <line
+              x1="0"
+              y1="180"
+              x2="200"
+              y2="180"
+              stroke="black"
+              strokeWidth="2"
+              strokeDasharray="4,4"
+            />
+            <line
+              x1="0"
+              y1="178"
+              x2="200"
+              y2="178"
+              stroke="gray"
+              strokeWidth="1"
+              strokeDasharray="2,2"
+            />
+            <line
+              x1="0"
+              y1="182"
+              x2="200"
+              y2="182"
+              stroke="gray"
+              strokeWidth="1"
+              strokeDasharray="2,2"
+            />
             {isActive && (
               <text
                 x={startX}
@@ -51,9 +79,9 @@ export const RenderedDrill = ({ drill, activeShotIndex }: Props) => {
               x2={xPosition}
               y2={yPosition}
               className={`stroke-slate stroke-2 ${
-                shotIndex === activeShotIndex ? "" : "opacity-10"
+                isActive ? "" : isNextShot ? "opacity-25" : "opacity-0"
               }`}
-              strokeDasharray={shotIndex === activeShotIndex ? "none" : "5,5"}
+              strokeDasharray={isActive ? "none" : "5,5"}
             />
             <circle
               cx={xPosition}
