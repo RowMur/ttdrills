@@ -1,6 +1,6 @@
 import { shotTypeShorthand } from "@/data";
 import { Drill, Placement } from "@/types";
-import { getRepetitionDisplay } from "@/utils/getRepetitionDisplay";
+// import { getRepetitionDisplay } from "@/utils/getRepetitionDisplay";
 import { modulo } from "@/utils/modulo";
 import { Fragment } from "react";
 
@@ -9,10 +9,10 @@ const HEIGHT = 360;
 
 type Props = {
   drill: Drill;
-  activeShotIndex: number;
+  activeBallIndex: number;
 };
 
-export const RenderedDrill = ({ drill, activeShotIndex }: Props) => {
+export const RenderedDrill = ({ drill, activeBallIndex }: Props) => {
   return (
     <svg
       width={WIDTH}
@@ -21,20 +21,16 @@ export const RenderedDrill = ({ drill, activeShotIndex }: Props) => {
       className="mx-auto"
     >
       <rect width="100%" height="100%" className="fill-white" />
-      {drill.shots.map((shot, shotIndex) => {
-        const [startX, startY] = getCoords(shot.from, false);
-        const [endX, endY] = getCoords(
-          {
-            depth: "long",
-            direction: "backhand",
-          },
-          true
-        );
-        const isActive = shotIndex === activeShotIndex;
+      {drill.balls.map((ball, ballIndex) => {
+        const isOpponent = ballIndex % 2 !== 0;
+        const [startX, startY] = getCoords(ball.placement, isOpponent);
+        const nextBall = drill.balls[modulo(ballIndex + 1, drill.balls.length)];
+        const [endX, endY] = getCoords(nextBall.placement, !isOpponent);
+        const isActive = ballIndex === activeBallIndex;
         const isNextShot =
-          shotIndex === modulo(activeShotIndex + 1, drill.shots.length);
+          ballIndex === modulo(activeBallIndex + 1, drill.balls.length);
         return (
-          <Fragment key={shotIndex}>
+          <Fragment key={ballIndex}>
             <line
               x1="0"
               y1="180"
@@ -65,15 +61,15 @@ export const RenderedDrill = ({ drill, activeShotIndex }: Props) => {
             {isActive && (
               <text
                 x={startX}
-                y={startY + 14}
+                y={isOpponent ? startY - 10 : startY + 20}
                 textAnchor="middle"
                 fontSize="14"
                 fill="black"
               >
-                {shot.repetition && (
+                {/* {ball.repetition && (
                   <>{getRepetitionDisplay(shot.repetition)} </>
-                )}
-                {shotTypeShorthand[shot.type]}
+                )} */}
+                {shotTypeShorthand[ball.stroke]}
               </text>
             )}
             <line
@@ -86,19 +82,23 @@ export const RenderedDrill = ({ drill, activeShotIndex }: Props) => {
               }`}
               strokeDasharray={isActive ? "none" : "5,5"}
             />
-            <circle
-              cx={endX}
-              cy={endY}
-              r="12"
-              fill={
-                shot.spin === "top"
-                  ? "red"
-                  : shot.spin === "back"
-                  ? "blue"
-                  : "white"
-              }
-            />
-            <circle cx={endX} cy={endY} r="8" fill="white" />
+            {isActive && (
+              <>
+                <circle
+                  cx={endX}
+                  cy={endY}
+                  r="12"
+                  fill={
+                    ball.spin === "top"
+                      ? "red"
+                      : ball.spin === "back"
+                      ? "blue"
+                      : "white"
+                  }
+                />
+                <circle cx={endX} cy={endY} r="8" fill="white" />
+              </>
+            )}
           </Fragment>
         );
       })}

@@ -8,118 +8,195 @@ export const shotTypeShorthand: Record<ShotType, string> = {
 export const DRILLS: Drill[] = [
   {
     name: "2 Backhands, 2 Forehands",
-    shots: [
+    balls: [
       {
         spin: "top",
-        type: "backhand",
-        from: { depth: "long", direction: "backhand" },
-        repetition: 2,
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
       },
       {
         spin: "top",
-        type: "forehand",
-        from: { depth: "long", direction: "forehand" },
-        repetition: 2,
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        stroke: "forehand",
+        placement: { depth: "long", direction: "forehand" },
+      },
+      {
+        spin: "top",
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        stroke: "forehand",
+        placement: { depth: "long", direction: "forehand" },
+      },
+      {
+        spin: "top",
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
       },
     ],
     loopBehavior: "continuous",
   },
   {
     name: "Falkenberg",
-    shots: [
+    balls: [
       {
         spin: "top",
-        type: "backhand",
-        from: { depth: "long", direction: "backhand" },
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
       },
       {
         spin: "top",
-        type: "forehand",
-        from: { depth: "long", direction: "backhand" },
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
       },
       {
         spin: "top",
-        type: "forehand",
-        from: { depth: "long", direction: "forehand" },
+        stroke: "forehand",
+        placement: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        stroke: "forehand",
+        placement: { depth: "long", direction: "forehand" },
+      },
+      {
+        spin: "top",
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
       },
     ],
     loopBehavior: "continuous",
   },
   {
     name: "1 Backhand, 1 Forehand",
-    shots: [
+    balls: [
       {
         spin: "top",
-        type: "backhand",
-        from: { depth: "long", direction: "backhand" },
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
       },
       {
         spin: "top",
-        type: "forehand",
-        from: { depth: "long", direction: "forehand" },
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        stroke: "forehand",
+        placement: { depth: "long", direction: "forehand" },
+      },
+      {
+        spin: "top",
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
       },
     ],
     loopBehavior: "continuous",
   },
   {
     name: "Backhand, Middle, Backhand, Wide",
-    shots: [
+    balls: [
       {
         spin: "top",
-        type: "backhand",
-        from: { depth: "long", direction: "backhand" },
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
       },
       {
         spin: "top",
-        type: "forehand",
-        from: { depth: "long", direction: "middle" },
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
       },
       {
         spin: "top",
-        type: "backhand",
-        from: { depth: "long", direction: "backhand" },
+        stroke: "forehand",
+        placement: { depth: "long", direction: "middle" },
       },
       {
         spin: "top",
-        type: "forehand",
-        from: { depth: "long", direction: "forehand" },
-      },
-    ],
-    loopBehavior: "continuous",
-  },
-  {
-    name: "1/2 Backhand, 1 Forehand",
-    shots: [
-      {
-        spin: "top",
-        type: "backhand",
-        from: { depth: "long", direction: "backhand" },
-        repetition: { min: 1, max: 2 },
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
       },
       {
         spin: "top",
-        type: "forehand",
-        from: { depth: "long", direction: "forehand" },
-      },
-    ],
-    loopBehavior: "continuous",
-  },
-  {
-    name: "1/2 Backhand, 1/2 Forehand",
-    shots: [
-      {
-        spin: "top",
-        type: "backhand",
-        from: { depth: "long", direction: "backhand" },
-        repetition: { min: 1, max: 2 },
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
       },
       {
         spin: "top",
-        type: "forehand",
-        from: { depth: "long", direction: "forehand" },
-        repetition: { min: 1, max: 2 },
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        stroke: "forehand",
+        placement: { depth: "long", direction: "forehand" },
+      },
+      {
+        spin: "top",
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
       },
     ],
     loopBehavior: "continuous",
   },
+  // {
+  //   name: "1/2 Backhand, 1 Forehand",
+  //   shots: [
+  //     {
+  //       spin: "top",
+  //       type: "backhand",
+  //       from: { depth: "long", direction: "backhand" },
+  //       to: { depth: "long", direction: "backhand" },
+  //       repetition: { min: 1, max: 2 },
+  //     },
+  //     {
+  //       spin: "top",
+  //       type: "forehand",
+  //       from: { depth: "long", direction: "forehand" },
+  //       to: { depth: "long", direction: "backhand" },
+  //     },
+  //   ],
+  //   loopBehavior: "continuous",
+  // },
+  // {
+  //   name: "1/2 Backhand, 1/2 Forehand",
+  //   shots: [
+  //     {
+  //       spin: "top",
+  //       type: "backhand",
+  //       from: { depth: "long", direction: "backhand" },
+  //       to: { depth: "long", direction: "backhand" },
+  //       repetition: { min: 1, max: 2 },
+  //     },
+  //     {
+  //       spin: "top",
+  //       type: "forehand",
+  //       from: { depth: "long", direction: "forehand" },
+  //       to: { depth: "long", direction: "backhand" },
+  //       repetition: { min: 1, max: 2 },
+  //     },
+  //   ],
+  //   loopBehavior: "continuous",
+  // },
 ];

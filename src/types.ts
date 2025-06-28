@@ -11,24 +11,24 @@ export type Placement = {
 
 export type ShotType = "forehand" | "backhand";
 
-export type Repetition =
-  | number
-  | {
-      min: number;
-      max: number;
-    };
+// export type Repetition =
+//   | number
+//   | {
+//       min: number;
+//       max: number;
+//     };
 
-type Shot = {
-  type: ShotType;
+type Ball = {
+  stroke: ShotType;
   spin: Spin;
-  from: Placement;
-  repetition?: Repetition;
+  placement: Placement;
+  // repetition?: Repetition;
 };
 
 type LoopBehavior = "continuous" | "free" | "stop";
 
 export type Drill = {
   name: string;
-  shots: Shot[];
+  balls: Ball[];
   loopBehavior: LoopBehavior;
 };
