@@ -7,6 +7,8 @@ const HEIGHT = 360;
 const sectionWidth = WIDTH / 3;
 const sectionHeight = HEIGHT / 6;
 
+const backAndForthSplit = 4;
+
 type Props = {
   drill: Drill;
   exchanges: Exchange[];
@@ -46,6 +48,9 @@ export const RenderedDrill = ({
     },
     false
   );
+
+  const isBackAndForth = startX === nextX && startY === nextY;
+
   return (
     <svg
       width={WIDTH}
@@ -191,9 +196,9 @@ export const RenderedDrill = ({
         </text>
       )}
       <line
-        x1={startX}
+        x1={isBackAndForth ? startX - backAndForthSplit : startX}
         y1={startY}
-        x2={endX}
+        x2={isBackAndForth ? endX - backAndForthSplit : endX}
         y2={endY}
         className={`stroke-2 stroke-white ${
           true ? "" : false ? "opacity-25" : "opacity-0"
@@ -202,9 +207,9 @@ export const RenderedDrill = ({
       />
       {nextExchangeBall && (
         <line
-          x1={endX}
+          x1={isBackAndForth ? endX + backAndForthSplit : endX}
           y1={endY}
-          x2={nextX}
+          x2={isBackAndForth ? nextX + backAndForthSplit : nextX}
           y2={nextY}
           className={`stroke-white stroke-2 ${
             true ? "" : false ? "opacity-25" : "opacity-0"
