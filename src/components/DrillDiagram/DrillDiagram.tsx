@@ -1,7 +1,7 @@
 import { HighlightedSection } from "@/components/DrillDiagram/HighlightedSection";
 import { Table } from "@/components/DrillDiagram/Table";
 import { shotTypeShorthand } from "@/data";
-import { Drill, Exchange } from "@/types";
+import { Drill } from "@/types";
 import { getCoords } from "@/utils/coords";
 // import { getRepetitionDisplay } from "@/utils/getRepetitionDisplay";
 
@@ -12,46 +12,44 @@ const backAndForthSplit = 4;
 
 type Props = {
   drill: Drill;
-  exchanges: Exchange[];
-  activeExchangeIndex: number;
+  nodeId: string;
 };
 
-export const DrillDiagram = ({
-  drill,
-  exchanges,
-  activeExchangeIndex,
-}: Props) => {
-  const activeExchange = exchanges[activeExchangeIndex];
-  const [out, incoming] = activeExchange;
-  const nextExchangeIndex =
-    drill.loopBehavior === "continuous"
-      ? (activeExchangeIndex + 1) % exchanges.length
-      : activeExchangeIndex + 1;
-  const nextExchange = exchanges[nextExchangeIndex];
-  const nextExchangeBall = nextExchange?.[0];
+export const DrillDiagram = ({ drill, nodeId }: Props) => {
+  const out = drill.graph.nodes[nodeId];
+  const incoming = out.next ? drill.graph.nodes[out.next[0]] : null;
+  const nextExchangeBall = incoming?.next
+    ? drill.graph.nodes[incoming.next[0]]
+    : null;
 
-  if (!out) {
+  if (!out || !incoming) {
     return null;
   }
 
-  const [startX, startY] = getCoords(HEIGHT, WIDTH, out.placement, false);
+  const [startX, startY] = getCoords(
+    HEIGHT,
+    WIDTH,
+    out.ball.placement,
+    out.ball.isOpponent
+  );
   const [endX, endY] = getCoords(
     HEIGHT,
     WIDTH,
-    incoming?.placement || {
+    incoming?.ball.placement || {
       depth: "long",
-      direction: out.placement.direction,
+      direction: out.ball.placement.direction,
     },
-    true
+    incoming?.ball.isOpponent || false
   );
   const [nextX, nextY] = getCoords(
     HEIGHT,
     WIDTH,
-    nextExchangeBall?.placement || {
+    nextExchangeBall?.ball.placement || {
       depth: "long",
-      direction: incoming?.placement.direction || out.placement.direction,
+      direction:
+        incoming?.ball.placement.direction || out.ball.placement.direction,
     },
-    false
+    nextExchangeBall?.ball.isOpponent || false
   );
 
   const isBackAndForth = startX === nextX && startY === nextY;
@@ -64,24 +62,31 @@ export const DrillDiagram = ({
       className="mx-auto"
     >
       <Table height={HEIGHT} width={WIDTH} />
-      {incoming && (
+      <HighlightedSection
+        tableHeight={HEIGHT}
+        tableWidth={WIDTH}
+        ball={
+          incoming?.ball || {
+            isOpponent: !out.ball.isOpponent,
+            placement: {
+              depth: "long",
+              direction: out.ball.placement.direction,
+            },
+            stroke: out.ball.stroke,
+            spin: out.ball.spin,
+          }
+        }
+      />
+      {/* {nextExchangeBall && (
         <HighlightedSection
           tableHeight={HEIGHT}
           tableWidth={WIDTH}
-          ball={incoming}
-          isOpponent
+          ball={nextExchangeBall.ball}
         />
-      )}
-      {nextExchangeBall && (
-        <HighlightedSection
-          tableHeight={HEIGHT}
-          tableWidth={WIDTH}
-          ball={nextExchangeBall}
-        />
-      )}
+      )} */}
       <text
         x={startX}
-        y={startY + 20}
+        y={out.ball.isOpponent ? startY - 10 : startY + 20}
         textAnchor="middle"
         fontSize="14"
         fill="white"
@@ -89,42 +94,58 @@ export const DrillDiagram = ({
         {/* {ball.repetition && (
                   <>{getRepetitionDisplay(shot.repetition)} </>
                 )} */}
-        {shotTypeShorthand[out.stroke]}
+        {shotTypeShorthand[out.ball.stroke]}
       </text>
-      {incoming && (
+      {/* {incoming && (
         <text
           x={endX}
-          y={endY - 10}
+          y={incoming.ball.isOpponent ? endY - 10 : endY + 20}
           textAnchor="middle"
           fontSize="14"
           fill="white"
         >
-          {/* {ball.repetition && (
-                  <>{getRepetitionDisplay(shot.repetition)} </>
-                  )} */}
-          {shotTypeShorthand[incoming.stroke]}
+          {shotTypeShorthand[incoming.ball.stroke]}
         </text>
-      )}
+      )} */}
       <line
-        x1={isBackAndForth ? startX - backAndForthSplit : startX}
+        x1={
+          isBackAndForth
+            ? incoming?.ball.isOpponent
+              ? startX - backAndForthSplit
+              : startX + backAndForthSplit
+            : startX
+        }
         y1={startY}
-        x2={isBackAndForth ? endX - backAndForthSplit : endX}
+        x2={
+          isBackAndForth
+            ? incoming?.ball.isOpponent
+              ? endX - backAndForthSplit
+              : endX + backAndForthSplit
+            : endX
+        }
         y2={endY}
-        className={`stroke-2 stroke-white ${
-          true ? "" : false ? "opacity-25" : "opacity-0"
-        }`}
-        strokeDasharray={true ? "none" : "5,5"}
+        className="stroke-2 stroke-white"
       />
       {nextExchangeBall && (
         <line
-          x1={isBackAndForth ? endX + backAndForthSplit : endX}
+          x1={
+            isBackAndForth
+              ? nextExchangeBall?.ball.isOpponent
+                ? endX - backAndForthSplit
+                : endX + backAndForthSplit
+              : endX
+          }
           y1={endY}
-          x2={isBackAndForth ? nextX + backAndForthSplit : nextX}
+          x2={
+            isBackAndForth
+              ? nextExchangeBall?.ball.isOpponent
+                ? nextX - backAndForthSplit
+                : nextX + backAndForthSplit
+              : nextX
+          }
           y2={nextY}
-          className={`stroke-white stroke-2 ${
-            true ? "" : false ? "opacity-25" : "opacity-0"
-          }`}
-          strokeDasharray={true ? "none" : "5,5"}
+          className="stroke-white stroke-2"
+          strokeDasharray="5,5"
         />
       )}
     </svg>

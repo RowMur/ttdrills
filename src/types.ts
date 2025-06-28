@@ -22,15 +22,23 @@ export type Ball = {
   stroke: ShotType;
   spin: Spin;
   placement: Placement;
+  isOpponent: boolean;
   // repetition?: Repetition;
 };
 
-export type Exchange = [Ball | undefined, Ball | undefined];
+type Node = {
+  id: string;
+  prev: string[] | null;
+  next: string[] | null;
+  ball: Ball;
+};
 
-type LoopBehavior = "continuous" | "free";
+type StepGraph = {
+  entryPoint: string;
+  nodes: Record<string, Node>;
+};
 
 export type Drill = {
   name: string;
-  balls: Ball[];
-  loopBehavior: LoopBehavior;
+  graph: StepGraph;
 };

@@ -1,7 +1,5 @@
 import { DrillDiagram } from "@/components/DrillDiagram/DrillDiagram";
-import { Tag } from "@/components/Tag";
-import { Drill, Exchange } from "@/types";
-import { modulo } from "@/utils/modulo";
+import { Drill } from "@/types";
 import { useState } from "react";
 
 type Props = {
@@ -9,37 +7,39 @@ type Props = {
 };
 
 export const DrillCard = ({ drill }: Props) => {
-  const exchanges: Exchange[] = [];
-  for (let i = 0; i < drill.balls.length; i += 2) {
-    const slice = drill.balls.slice(i, i + 2);
-    exchanges.push([slice[0], slice[1]]);
-  }
-  const [activeExchangeIndex, setActiveExchangeIndex] = useState(0);
+  const [nodeId, setNodeId] = useState(drill.graph.entryPoint);
   return (
     <div className="shadow-lg p-4 rounded-lg bg-grey">
       <h2 className="font-semibold mb-2 text-wrap">{drill.name}</h2>
-      <div className="flex flex-wrap gap-2 mb-4">
+      {/* TODO: Find some way to dynamically check if it's continuous */}
+      {/* <div className="flex flex-wrap gap-2 mb-4">
         <Tag text={drill.loopBehavior} />
-      </div>
-      <DrillDiagram
-        drill={drill}
-        exchanges={exchanges}
-        activeExchangeIndex={activeExchangeIndex}
-      />
+      </div> */}
+      <DrillDiagram drill={drill} nodeId={nodeId} />
       <div className="flex justify-center">
         <button
           onClick={() =>
-            setActiveExchangeIndex((prev) => modulo(prev - 1, exchanges.length))
+            setNodeId((prev) => drill.graph.nodes[prev].prev?.[0] || prev)
           }
         >
           Prev
         </button>
-        <span className="mx-4">
-          {activeExchangeIndex + 1} / {exchanges.length}
-        </span>
         <button
           onClick={() =>
-            setActiveExchangeIndex((prev) => modulo(prev + 1, exchanges.length))
+            setNodeId((prev) => {
+              const nextNodeId = drill.graph.nodes[prev].next?.[0];
+              if (nextNodeId === undefined) {
+                return prev;
+              }
+
+              const nextNode = drill.graph.nodes[nextNodeId];
+              if (nextNode.next === null) {
+                // If the next node has no next nodes, stay on the current node as last node is just for placement
+                return prev;
+              }
+
+              return nextNodeId;
+            })
           }
         >
           Next

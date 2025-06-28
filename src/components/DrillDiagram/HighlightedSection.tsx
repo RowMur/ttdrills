@@ -5,7 +5,6 @@ type Props = {
   tableHeight: number;
   tableWidth: number;
   ball: Ball;
-  isOpponent?: boolean;
 };
 
 export const HighlightedSection = (props: Props) => {
@@ -18,7 +17,7 @@ export const HighlightedSection = (props: Props) => {
     props.tableHeight,
     props.tableWidth,
     props.ball.placement,
-    props.isOpponent || false
+    props.ball.isOpponent
   );
 
   return (
