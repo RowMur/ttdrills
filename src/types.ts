@@ -18,7 +18,7 @@ export type ShotType = "forehand" | "backhand";
 //       max: number;
 //     };
 
-type Ball = {
+export type Ball = {
   stroke: ShotType;
   spin: Spin;
   placement: Placement;

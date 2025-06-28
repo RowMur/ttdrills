@@ -1,13 +1,13 @@
-import { Repetition } from "@/types";
+// import { Repetition } from "@/types";
 
-export const getRepetitionDisplay = (repetition: Repetition): string => {
-  if (typeof repetition === "number") {
-    return repetition.toString() + "x";
-  }
+// export const getRepetitionDisplay = (repetition: Repetition): string => {
+//   if (typeof repetition === "number") {
+//     return repetition.toString() + "x";
+//   }
 
-  if (repetition.min === repetition.max) {
-    return repetition.min.toString() + "x";
-  }
+//   if (repetition.min === repetition.max) {
+//     return repetition.min.toString() + "x";
+//   }
 
-  return `${repetition.min}-${repetition.max}x`;
-};
+//   return `${repetition.min}-${repetition.max}x`;
+// };
