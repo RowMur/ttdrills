@@ -35,7 +35,7 @@ export const DRILLS: Drill[] = [
           },
         },
         backhand2: {
-          id: "backhand1",
+          id: "backhand2",
           prev: ["block1"],
           next: ["block2"],
           ball: {
@@ -57,7 +57,7 @@ export const DRILLS: Drill[] = [
           },
         },
         forehand1: {
-          id: "forehand1 ",
+          id: "forehand1",
           prev: ["block2"],
           next: ["block3"],
           ball: {
@@ -325,25 +325,80 @@ export const DRILLS: Drill[] = [
       },
     },
   },
-  // // {
-  // //   name: "1/2 Backhand, 1 Forehand",
-  // //   shots: [
-  // //     {
-  // //       spin: "top",
-  // //       type: "backhand",
-  // //       from: { depth: "long", direction: "backhand" },
-  // //       to: { depth: "long", direction: "backhand" },
-  // //       repetition: { min: 1, max: 2 },
-  // //     },
-  // //     {
-  // //       spin: "top",
-  // //       type: "forehand",
-  // //       from: { depth: "long", direction: "forehand" },
-  // //       to: { depth: "long", direction: "backhand" },
-  // //     },
-  // //   ],
-  // //   loopBehavior: "continuous",
-  // // },
+  {
+    name: "1/2 Backhand, 1 Forehand",
+    graph: {
+      entryPoint: "backhand1",
+      nodes: {
+        backhand1: {
+          id: "backhand1",
+          prev: ["block3"],
+          next: ["block1"],
+          ball: {
+            spin: "top",
+            stroke: "backhand",
+            placement: { depth: "long", direction: "backhand" },
+            isOpponent: false,
+          },
+        },
+        block1: {
+          id: "block1",
+          prev: ["backhand1"],
+          next: ["backhand2", "forehand1"],
+          ball: {
+            spin: "top",
+            stroke: "backhand",
+            placement: { depth: "long", direction: "backhand" },
+            isOpponent: true,
+          },
+        },
+        backhand2: {
+          id: "backhand2",
+          prev: ["block1"],
+          next: ["block2"],
+          ball: {
+            spin: "top",
+            stroke: "backhand",
+            placement: { depth: "long", direction: "backhand" },
+            isOpponent: false,
+          },
+        },
+        block2: {
+          id: "block2",
+          prev: ["backhand2"],
+          next: ["forehand1"],
+          ball: {
+            spin: "top",
+            stroke: "backhand",
+            placement: { depth: "long", direction: "backhand" },
+            isOpponent: true,
+          },
+        },
+        forehand1: {
+          id: "forehand1",
+          prev: ["block1", "block2"],
+          next: ["block3"],
+          ball: {
+            spin: "top",
+            stroke: "forehand",
+            placement: { depth: "long", direction: "forehand" },
+            isOpponent: false,
+          },
+        },
+        block3: {
+          id: "block3",
+          prev: ["forehand1"],
+          next: ["backhand1"],
+          ball: {
+            spin: "top",
+            stroke: "backhand",
+            placement: { depth: "long", direction: "backhand" },
+            isOpponent: true,
+          },
+        },
+      },
+    },
+  },
   // // {
   // //   name: "1/2 Backhand, 1/2 Forehand",
   // //   shots: [

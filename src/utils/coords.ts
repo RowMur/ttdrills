@@ -12,7 +12,7 @@ export const getCoords = (
   tableWidth: number,
   placement: Placement,
   isOpponent: boolean
-) => {
+): [number, number, number, number] => {
   const { sectionWidth, sectionHeight } = getSectionDimensions(
     tableHeight,
     tableWidth

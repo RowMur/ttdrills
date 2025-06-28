@@ -26,7 +26,7 @@ export type Ball = {
   // repetition?: Repetition;
 };
 
-type Node = {
+export type Node = {
   id: string;
   prev: string[] | null;
   next: string[] | null;

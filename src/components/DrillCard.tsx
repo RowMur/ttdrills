@@ -1,8 +1,13 @@
+"use client";
+
 import { ControlButton } from "@/components/ControlButton";
 import { DrillDiagram } from "@/components/DrillDiagram/DrillDiagram";
-import { Drill } from "@/types";
+import { Drill, Node } from "@/types";
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { useState } from "react";
+
+const DIAGRAM_HEIGHT = 360;
+const DIAGRAM_WIDTH = 200;
 
 type Props = {
   drill: Drill;
@@ -10,14 +15,21 @@ type Props = {
 
 export const DrillCard = ({ drill }: Props) => {
   const [nodeId, setNodeId] = useState(drill.graph.entryPoint);
+  const [selectingNextNode, setSelectingNextNode] = useState(false);
 
   let hasNext = true;
-  const nextNodeId = drill.graph.nodes[nodeId].next?.[0];
-  if (nextNodeId === undefined) {
+  const nextNodeIds = drill.graph.nodes[nodeId].next;
+  const availableNextNodes: Node[] | undefined = [];
+  if (!nextNodeIds) {
     hasNext = false;
   } else {
-    const nextNode = drill.graph.nodes[nextNodeId];
-    if (nextNode.next === null) {
+    for (const nextNodeId of nextNodeIds) {
+      const nextNode = drill.graph.nodes[nextNodeId];
+      if (nextNode?.next && nextNode.next !== null) {
+        availableNextNodes.push(nextNode);
+      }
+    }
+    if (availableNextNodes.length <= 0) {
       // If the next node has no next nodes, stay on the current node as last node is just for placement
       hasNext = false;
     }
@@ -32,7 +44,32 @@ export const DrillCard = ({ drill }: Props) => {
       {/* <div className="flex flex-wrap gap-2 mb-4">
         <Tag text={drill.loopBehavior} />
       </div> */}
-      <DrillDiagram drill={drill} nodeId={nodeId} />
+      <div
+        className={`relative min-w-[${DIAGRAM_WIDTH}px] w-fit h-[${DIAGRAM_HEIGHT}px] mx-auto`}
+      >
+        <DrillDiagram
+          drill={drill}
+          nodeId={nodeId}
+          height={DIAGRAM_HEIGHT}
+          width={DIAGRAM_WIDTH}
+        />
+        {selectingNextNode && (
+          <div className="absolute left-0 top-0 size-full bg-slate opacity-80 grid place-items-center">
+            {availableNextNodes.map((nextNode) => (
+              <ControlButton
+                key={nextNode.id}
+                onClick={() => {
+                  setNodeId(nextNode.id);
+                  setSelectingNextNode(false);
+                }}
+              >
+                {nextNode.ball.placement.direction}{" "}
+                {nextNode.ball.placement.depth}
+              </ControlButton>
+            ))}
+          </div>
+        )}
+      </div>
       <div className="flex justify-between gap-2 mt-4">
         <ControlButton onClick={() => setNodeId(drill.graph.entryPoint)}>
           <RotateCcw />
@@ -45,7 +82,11 @@ export const DrillCard = ({ drill }: Props) => {
             <ChevronLeft />
           </ControlButton>
           <ControlButton
-            onClick={nextNodeId ? () => setNodeId(nextNodeId) : undefined}
+            onClick={
+              availableNextNodes?.length === 1
+                ? () => setNodeId(availableNextNodes[0].id)
+                : () => setSelectingNextNode(true)
+            }
             disabled={!hasNext}
           >
             <ChevronRight />

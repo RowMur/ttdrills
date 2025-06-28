@@ -5,85 +5,62 @@ import { Drill } from "@/types";
 import { getCoords } from "@/utils/coords";
 // import { getRepetitionDisplay } from "@/utils/getRepetitionDisplay";
 
-const WIDTH = 200;
-const HEIGHT = 360;
-
-const backAndForthSplit = 4;
-
 type Props = {
   drill: Drill;
   nodeId: string;
+  height: number;
+  width: number;
 };
 
-export const DrillDiagram = ({ drill, nodeId }: Props) => {
+export const DrillDiagram = ({ drill, nodeId, height, width }: Props) => {
   const out = drill.graph.nodes[nodeId];
-  const incoming = out.next ? drill.graph.nodes[out.next[0]] : null;
-  const nextExchangeBall = incoming?.next
-    ? drill.graph.nodes[incoming.next[0]]
+  const incomingOptions = out.next
+    ? out.next.map((i) => drill.graph.nodes[i])
     : null;
 
-  if (!out || !incoming) {
+  if (!out || !incomingOptions) {
     return null;
   }
 
   const [startX, startY] = getCoords(
-    HEIGHT,
-    WIDTH,
+    height,
+    width,
     out.ball.placement,
     out.ball.isOpponent
   );
-  const [endX, endY] = getCoords(
-    HEIGHT,
-    WIDTH,
-    incoming?.ball.placement || {
-      depth: "long",
-      direction: out.ball.placement.direction,
-    },
-    incoming?.ball.isOpponent || false
+  const endCoords = incomingOptions.map((i) =>
+    getCoords(
+      height,
+      width,
+      i?.ball.placement || {
+        depth: "long",
+        direction: out.ball.placement.direction,
+      },
+      i?.ball.isOpponent || false
+    )
   );
-  const [nextX, nextY] = getCoords(
-    HEIGHT,
-    WIDTH,
-    nextExchangeBall?.ball.placement || {
-      depth: "long",
-      direction:
-        incoming?.ball.placement.direction || out.ball.placement.direction,
-    },
-    nextExchangeBall?.ball.isOpponent || false
-  );
-
-  const isBackAndForth = startX === nextX && startY === nextY;
 
   return (
-    <svg
-      width={WIDTH}
-      height={HEIGHT}
-      xmlns="http://www.w3.org/2000/svg"
-      className="mx-auto"
-    >
-      <Table height={HEIGHT} width={WIDTH} />
-      <HighlightedSection
-        tableHeight={HEIGHT}
-        tableWidth={WIDTH}
-        ball={
-          incoming?.ball || {
-            isOpponent: !out.ball.isOpponent,
-            placement: {
-              depth: "long",
-              direction: out.ball.placement.direction,
-            },
-            stroke: out.ball.stroke,
-            spin: out.ball.spin,
-          }
-        }
-      />
-      {/* {nextExchangeBall && (
+    <svg width={width} height={height} xmlns="http://www.w3.org/2000/svg">
+      <Table height={height} width={width} />
+      {incomingOptions.map((incoming) => (
         <HighlightedSection
-          tableHeight={HEIGHT}
-          tableWidth={WIDTH}
-          ball={nextExchangeBall.ball}
+          key={incoming.id}
+          tableHeight={height}
+          tableWidth={width}
+          ball={
+            incoming?.ball || {
+              isOpponent: !out.ball.isOpponent,
+              placement: {
+                depth: "long",
+                direction: out.ball.placement.direction,
+              },
+              stroke: out.ball.stroke,
+              spin: out.ball.spin,
+            }
+          }
         />
-      )} */}
+      ))}
       <text
         x={startX}
         y={out.ball.isOpponent ? startY - 10 : startY + 20}
@@ -96,58 +73,20 @@ export const DrillDiagram = ({ drill, nodeId }: Props) => {
                 )} */}
         {shotTypeShorthand[out.ball.stroke]}
       </text>
-      {/* {incoming && (
-        <text
-          x={endX}
-          y={incoming.ball.isOpponent ? endY - 10 : endY + 20}
-          textAnchor="middle"
-          fontSize="14"
-          fill="white"
-        >
-          {shotTypeShorthand[incoming.ball.stroke]}
-        </text>
-      )} */}
-      <line
-        x1={
-          isBackAndForth
-            ? incoming?.ball.isOpponent
-              ? startX - backAndForthSplit
-              : startX + backAndForthSplit
-            : startX
-        }
-        y1={startY}
-        x2={
-          isBackAndForth
-            ? incoming?.ball.isOpponent
-              ? endX - backAndForthSplit
-              : endX + backAndForthSplit
-            : endX
-        }
-        y2={endY}
-        className="stroke-2 stroke-white"
-      />
-      {nextExchangeBall && (
-        <line
-          x1={
-            isBackAndForth
-              ? nextExchangeBall?.ball.isOpponent
-                ? endX - backAndForthSplit
-                : endX + backAndForthSplit
-              : endX
-          }
-          y1={endY}
-          x2={
-            isBackAndForth
-              ? nextExchangeBall?.ball.isOpponent
-                ? nextX - backAndForthSplit
-                : nextX + backAndForthSplit
-              : nextX
-          }
-          y2={nextY}
-          className="stroke-white stroke-2"
-          strokeDasharray="5,5"
-        />
-      )}
+      {incomingOptions.map((incoming, index) => {
+        const [endX, endY] = endCoords[index];
+        return (
+          <line
+            key={incoming.id}
+            x1={startX}
+            y1={startY}
+            x2={endX}
+            y2={endY}
+            className="stroke-2 stroke-white"
+            strokeDasharray={incomingOptions.length > 1 ? "4,2" : "none"}
+          />
+        );
+      })}
     </svg>
   );
 };
