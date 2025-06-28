@@ -25,7 +25,9 @@ type Ball = {
   // repetition?: Repetition;
 };
 
-type LoopBehavior = "continuous" | "free" | "stop";
+export type Exchange = [Ball, Ball];
+
+type LoopBehavior = "continuous" | "free";
 
 export type Drill = {
   name: string;
