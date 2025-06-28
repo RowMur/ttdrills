@@ -71,12 +71,24 @@ export const DrillCard = ({ drill }: Props) => {
         )}
       </div>
       <div className="flex justify-between gap-2 mt-4">
-        <ControlButton onClick={() => setNodeId(drill.graph.entryPoint)}>
+        <ControlButton
+          onClick={() => {
+            setSelectingNextNode(false);
+            setNodeId(drill.graph.entryPoint);
+          }}
+        >
           <RotateCcw />
         </ControlButton>
         <div className="flex justify-center">
           <ControlButton
-            onClick={prevNodeId ? () => setNodeId(prevNodeId) : undefined}
+            onClick={
+              prevNodeId
+                ? () => {
+                    setNodeId(prevNodeId);
+                    setSelectingNextNode(false);
+                  }
+                : undefined
+            }
             disabled={!prevNodeId}
           >
             <ChevronLeft />
@@ -84,7 +96,10 @@ export const DrillCard = ({ drill }: Props) => {
           <ControlButton
             onClick={
               availableNextNodes?.length === 1
-                ? () => setNodeId(availableNextNodes[0].id)
+                ? () => {
+                    setSelectingNextNode(false);
+                    setNodeId(availableNextNodes[0].id);
+                  }
                 : () => setSelectingNextNode(true)
             }
             disabled={!hasNext}
