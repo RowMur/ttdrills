@@ -184,7 +184,7 @@ export const DRILLS: Drill[] = [
       nodes: {
         backhand1: {
           id: "backhand1",
-          prev: null,
+          prev: ["block2"],
           next: ["block1"],
           ball: {
             spin: "top",
@@ -236,7 +236,7 @@ export const DRILLS: Drill[] = [
       nodes: {
         backhand1: {
           id: "backhand1",
-          prev: null,
+          prev: ["block4"],
           next: ["block1"],
           ball: {
             spin: "top",
