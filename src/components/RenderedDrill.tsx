@@ -39,7 +39,12 @@ export const RenderedDrill = ({
       xmlns="http://www.w3.org/2000/svg"
       className="mx-auto"
     >
-      <rect width="100%" height="100%" className="fill-white" />
+      <rect
+        width="100%"
+        height="100%"
+        className="fill-[#1f3a93] stroke-2 stroke-white"
+      />
+      <line x1="100" y1="0" x2="100" y2="360" stroke="white" strokeWidth="1" />
       <rect
         x={endTopLeftX}
         y={endTopLeftY}
@@ -66,39 +71,89 @@ export const RenderedDrill = ({
             : "fill-slate"
         }
       />
+      <line x1="0" y1="177" x2="200" y2="177" stroke="white" strokeWidth="1" />
+      <line
+        x1="0"
+        y1="178"
+        x2="200"
+        y2="178"
+        stroke="black"
+        strokeWidth="1"
+        strokeDasharray="1,1"
+      />
+      <line
+        x1="0"
+        y1="179"
+        x2="200"
+        y2="179"
+        stroke="black"
+        strokeWidth="1"
+        strokeDasharray="1,1"
+        strokeDashoffset={1}
+      />
       <line
         x1="0"
         y1="180"
         x2="200"
         y2="180"
         stroke="black"
-        strokeWidth="2"
-        strokeDasharray="4,4"
+        strokeWidth="1"
+        strokeDasharray="1,1"
       />
       <line
         x1="0"
-        y1="178"
+        y1="181"
         x2="200"
-        y2="178"
-        stroke="gray"
+        y2="181"
+        stroke="black"
         strokeWidth="1"
-        strokeDasharray="2,2"
+        strokeDasharray="1,1"
+        strokeDashoffset={1}
       />
       <line
         x1="0"
         y1="182"
         x2="200"
         y2="182"
-        stroke="gray"
+        stroke="black"
         strokeWidth="1"
-        strokeDasharray="2,2"
+        strokeDasharray="1,1"
+      />
+      <line
+        x1="0"
+        y1="183"
+        x2="200"
+        y2="183"
+        stroke="black"
+        strokeWidth="1"
+        strokeDasharray="1,1"
+        strokeDashoffset={1}
+      />
+      <line
+        x1="0"
+        y1="184"
+        x2="200"
+        y2="184"
+        stroke="black"
+        strokeWidth="1"
+        strokeDasharray="1,1"
+      />
+      <line
+        x1="0"
+        y1="185"
+        x2="200"
+        y2="185"
+        stroke="black"
+        strokeWidth="1"
+        strokeDasharray="1,1"
+        strokeDashoffset={1}
       />
       <text
         x={startX}
         y={startY + 20}
         textAnchor="middle"
         fontSize="14"
-        fill="black"
+        fill="white"
       >
         {/* {ball.repetition && (
                   <>{getRepetitionDisplay(shot.repetition)} </>
@@ -110,7 +165,7 @@ export const RenderedDrill = ({
         y={endY - 10}
         textAnchor="middle"
         fontSize="14"
-        fill="black"
+        fill="white"
       >
         {/* {ball.repetition && (
                   <>{getRepetitionDisplay(shot.repetition)} </>
@@ -122,7 +177,7 @@ export const RenderedDrill = ({
         y1={startY}
         x2={endX}
         y2={endY}
-        className={`stroke-slate stroke-2 ${
+        className={`stroke-2 stroke-white ${
           true ? "" : false ? "opacity-25" : "opacity-0"
         }`}
         strokeDasharray={true ? "none" : "5,5"}
@@ -132,7 +187,7 @@ export const RenderedDrill = ({
         y1={endY}
         x2={nextX}
         y2={nextY}
-        className={`stroke-slate stroke-2 ${
+        className={`stroke-white stroke-2 ${
           true ? "" : false ? "opacity-25" : "opacity-0"
         }`}
         strokeDasharray={true ? "none" : "5,5"}
