@@ -14,22 +14,36 @@ type Props = {
 };
 
 export const RenderedDrill = ({
-  // drill,
+  drill,
   exchanges,
   activeExchangeIndex,
 }: Props) => {
   const activeExchange = exchanges[activeExchangeIndex];
   const [out, incoming] = activeExchange;
-  const nextExchangeBall =
-    exchanges[(activeExchangeIndex + 1) % exchanges.length][0];
+  const nextExchangeIndex =
+    drill.loopBehavior === "continuous"
+      ? (activeExchangeIndex + 1) % exchanges.length
+      : activeExchangeIndex + 1;
+  const nextExchange = exchanges[nextExchangeIndex];
+  const nextExchangeBall = nextExchange?.[0];
+
+  if (!out) {
+    return null;
+  }
 
   const [startX, startY] = getCoords(out.placement, false);
   const [endX, endY, endTopLeftX, endTopLeftY] = getCoords(
-    incoming.placement,
+    incoming?.placement || {
+      depth: "long",
+      direction: out.placement.direction,
+    },
     true
   );
   const [nextX, nextY, nextTopLeftX, nextTopleftY] = getCoords(
-    nextExchangeBall.placement,
+    nextExchangeBall?.placement || {
+      depth: "long",
+      direction: incoming?.placement.direction || out.placement.direction,
+    },
     false
   );
   return (
@@ -51,26 +65,28 @@ export const RenderedDrill = ({
         width={sectionWidth}
         height={sectionHeight}
         className={
-          incoming.spin === "top"
+          !incoming || incoming.spin === "top"
             ? "fill-red"
             : incoming.spin === "back"
-            ? "fill-blue"
+            ? "fill-green"
             : "fill-slate"
         }
       />
-      <rect
-        x={nextTopLeftX}
-        y={nextTopleftY}
-        width={sectionWidth}
-        height={sectionHeight}
-        className={
-          incoming.spin === "top"
-            ? "fill-red"
-            : incoming.spin === "back"
-            ? "fill-blue"
-            : "fill-slate"
-        }
-      />
+      {nextExchangeBall && (
+        <rect
+          x={nextTopLeftX}
+          y={nextTopleftY}
+          width={sectionWidth}
+          height={sectionHeight}
+          className={
+            !nextExchangeBall || nextExchangeBall.spin === "top"
+              ? "fill-red"
+              : nextExchangeBall.spin === "back"
+              ? "fill-green"
+              : "fill-slate"
+          }
+        />
+      )}
       <line x1="0" y1="177" x2="200" y2="177" stroke="white" strokeWidth="1" />
       <line
         x1="0"
@@ -160,18 +176,20 @@ export const RenderedDrill = ({
                 )} */}
         {shotTypeShorthand[out.stroke]}
       </text>
-      <text
-        x={endX}
-        y={endY - 10}
-        textAnchor="middle"
-        fontSize="14"
-        fill="white"
-      >
-        {/* {ball.repetition && (
+      {incoming && (
+        <text
+          x={endX}
+          y={endY - 10}
+          textAnchor="middle"
+          fontSize="14"
+          fill="white"
+        >
+          {/* {ball.repetition && (
                   <>{getRepetitionDisplay(shot.repetition)} </>
-                )} */}
-        {shotTypeShorthand[incoming.stroke]}
-      </text>
+                  )} */}
+          {shotTypeShorthand[incoming.stroke]}
+        </text>
+      )}
       <line
         x1={startX}
         y1={startY}
@@ -182,16 +200,18 @@ export const RenderedDrill = ({
         }`}
         strokeDasharray={true ? "none" : "5,5"}
       />
-      <line
-        x1={endX}
-        y1={endY}
-        x2={nextX}
-        y2={nextY}
-        className={`stroke-white stroke-2 ${
-          true ? "" : false ? "opacity-25" : "opacity-0"
-        }`}
-        strokeDasharray={true ? "none" : "5,5"}
-      />
+      {nextExchangeBall && (
+        <line
+          x1={endX}
+          y1={endY}
+          x2={nextX}
+          y2={nextY}
+          className={`stroke-white stroke-2 ${
+            true ? "" : false ? "opacity-25" : "opacity-0"
+          }`}
+          strokeDasharray={true ? "none" : "5,5"}
+        />
+      )}
       {/* <circle
         cx={endX}
         cy={endY}

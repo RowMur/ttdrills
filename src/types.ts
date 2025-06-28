@@ -25,7 +25,7 @@ type Ball = {
   // repetition?: Repetition;
 };
 
-export type Exchange = [Ball, Ball];
+export type Exchange = [Ball | undefined, Ball | undefined];
 
 type LoopBehavior = "continuous" | "free";
 

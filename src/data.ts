@@ -199,4 +199,40 @@ export const DRILLS: Drill[] = [
   //   ],
   //   loopBehavior: "continuous",
   // },
+  {
+    name: "Flick and Down the Line",
+    balls: [
+      {
+        spin: "back",
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "back",
+        stroke: "backhand",
+        placement: { depth: "short", direction: "backhand" },
+      },
+      {
+        spin: "back",
+        stroke: "backhand",
+        placement: { depth: "short", direction: "middle" },
+      },
+      {
+        spin: "top",
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        stroke: "forehand",
+        placement: { depth: "long", direction: "forehand" },
+      },
+    ],
+    loopBehavior: "free",
+  },
 ];
