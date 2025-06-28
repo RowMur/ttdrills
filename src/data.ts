@@ -3,6 +3,7 @@ import { Drill, ShotType } from "@/types";
 export const shotTypeShorthand: Record<ShotType, string> = {
   forehand: "FH",
   backhand: "BH",
+  serve: "S",
 };
 
 export const DRILLS: Drill[] = [
@@ -204,7 +205,7 @@ export const DRILLS: Drill[] = [
     balls: [
       {
         spin: "back",
-        stroke: "backhand",
+        stroke: "serve",
         placement: { depth: "long", direction: "backhand" },
       },
       {
@@ -225,6 +226,32 @@ export const DRILLS: Drill[] = [
       {
         spin: "top",
         stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        stroke: "forehand",
+        placement: { depth: "long", direction: "forehand" },
+      },
+    ],
+    loopBehavior: "free",
+  },
+  {
+    name: "3rd Ball Forehand Pivot",
+    balls: [
+      {
+        spin: "no",
+        stroke: "serve",
+        placement: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "no",
+        stroke: "backhand",
+        placement: { depth: "long", direction: "backhand" },
+      },
+      {
+        spin: "top",
+        stroke: "forehand",
         placement: { depth: "long", direction: "backhand" },
       },
       {

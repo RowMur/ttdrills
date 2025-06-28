@@ -9,7 +9,7 @@ export type Placement = {
   direction: Direction;
 };
 
-export type ShotType = "forehand" | "backhand";
+export type ShotType = "forehand" | "backhand" | "serve";
 
 // export type Repetition =
 //   | number

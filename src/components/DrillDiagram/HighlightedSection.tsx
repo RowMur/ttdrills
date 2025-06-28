@@ -32,7 +32,7 @@ export const HighlightedSection = (props: Props) => {
           ? "fill-red"
           : props.ball.spin === "back"
           ? "fill-green"
-          : "fill-slate"
+          : "fill-light-grey"
       }
     />
   );
