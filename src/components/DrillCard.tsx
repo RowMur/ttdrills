@@ -1,4 +1,4 @@
-import { RenderedDrill } from "@/components/RenderedDrill";
+import { DrillDiagram } from "@/components/DrillDiagram/DrillDiagram";
 import { Tag } from "@/components/Tag";
 import { Drill, Exchange } from "@/types";
 import { modulo } from "@/utils/modulo";
@@ -21,7 +21,7 @@ export const DrillCard = ({ drill }: Props) => {
       <div className="flex flex-wrap gap-2 mb-4">
         <Tag text={drill.loopBehavior} />
       </div>
-      <RenderedDrill
+      <DrillDiagram
         drill={drill}
         exchanges={exchanges}
         activeExchangeIndex={activeExchangeIndex}

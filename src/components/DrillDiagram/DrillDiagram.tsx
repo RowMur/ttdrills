@@ -15,7 +15,7 @@ type Props = {
   activeExchangeIndex: number;
 };
 
-export const RenderedDrill = ({
+export const DrillDiagram = ({
   drill,
   exchanges,
   activeExchangeIndex,
