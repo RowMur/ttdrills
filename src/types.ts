@@ -40,5 +40,6 @@ type StepGraph = {
 
 export type Drill = {
   name: string;
+  slug: string;
   graph: StepGraph;
 };

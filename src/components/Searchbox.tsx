@@ -15,7 +15,7 @@ export const Searchbox = () => {
   const handleSearch = useCallback(
     (query: string) => {
       if (query) {
-        router.push(`?${SEARCH_KEY}=${encodeURIComponent(query)}`);
+        router.push(`/?${SEARCH_KEY}=${encodeURIComponent(query)}`);
       } else {
         router.push("/");
       }
@@ -24,7 +24,7 @@ export const Searchbox = () => {
   );
 
   return (
-    <div className="flex gap-2 mb-8 mx-auto w-60 md:w-72">
+    <div className="flex gap-2 w-72">
       <input
         type="text"
         placeholder="Search drills..."

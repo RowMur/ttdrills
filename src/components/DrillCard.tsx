@@ -4,6 +4,7 @@ import { ControlButton } from "@/components/ControlButton";
 import { DrillDiagram } from "@/components/DrillDiagram/DrillDiagram";
 import { Drill, Node } from "@/types";
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 const DIAGRAM_HEIGHT = 360;
@@ -39,11 +40,11 @@ export const DrillCard = ({ drill }: Props) => {
 
   return (
     <div className="shadow-lg p-4 rounded-lg bg-grey w-[232px] flex flex-col">
-      <h2 className="font-semibold mb-2 text-wrap grow">{drill.name}</h2>
-      {/* TODO: Find some way to dynamically check if it's continuous */}
-      {/* <div className="flex flex-wrap gap-2 mb-4">
-        <Tag text={drill.loopBehavior} />
-      </div> */}
+      <h2 className="font-semibold mb-2 text-wrap grow">
+        <Link href={`/drills/${drill.slug}`} className="hover:underline">
+          {drill.name}
+        </Link>
+      </h2>
       <div className={`relative w-fit mx-auto`}>
         <DrillDiagram
           drill={drill}

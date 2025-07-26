@@ -9,6 +9,7 @@ export const shotTypeShorthand: Record<ShotType, string> = {
 export const DRILLS: Drill[] = [
   {
     name: "2 Backhands, 2 Forehands",
+    slug: "2-backhands-2-forehands",
     graph: {
       entryPoint: "backhand1",
       nodes: {
@@ -105,6 +106,7 @@ export const DRILLS: Drill[] = [
   },
   {
     name: "Falkenberg",
+    slug: "falkenberg",
     graph: {
       entryPoint: "backhand1",
       nodes: {
@@ -179,6 +181,7 @@ export const DRILLS: Drill[] = [
   },
   {
     name: "1 Backhand, 1 Forehand",
+    slug: "1-backhand-1-forehand",
     graph: {
       entryPoint: "backhand1",
       nodes: {
@@ -231,6 +234,7 @@ export const DRILLS: Drill[] = [
   },
   {
     name: "Backhand, Middle, Backhand, Wide",
+    slug: "backhand-middle-backhand-wide",
     graph: {
       entryPoint: "backhand1",
       nodes: {
@@ -327,6 +331,7 @@ export const DRILLS: Drill[] = [
   },
   {
     name: "1/2 Backhand, 1 Forehand",
+    slug: "1-2-backhand-1-forehand",
     graph: {
       entryPoint: "backhand1",
       nodes: {
@@ -401,6 +406,7 @@ export const DRILLS: Drill[] = [
   },
   {
     name: "1/2 Backhand, 1/2 Forehand",
+    slug: "1-2-backhand-1-2-forehand",
     graph: {
       entryPoint: "backhand1",
       nodes: {
@@ -497,6 +503,7 @@ export const DRILLS: Drill[] = [
   },
   {
     name: "Flick and Down the Line",
+    slug: "flick-and-down-the-line",
     graph: {
       entryPoint: "serve",
       nodes: {
@@ -571,6 +578,7 @@ export const DRILLS: Drill[] = [
   },
   {
     name: "3rd Ball Forehand Pivot",
+    slug: "3rd-ball-forehand-pivot",
     graph: {
       entryPoint: "serve",
       nodes: {
