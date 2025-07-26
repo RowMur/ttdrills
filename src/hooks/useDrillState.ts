@@ -1,4 +1,5 @@
 import { Drill, Node } from "@/types";
+import { isPlaceholderPositioningNode } from "@/utils/isPlaceholderPositioningNode";
 import { useCallback, useMemo, useState } from "react";
 
 type Input = {
@@ -21,7 +22,7 @@ export const useDrillState = (input: Input) => {
     const availableNextNodes: Node[] | undefined = [];
     for (const nextNodeId of nextNodeIds) {
       const nextNode = drill.graph.nodes[nextNodeId];
-      if (nextNode?.next && nextNode.next !== null) {
+      if (!isPlaceholderPositioningNode(nextNode)) {
         availableNextNodes.push(nextNode);
       }
     }

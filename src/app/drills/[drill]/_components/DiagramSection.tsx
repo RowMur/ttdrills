@@ -5,6 +5,7 @@ import { ControlButton } from "@/components/ControlButton";
 import { DrillDiagram } from "@/components/DrillDiagram/DrillDiagram";
 import { useDrillState } from "@/hooks/useDrillState";
 import { Drill, Node } from "@/types";
+import { isPlaceholderPositioningNode } from "@/utils/isPlaceholderPositioningNode";
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { useMemo } from "react";
 
@@ -134,6 +135,12 @@ const getDrillPaths = (drill: Drill) => {
       paths.push(path);
       return;
     }
+
+    if (isPlaceholderPositioningNode(node)) {
+      paths.push(path);
+      return;
+    }
+
     path.push(nodeId);
 
     if (node.next && node.next.length > 0) {
