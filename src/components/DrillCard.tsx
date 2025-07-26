@@ -38,15 +38,13 @@ export const DrillCard = ({ drill }: Props) => {
   const prevNodeId = drill.graph.nodes[nodeId].prev?.[0];
 
   return (
-    <div className="shadow-lg p-4 rounded-lg bg-grey">
-      <h2 className="font-semibold mb-2 text-wrap">{drill.name}</h2>
+    <div className="shadow-lg p-4 rounded-lg bg-grey w-[232px] flex flex-col">
+      <h2 className="font-semibold mb-2 text-wrap grow">{drill.name}</h2>
       {/* TODO: Find some way to dynamically check if it's continuous */}
       {/* <div className="flex flex-wrap gap-2 mb-4">
         <Tag text={drill.loopBehavior} />
       </div> */}
-      <div
-        className={`relative min-w-[${DIAGRAM_WIDTH}px] w-fit h-[${DIAGRAM_HEIGHT}px] mx-auto`}
-      >
+      <div className={`relative w-fit mx-auto`}>
         <DrillDiagram
           drill={drill}
           nodeId={nodeId}

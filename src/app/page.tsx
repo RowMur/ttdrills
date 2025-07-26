@@ -1,5 +1,3 @@
-"use client";
-
 import { DrillCard } from "@/components/DrillCard";
 import { DRILLS } from "@/data";
 
