@@ -9,7 +9,7 @@ type Props = {
   nodeId: string;
   selectingNextNode: boolean;
   availableNextNodes: Node[];
-  goToNode: (nodeId: string) => void;
+  goToNextNodeOption: (nodeId: string) => void;
   height: number;
   width: number;
 };
@@ -19,7 +19,7 @@ export const DrillDiagram = ({
   nodeId,
   selectingNextNode,
   availableNextNodes,
-  goToNode,
+  goToNextNodeOption,
   height,
   width,
 }: Props) => {
@@ -32,7 +32,7 @@ export const DrillDiagram = ({
             <ControlButton
               key={nextNode.id}
               onClick={() => {
-                goToNode(nextNode.id);
+                goToNextNodeOption(nextNode.id);
               }}
             >
               {nextNode.ball.placement.direction}{" "}

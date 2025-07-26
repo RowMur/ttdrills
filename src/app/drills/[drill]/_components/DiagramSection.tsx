@@ -18,15 +18,32 @@ type Props = {
 export const DiagramSection = ({ drill }: Props) => {
   const {
     nodeId,
+    path,
     availableNextNodes,
     selectingNextNode,
-    goToNode,
     reset,
     goBack,
     canGoBack,
     goForward,
     canGoForward,
+    goToNextNodeOption,
   } = useDrillState({ drill });
+
+  const paths = useMemo(() => getDrillPaths(drill), [drill]);
+  console.log("Path:", path);
+  const currentValidPaths = [];
+  for (const pathOption of paths) {
+    for (let i = 0; i < path.length; i++) {
+      if (pathOption[i] !== path[i]) {
+        break;
+      }
+      if (i === path.length - 1) {
+        currentValidPaths.push(pathOption);
+      }
+    }
+  }
+
+  console.log("Current valid paths:", currentValidPaths);
 
   const steps = useMemo(() => getSteps(drill), [drill]);
 
@@ -40,7 +57,7 @@ export const DiagramSection = ({ drill }: Props) => {
           width={DIAGRAM_WIDTH}
           selectingNextNode={selectingNextNode}
           availableNextNodes={availableNextNodes}
-          goToNode={goToNode}
+          goToNextNodeOption={goToNextNodeOption}
         />
       </div>
       <div className="grow bg-grey rounded flex flex-col p-4 gap-4">
@@ -118,4 +135,30 @@ const getSteps = (drill: Drill) => {
   }
 
   return steps;
+};
+
+const getDrillPaths = (drill: Drill) => {
+  const paths: string[][] = [];
+
+  const traverse = (nodeId: string, path: string[], exitId: string) => {
+    const node = drill.graph.nodes[nodeId];
+    if (!node) return;
+
+    if (nodeId === exitId && path.length > 0) {
+      paths.push(path);
+      return;
+    }
+    path.push(nodeId);
+
+    if (node.next && node.next.length > 0) {
+      for (const nextNodeId of node.next) {
+        traverse(nextNodeId, [...path], exitId);
+      }
+    } else {
+      paths.push(path);
+    }
+  };
+
+  traverse(drill.graph.entryPoint, [], drill.graph.entryPoint);
+  return paths;
 };

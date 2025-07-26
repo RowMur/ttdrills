@@ -8,7 +8,8 @@ type Input = {
 export const useDrillState = (input: Input) => {
   const { drill } = input;
 
-  const [nodeId, setNodeId] = useState(drill.graph.entryPoint);
+  const [path, setPath] = useState([drill.graph.entryPoint]);
+  const nodeId = path[path.length - 1];
   const [selectingNextNode, setSelectingNextNode] = useState(false);
 
   const availableNextNodes: Node[] = useMemo(() => {
@@ -31,17 +32,17 @@ export const useDrillState = (input: Input) => {
   const prevNodeId = drill.graph.nodes[nodeId].prev?.[0];
 
   const reset = useCallback(() => {
-    setNodeId(drill.graph.entryPoint);
+    setPath([drill.graph.entryPoint]);
     setSelectingNextNode(false);
   }, [drill.graph.entryPoint]);
 
   const canGoBack = !!prevNodeId;
   const goBack = useCallback(() => {
     if (canGoBack) {
-      setNodeId(prevNodeId);
+      setPath((prev) => [...prev.slice(0, -1)]);
       setSelectingNextNode(false);
     }
-  }, [prevNodeId, canGoBack]);
+  }, [canGoBack]);
 
   const canGoForward = availableNextNodes.length > 0;
   const goForward = useCallback(() => {
@@ -49,19 +50,36 @@ export const useDrillState = (input: Input) => {
 
     if (availableNextNodes?.length === 1) {
       setSelectingNextNode(false);
-      setNodeId(availableNextNodes[0].id);
+      const nextNodeId = availableNextNodes[0].id;
+      if (nextNodeId === drill.graph.entryPoint) {
+        reset();
+        return;
+      }
+      setPath((prev) => [...prev, availableNextNodes[0].id]);
     } else {
       setSelectingNextNode(true);
     }
-  }, [availableNextNodes, canGoForward]);
+  }, [availableNextNodes, canGoForward, reset, drill.graph.entryPoint]);
 
-  const goToNode = useCallback((nodeId: string) => {
-    setNodeId(nodeId);
-    setSelectingNextNode(false);
-  }, []);
+  const goToNextNodeOption = useCallback(
+    (nodeId: string) => {
+      if (availableNextNodes.find((n) => n.id === nodeId)) {
+        setSelectingNextNode(false);
+        if (nodeId === drill.graph.entryPoint) {
+          reset();
+          return;
+        }
+        setPath((prev) => [...prev, nodeId]);
+      } else {
+        console.warn(`Node ID ${nodeId} is not in available next nodes.`);
+      }
+    },
+    [availableNextNodes, drill.graph.entryPoint, reset]
+  );
 
   return {
     nodeId,
+    path,
     reset,
     canGoBack,
     goBack,
@@ -69,6 +87,6 @@ export const useDrillState = (input: Input) => {
     goForward,
     availableNextNodes,
     selectingNextNode,
-    goToNode,
+    goToNextNodeOption,
   };
 };

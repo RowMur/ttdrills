@@ -24,7 +24,7 @@ export const DrillCard = ({ drill }: Props) => {
     goBack,
     canGoForward,
     goForward,
-    goToNode,
+    goToNextNodeOption,
   } = useDrillState({ drill });
 
   return (
@@ -40,7 +40,7 @@ export const DrillCard = ({ drill }: Props) => {
           nodeId={nodeId}
           selectingNextNode={selectingNextNode}
           availableNextNodes={availableNextNodes}
-          goToNode={goToNode}
+          goToNextNodeOption={goToNextNodeOption}
           height={DIAGRAM_HEIGHT}
           width={DIAGRAM_WIDTH}
         />
