@@ -29,14 +29,12 @@ export const useDrillState = (input: Input) => {
     return availableNextNodes;
   }, [drill.graph.nodes, nodeId]);
 
-  const prevNodeId = drill.graph.nodes[nodeId].prev?.[0];
-
   const reset = useCallback(() => {
     setPath([drill.graph.entryPoint]);
     setSelectingNextNode(false);
   }, [drill.graph.entryPoint]);
 
-  const canGoBack = !!prevNodeId;
+  const canGoBack = path.length > 1;
   const goBack = useCallback(() => {
     if (canGoBack) {
       setPath((prev) => [...prev.slice(0, -1)]);

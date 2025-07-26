@@ -43,9 +43,18 @@ export const DiagramSection = ({ drill }: Props) => {
     }
   }
 
-  console.log("Current valid paths:", currentValidPaths);
+  const longestCommonPath = getLongestCommonPath(currentValidPaths);
+  const longestCommonPathNodes = longestCommonPath.map(
+    (nodeId) => drill.graph.nodes[nodeId]
+  );
 
-  const steps = useMemo(() => getSteps(drill), [drill]);
+  const finalInLongestPath =
+    longestCommonPathNodes[longestCommonPathNodes.length - 1];
+  const potentialNextNodes = finalInLongestPath.next?.map(
+    (nodeId) => drill.graph.nodes[nodeId]
+  );
+
+  const steps = groupIntoSteps(longestCommonPathNodes);
 
   return (
     <div className="my-4 flex items-stretch gap-4 flex-col sm:flex-row">
@@ -92,6 +101,20 @@ export const DiagramSection = ({ drill }: Props) => {
               ))}
             </tbody>
           </table>
+          {potentialNextNodes && potentialNextNodes?.length > 1 && (
+            <div className="justify-center flex mt-4 gap-2">
+              {potentialNextNodes.map((node, i) => (
+                <>
+                  <span className="text-xs text-slate-500" key={node.id}>
+                    {node.ball.placement.depth} {node.ball.placement.direction}
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    {i < potentialNextNodes.length - 1 ? "or" : ""}
+                  </span>
+                </>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -99,43 +122,6 @@ export const DiagramSection = ({ drill }: Props) => {
 };
 
 type Step = [Node | null, Node | null];
-
-const getSteps = (drill: Drill) => {
-  const firstNode = drill.graph.nodes[drill.graph.entryPoint];
-  if (!firstNode) return [];
-
-  const steps: Step[] = [];
-  let currentStep: Step = [null, null];
-  let currentNode: Node | null = firstNode;
-  while (currentNode) {
-    if (!currentNode) {
-      break;
-    }
-
-    if (currentStep[0] && currentStep[1]) {
-      steps.push(currentStep);
-      currentStep = [null, null];
-    }
-
-    if (currentNode.ball.isOpponent) {
-      currentStep[1] = currentNode;
-    } else {
-      currentStep[0] = currentNode;
-    }
-
-    const nextNodeId: string | undefined = currentNode.next?.[0];
-    if (nextNodeId === drill.graph.entryPoint) {
-      break;
-    }
-    currentNode = nextNodeId ? drill.graph.nodes[nextNodeId] : null;
-  }
-
-  if (currentStep[0] || currentStep[1]) {
-    steps.push(currentStep);
-  }
-
-  return steps;
-};
 
 const getDrillPaths = (drill: Drill) => {
   const paths: string[][] = [];
@@ -161,4 +147,46 @@ const getDrillPaths = (drill: Drill) => {
 
   traverse(drill.graph.entryPoint, [], drill.graph.entryPoint);
   return paths;
+};
+
+const groupIntoSteps = (nodes: Node[]) => {
+  const steps: Step[] = [];
+  let currentStep: Step = [null, null];
+
+  for (const node of nodes) {
+    if (node.ball.isOpponent) {
+      currentStep[1] = node;
+    } else {
+      currentStep[0] = node;
+    }
+
+    if (currentStep[1]) {
+      steps.push(currentStep);
+      currentStep = [null, null];
+    }
+  }
+
+  if (currentStep[0] || currentStep[1]) {
+    steps.push(currentStep);
+  }
+
+  return steps;
+};
+
+const getLongestCommonPath = (paths: string[][]) => {
+  if (paths.length === 0) return [];
+
+  const minLength = Math.min(...paths.map((p) => p.length));
+  const longestPath: string[] = [];
+
+  for (let i = 0; i < minLength; i++) {
+    const currentNode = paths[0][i];
+    if (paths.every((p) => p[i] === currentNode)) {
+      longestPath.push(currentNode);
+    } else {
+      break;
+    }
+  }
+
+  return longestPath;
 };
