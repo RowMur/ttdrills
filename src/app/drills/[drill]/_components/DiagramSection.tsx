@@ -31,7 +31,6 @@ export const DiagramSection = ({ drill }: Props) => {
   } = useDrillState({ drill });
 
   const paths = useMemo(() => getDrillPaths(drill), [drill]);
-  console.log("Path:", path);
   const currentValidPaths = [];
   for (const pathOption of paths) {
     for (let i = 0; i < path.length; i++) {
