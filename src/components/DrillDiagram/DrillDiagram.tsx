@@ -1,92 +1,46 @@
-import { HighlightedSection } from "@/components/DrillDiagram/HighlightedSection";
-import { Table } from "@/components/DrillDiagram/Table";
-import { shotTypeShorthand } from "@/data";
-import { Drill } from "@/types";
-import { getCoords } from "@/utils/coords";
-// import { getRepetitionDisplay } from "@/utils/getRepetitionDisplay";
+"use client";
+
+import { ControlButton } from "@/components/ControlButton";
+import { DrillView } from "@/components/DrillDiagram/DrillView";
+import { Drill, Node } from "@/types";
 
 type Props = {
   drill: Drill;
   nodeId: string;
+  selectingNextNode: boolean;
+  availableNextNodes: Node[];
+  goToNode: (nodeId: string) => void;
   height: number;
   width: number;
 };
 
-export const DrillDiagram = ({ drill, nodeId, height, width }: Props) => {
-  const out = drill.graph.nodes[nodeId];
-  const incomingOptions = out.next
-    ? out.next.map((i) => drill.graph.nodes[i])
-    : null;
-
-  if (!out || !incomingOptions) {
-    return null;
-  }
-
-  const [startX, startY] = getCoords(
-    height,
-    width,
-    out.ball.placement,
-    out.ball.isOpponent
-  );
-  const endCoords = incomingOptions.map((i) =>
-    getCoords(
-      height,
-      width,
-      i?.ball.placement || {
-        depth: "long",
-        direction: out.ball.placement.direction,
-      },
-      i?.ball.isOpponent || false
-    )
-  );
-
+export const DrillDiagram = ({
+  drill,
+  nodeId,
+  selectingNextNode,
+  availableNextNodes,
+  goToNode,
+  height,
+  width,
+}: Props) => {
   return (
-    <svg width={width} height={height} xmlns="http://www.w3.org/2000/svg">
-      <Table height={height} width={width} />
-      {incomingOptions.map((incoming) => (
-        <HighlightedSection
-          key={incoming.id}
-          tableHeight={height}
-          tableWidth={width}
-          ball={
-            incoming?.ball || {
-              isOpponent: !out.ball.isOpponent,
-              placement: {
-                depth: "long",
-                direction: out.ball.placement.direction,
-              },
-              stroke: out.ball.stroke,
-              spin: out.ball.spin,
-            }
-          }
-        />
-      ))}
-      <text
-        x={startX}
-        y={out.ball.isOpponent ? startY - 10 : startY + 20}
-        textAnchor="middle"
-        fontSize="14"
-        fill="white"
-      >
-        {/* {ball.repetition && (
-                  <>{getRepetitionDisplay(shot.repetition)} </>
-                )} */}
-        {shotTypeShorthand[out.ball.stroke]}
-      </text>
-      {incomingOptions.map((incoming, index) => {
-        const [endX, endY] = endCoords[index];
-        return (
-          <line
-            key={incoming.id}
-            x1={startX}
-            y1={startY}
-            x2={endX}
-            y2={endY}
-            className="stroke-2 stroke-white"
-            strokeDasharray={incomingOptions.length > 1 ? "4,2" : "none"}
-          />
-        );
-      })}
-    </svg>
+    <div className={`relative w-fit mx-auto`}>
+      <DrillView drill={drill} nodeId={nodeId} height={height} width={width} />
+      {selectingNextNode && (
+        <div className="absolute left-0 top-0 size-full bg-slate opacity-80 grid place-items-center">
+          {availableNextNodes.map((nextNode) => (
+            <ControlButton
+              key={nextNode.id}
+              onClick={() => {
+                goToNode(nextNode.id);
+              }}
+            >
+              {nextNode.ball.placement.direction}{" "}
+              {nextNode.ball.placement.depth}
+            </ControlButton>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };

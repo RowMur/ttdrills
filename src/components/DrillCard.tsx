@@ -34,29 +34,15 @@ export const DrillCard = ({ drill }: Props) => {
           {drill.name}
         </Link>
       </h2>
-      <div className={`relative w-fit mx-auto`}>
-        <DrillDiagram
-          drill={drill}
-          nodeId={nodeId}
-          height={DIAGRAM_HEIGHT}
-          width={DIAGRAM_WIDTH}
-        />
-        {selectingNextNode && (
-          <div className="absolute left-0 top-0 size-full bg-slate opacity-80 grid place-items-center">
-            {availableNextNodes.map((nextNode) => (
-              <ControlButton
-                key={nextNode.id}
-                onClick={() => {
-                  goToNode(nextNode.id);
-                }}
-              >
-                {nextNode.ball.placement.direction}{" "}
-                {nextNode.ball.placement.depth}
-              </ControlButton>
-            ))}
-          </div>
-        )}
-      </div>
+      <DrillDiagram
+        drill={drill}
+        nodeId={nodeId}
+        selectingNextNode={selectingNextNode}
+        availableNextNodes={availableNextNodes}
+        goToNode={goToNode}
+        height={DIAGRAM_HEIGHT}
+        width={DIAGRAM_WIDTH}
+      />
       <div className="flex justify-between gap-2 mt-4">
         <ControlButton onClick={reset}>
           <RotateCcw />
