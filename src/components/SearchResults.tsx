@@ -20,7 +20,7 @@ export const SearchResults = () => {
           <p>Found {filteredDrills.length} drills.</p>
         )}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-fit mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-fit mx-auto">
         {filteredDrills.map((drill) => (
           <DrillCard key={drill.name} drill={drill} />
         ))}
