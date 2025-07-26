@@ -19,7 +19,9 @@ const Page = async (props: Props) => {
 
   return (
     <Main>
-      <h2 className="text-xl font-bold">{drill.name}</h2>
+      <h2 className="text-xl font-bold text-center sm:text-left">
+        {drill.name}
+      </h2>
       <DiagramSection drill={drill} />
     </Main>
   );

@@ -44,6 +44,19 @@ export const DiagramSection = ({ drill }: Props) => {
         />
       </div>
       <div className="grow bg-grey rounded flex flex-col p-4 gap-4">
+        <div className="flex justify-between items-end gap-2">
+          <ControlButton onClick={reset}>
+            <RotateCcw />
+          </ControlButton>
+          <div className="flex justify-center">
+            <ControlButton onClick={goBack} disabled={!canGoBack}>
+              <ChevronLeft />
+            </ControlButton>
+            <ControlButton onClick={goForward} disabled={!canGoForward}>
+              <ChevronRight />
+            </ControlButton>
+          </div>
+        </div>
         <div className="grow">
           <table className="w-full">
             <tbody>
@@ -62,19 +75,6 @@ export const DiagramSection = ({ drill }: Props) => {
               ))}
             </tbody>
           </table>
-        </div>
-        <div className="flex justify-between items-end gap-2">
-          <ControlButton onClick={reset}>
-            <RotateCcw />
-          </ControlButton>
-          <div className="flex justify-center">
-            <ControlButton onClick={goBack} disabled={!canGoBack}>
-              <ChevronLeft />
-            </ControlButton>
-            <ControlButton onClick={goForward} disabled={!canGoForward}>
-              <ChevronRight />
-            </ControlButton>
-          </div>
         </div>
       </div>
     </div>
