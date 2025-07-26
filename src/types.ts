@@ -1,4 +1,4 @@
-type Spin = "top" | "back" | "no";
+export type Spin = "top" | "back" | "no" | "block";
 
 type Depth = "short" | "halflong" | "long";
 

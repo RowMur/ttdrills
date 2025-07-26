@@ -1,10 +1,12 @@
-import { Ball } from "@/types";
+import { Placement, Spin } from "@/types";
 import { getSectionDimensions, getCoords } from "@/utils/coords";
 
 type Props = {
   tableHeight: number;
   tableWidth: number;
-  ball: Ball;
+  spin: Spin;
+  placement: Placement;
+  isOpponent: boolean;
 };
 
 export const HighlightedSection = (props: Props) => {
@@ -16,8 +18,8 @@ export const HighlightedSection = (props: Props) => {
   const [, , endTopLeftX, endTopLeftY] = getCoords(
     props.tableHeight,
     props.tableWidth,
-    props.ball.placement,
-    props.ball.isOpponent
+    props.placement,
+    props.isOpponent
   );
 
   return (
@@ -27,9 +29,9 @@ export const HighlightedSection = (props: Props) => {
       width={sectionWidth}
       height={sectionHeight}
       className={
-        props.ball.spin === "top"
+        props.spin === "top"
           ? "fill-red"
-          : props.ball.spin === "back"
+          : props.spin === "back"
           ? "fill-green"
           : "fill-light-grey"
       }

@@ -1,9 +1,22 @@
-import { Drill, ShotType } from "@/types";
+import { Drill, ShotType, Spin } from "@/types";
 
 export const shotTypeShorthand: Record<ShotType, string> = {
   forehand: "FH",
   backhand: "BH",
   serve: "S",
+};
+
+export const shotTypeDisplay: Record<ShotType, string> = {
+  forehand: "FH",
+  backhand: "BH",
+  serve: "Serve",
+};
+
+export const spinDisplay: Record<Spin, string> = {
+  top: "Topspin",
+  back: "Backspin",
+  block: "Block",
+  no: "Float",
 };
 
 export const DRILLS: Drill[] = [
@@ -29,7 +42,7 @@ export const DRILLS: Drill[] = [
           prev: ["backhand1"],
           next: ["backhand2"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -51,7 +64,7 @@ export const DRILLS: Drill[] = [
           prev: ["backhand2"],
           next: ["forehand1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -73,7 +86,7 @@ export const DRILLS: Drill[] = [
           prev: ["forehand1"],
           next: ["forehand2"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -95,7 +108,7 @@ export const DRILLS: Drill[] = [
           prev: ["forehand2"],
           next: ["backhand1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -126,7 +139,7 @@ export const DRILLS: Drill[] = [
           prev: ["backhand1"],
           next: ["forehand1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -148,7 +161,7 @@ export const DRILLS: Drill[] = [
           prev: ["forehand1"],
           next: ["forehand2"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -170,7 +183,7 @@ export const DRILLS: Drill[] = [
           prev: ["forehand2"],
           next: ["backhand1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -201,7 +214,7 @@ export const DRILLS: Drill[] = [
           prev: ["backhand1"],
           next: ["forehand1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -223,7 +236,7 @@ export const DRILLS: Drill[] = [
           prev: ["forehand1"],
           next: ["backhand1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -254,7 +267,7 @@ export const DRILLS: Drill[] = [
           prev: ["backhand1"],
           next: ["middle1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -276,7 +289,7 @@ export const DRILLS: Drill[] = [
           prev: ["middle1"],
           next: ["backhand2"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -298,7 +311,7 @@ export const DRILLS: Drill[] = [
           prev: ["backhand2"],
           next: ["wide1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -320,7 +333,7 @@ export const DRILLS: Drill[] = [
           prev: ["wide1"],
           next: ["backhand1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -351,7 +364,7 @@ export const DRILLS: Drill[] = [
           prev: ["backhand1"],
           next: ["backhand2", "forehand1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -373,7 +386,7 @@ export const DRILLS: Drill[] = [
           prev: ["backhand2"],
           next: ["forehand1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -395,7 +408,7 @@ export const DRILLS: Drill[] = [
           prev: ["forehand1"],
           next: ["backhand1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -426,7 +439,7 @@ export const DRILLS: Drill[] = [
           prev: ["backhand1"],
           next: ["backhand2", "forehand1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -448,7 +461,7 @@ export const DRILLS: Drill[] = [
           prev: ["backhand2"],
           next: ["forehand1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -470,7 +483,7 @@ export const DRILLS: Drill[] = [
           prev: ["forehand1"],
           next: ["forehand2", "backhand1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -492,7 +505,7 @@ export const DRILLS: Drill[] = [
           prev: ["forehand2"],
           next: ["backhand1"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -534,7 +547,7 @@ export const DRILLS: Drill[] = [
           prev: ["touch"],
           next: ["block"],
           ball: {
-            spin: "back",
+            spin: "top",
             stroke: "backhand",
             placement: { depth: "short", direction: "middle" },
             isOpponent: false,
@@ -545,7 +558,7 @@ export const DRILLS: Drill[] = [
           prev: ["flick"],
           next: ["line"],
           ball: {
-            spin: "top",
+            spin: "block",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,
@@ -587,7 +600,7 @@ export const DRILLS: Drill[] = [
           prev: null,
           next: ["return"],
           ball: {
-            spin: "back",
+            spin: "top",
             stroke: "serve",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: false,
@@ -598,7 +611,7 @@ export const DRILLS: Drill[] = [
           prev: ["serve"],
           next: ["forehand-pivot"],
           ball: {
-            spin: "no",
+            spin: "top",
             stroke: "backhand",
             placement: { depth: "long", direction: "backhand" },
             isOpponent: true,

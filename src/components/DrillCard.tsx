@@ -34,15 +34,17 @@ export const DrillCard = ({ drill }: Props) => {
           {drill.name}
         </Link>
       </h2>
-      <DrillDiagram
-        drill={drill}
-        nodeId={nodeId}
-        selectingNextNode={selectingNextNode}
-        availableNextNodes={availableNextNodes}
-        goToNode={goToNode}
-        height={DIAGRAM_HEIGHT}
-        width={DIAGRAM_WIDTH}
-      />
+      <div className="mx-auto">
+        <DrillDiagram
+          drill={drill}
+          nodeId={nodeId}
+          selectingNextNode={selectingNextNode}
+          availableNextNodes={availableNextNodes}
+          goToNode={goToNode}
+          height={DIAGRAM_HEIGHT}
+          width={DIAGRAM_WIDTH}
+        />
+      </div>
       <div className="flex justify-between gap-2 mt-4">
         <ControlButton onClick={reset}>
           <RotateCcw />

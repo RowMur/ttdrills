@@ -24,7 +24,7 @@ export const DrillDiagram = ({
   width,
 }: Props) => {
   return (
-    <div className={`relative w-fit mx-auto`}>
+    <div className={`relative w-fit`}>
       <DrillView drill={drill} nodeId={nodeId} height={height} width={width} />
       {selectingNextNode && (
         <div className="absolute left-0 top-0 size-full bg-slate opacity-80 grid place-items-center">

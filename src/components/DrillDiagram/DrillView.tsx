@@ -47,17 +47,9 @@ export const DrillView = ({ drill, nodeId, height, width }: Props) => {
           key={incoming.id}
           tableHeight={height}
           tableWidth={width}
-          ball={
-            incoming?.ball || {
-              isOpponent: !out.ball.isOpponent,
-              placement: {
-                depth: "long",
-                direction: out.ball.placement.direction,
-              },
-              stroke: out.ball.stroke,
-              spin: out.ball.spin,
-            }
-          }
+          placement={incoming.ball.placement}
+          isOpponent={incoming.ball.isOpponent}
+          spin={out.ball.spin}
         />
       ))}
       <text
