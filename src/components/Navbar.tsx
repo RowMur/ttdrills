@@ -1,13 +1,8 @@
-"use client";
-
-import { Searchbox } from "@/components/Searchbox";
+import { SearchboxWithPageCheckWrapper } from "@/components/Searchbox";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 
 export const Navbar = () => {
-  const pathname = usePathname();
-  const isHome = pathname === "/";
-
   return (
     <nav className="max-w-3xl mx-auto mb-4 px-4 text-white">
       <div className="flex justify-between items-center gap-4 min-h-20 bg-grey rounded-b-3xl p-4">
@@ -16,7 +11,9 @@ export const Navbar = () => {
             Table Tennis Drills
           </Link>
         </h1>
-        {!isHome && <Searchbox />}
+        <Suspense fallback={<div>Loading Search...</div>}>
+          <SearchboxWithPageCheckWrapper />
+        </Suspense>
       </div>
     </nav>
   );

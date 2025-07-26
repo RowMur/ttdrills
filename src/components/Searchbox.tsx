@@ -3,7 +3,7 @@
 import { SEARCH_KEY } from "@/constants";
 import { useSearchTerm } from "@/hooks/useSearchTerm";
 import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 export const Searchbox = () => {
@@ -45,4 +45,11 @@ export const Searchbox = () => {
       </button>
     </div>
   );
+};
+
+export const SearchboxWithPageCheckWrapper = () => {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
+  return isHome ? null : <Searchbox />;
 };
