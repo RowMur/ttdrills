@@ -94,7 +94,7 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
         <label className="block text-sm font-medium text-white mb-2">
           Difficulty *
         </label>
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
           {(Object.keys(difficultyDisplay) as DifficultyLevel[]).map(
             (level) => (
               <button
