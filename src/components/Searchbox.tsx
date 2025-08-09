@@ -4,7 +4,7 @@ import { SEARCH_KEY } from "@/constants";
 import { useSearchTerm } from "@/hooks/useSearchTerm";
 import { getRandomDrill } from "@/utils/drillSearch";
 import { Search, Dice6 } from "lucide-react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 export const Searchbox = () => {
