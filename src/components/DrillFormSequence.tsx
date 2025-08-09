@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { StepGraph, Node, ShotType, Spin, Placement } from "@/types";
 import { shotTypeDisplay, spinDisplay } from "@/data";
-import { Plus, X, ArrowRight } from "lucide-react";
+import { Plus, X, ArrowRight, AlertTriangle } from "lucide-react";
 
 type Props = {
   sequence: StepGraph;
@@ -37,6 +37,10 @@ export const DrillFormSequence = ({ onChange }: Props) => {
     return [initialNode];
   });
   const [entryPoint, setEntryPoint] = useState("shot1");
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    nodeId: string;
+    cascadeNodes: string[];
+  } | null>(null);
 
   // Initialize the sequence with the default shot
   useEffect(() => {
@@ -107,37 +111,245 @@ export const DrillFormSequence = ({ onChange }: Props) => {
     updateSequence(finalNodes, entryPoint);
   };
 
+  const isValidBackwardConnection = (
+    toNodeId: string,
+    fromNodeId: string
+  ): boolean => {
+    // Allow connections back to the entry point (start of drill) from any node
+    // This enables looping drill patterns
+    if (fromNodeId === entryPoint) {
+      return true;
+    }
+
+    // Prevent other cycles by checking if fromNodeId is reachable from toNodeId
+    // If it is, then adding this connection would create a cycle
+    const visited = new Set<string>();
+    const queue = [toNodeId];
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()!;
+      if (visited.has(currentId)) continue;
+
+      // If we reach the fromNode while traversing forward from toNode,
+      // then adding this connection would create a cycle
+      if (currentId === fromNodeId) {
+        return false;
+      }
+
+      visited.add(currentId);
+      const currentNode = nodes.find((n) => n.id === currentId);
+      if (currentNode) {
+        queue.push(...currentNode.next);
+      }
+    }
+
+    return true; // No cycle detected, connection is valid
+  };
+
+  const canRemovePreviousConnection = (
+    nodeId: string,
+    prevNodeId: string
+  ): boolean => {
+    const node = nodes.find((n) => n.id === nodeId);
+    if (!node) return false;
+
+    // Don't allow removal if this is the only connection to this node (would make it unreachable)
+    if (node.prev.length <= 1 && node.id !== entryPoint) {
+      return false;
+    }
+
+    // Check if removing this connection would make any nodes unreachable
+    const testNodes = nodes.map((n) => ({ ...n }));
+    const testNode = testNodes.find((n) => n.id === nodeId);
+    const testPrevNode = testNodes.find((n) => n.id === prevNodeId);
+
+    if (testNode && testPrevNode) {
+      // Remove the connection
+      testNode.prev = testNode.prev.filter((id) => id !== prevNodeId);
+      testPrevNode.next = testPrevNode.next.filter((id) => id !== nodeId);
+
+      // Check if all nodes are still reachable from entry point
+      return isGraphConnected(testNodes, entryPoint);
+    }
+
+    return false;
+  };
+
+  const isGraphConnected = (
+    nodeList: NodeFormData[],
+    entryPointId: string
+  ): boolean => {
+    const visited = new Set<string>();
+    const queue = [entryPointId];
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()!;
+      if (visited.has(currentId)) continue;
+
+      visited.add(currentId);
+      const currentNode = nodeList.find((n) => n.id === currentId);
+      if (currentNode) {
+        queue.push(...currentNode.next);
+      }
+    }
+
+    // All nodes should be reachable from entry point
+    return visited.size === nodeList.length;
+  };
+
+  const findCascadeNodes = (nodeId: string): string[] => {
+    // Find all nodes that would become unreachable if this node is deleted
+    const cascadeNodes: string[] = [];
+    const visited = new Set<string>();
+    const queue = [nodeId];
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()!;
+      if (visited.has(currentId)) continue;
+
+      visited.add(currentId);
+      cascadeNodes.push(currentId);
+
+      const currentNode = nodes.find((n) => n.id === currentId);
+      if (currentNode) {
+        // Add all next nodes that would become unreachable
+        for (const nextId of currentNode.next) {
+          // Never cascade delete the entry point (start shot)
+          if (nextId === entryPoint) {
+            continue;
+          }
+
+          const nextNode = nodes.find((n) => n.id === nextId);
+          if (nextNode) {
+            // If this next node has no other previous connections besides the current node,
+            // it would become unreachable
+            const otherPrevConnections = nextNode.prev.filter(
+              (id) => id !== currentId
+            );
+            if (otherPrevConnections.length === 0) {
+              queue.push(nextId);
+            }
+          }
+        }
+      }
+    }
+
+    return cascadeNodes;
+  };
+
+  const addPreviousConnection = (toNodeId: string, fromNodeId: string) => {
+    const updatedNodes = [...nodes];
+    const toNode = updatedNodes.find((n) => n.id === toNodeId);
+    const fromNode = updatedNodes.find((n) => n.id === fromNodeId);
+
+    if (toNode && fromNode && !toNode.prev.includes(fromNodeId)) {
+      toNode.prev.push(fromNodeId);
+      if (!fromNode.next.includes(toNodeId)) {
+        fromNode.next.push(toNodeId);
+      }
+
+      const finalNodes = recalculatePlayerAssignments(updatedNodes);
+      setNodes(finalNodes);
+      updateSequence(finalNodes, entryPoint);
+    }
+  };
+
+  const removePreviousConnection = (nodeId: string, prevNodeId: string) => {
+    const updatedNodes = [...nodes];
+    const node = updatedNodes.find((n) => n.id === nodeId);
+    const prevNode = updatedNodes.find((n) => n.id === prevNodeId);
+
+    if (node && prevNode) {
+      node.prev = node.prev.filter((id) => id !== prevNodeId);
+      prevNode.next = prevNode.next.filter((id) => id !== nodeId);
+
+      const finalNodes = recalculatePlayerAssignments(updatedNodes);
+      setNodes(finalNodes);
+      updateSequence(finalNodes, entryPoint);
+    }
+  };
+
   const removeNode = (index: number) => {
-    // Don't allow removing the last shot
+    // Don't allow removing the last shot or the starting shot
     if (nodes.length <= 1) {
       return;
     }
 
     const nodeToRemove = nodes[index];
-    const updatedNodes = nodes.filter((_, i) => i !== index);
+    // Don't allow removing the entry point (starting shot)
+    if (nodeToRemove.id === entryPoint) {
+      return;
+    }
+    const cascadeNodes = findCascadeNodes(nodeToRemove.id);
 
-    // Update connections
+    // If there are cascade nodes (nodes that would become unreachable), show confirmation
+    if (cascadeNodes.length > 1) {
+      // More than just the node being deleted
+      setDeleteConfirmation({
+        nodeId: nodeToRemove.id,
+        cascadeNodes: cascadeNodes,
+      });
+      return;
+    }
+
+    // If no cascade nodes, proceed with simple deletion
+    performNodeDeletion([nodeToRemove.id]);
+  };
+
+  const performNodeDeletion = (nodeIdsToDelete: string[]) => {
+    let updatedNodes = [...nodes];
+
+    // Remove all nodes in the cascade
+    updatedNodes = updatedNodes.filter(
+      (node) => !nodeIdsToDelete.includes(node.id)
+    );
+
+    // Update connections - remove references to deleted nodes
     updatedNodes.forEach((node) => {
-      node.prev = node.prev.filter((id) => id !== nodeToRemove.id);
-      node.next = node.next.filter((id) => id !== nodeToRemove.id);
+      node.prev = node.prev.filter((id) => !nodeIdsToDelete.includes(id));
+      node.next = node.next.filter((id) => !nodeIdsToDelete.includes(id));
     });
 
     // Recalculate player assignments to maintain alternating pattern
     const finalNodes = recalculatePlayerAssignments(updatedNodes);
     setNodes(finalNodes);
 
-    if (entryPoint === nodeToRemove.id) {
-      setEntryPoint(updatedNodes.length > 0 ? updatedNodes[0].id : "");
+    // Update entry point if needed
+    let newEntryPoint = entryPoint;
+    if (nodeIdsToDelete.includes(entryPoint)) {
+      newEntryPoint = finalNodes.length > 0 ? finalNodes[0].id : "";
+      setEntryPoint(newEntryPoint);
     }
 
-    updateSequence(
-      finalNodes,
-      entryPoint === nodeToRemove.id
-        ? finalNodes.length > 0
-          ? finalNodes[0].id
-          : ""
-        : entryPoint
-    );
+    updateSequence(finalNodes, newEntryPoint);
+  };
+
+  const confirmDelete = () => {
+    if (deleteConfirmation) {
+      performNodeDeletion(deleteConfirmation.cascadeNodes);
+      setDeleteConfirmation(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirmation(null);
+  };
+
+  const addNextConnection = (fromIndex: number, toNodeId: string) => {
+    const updatedNodes = [...nodes];
+    const fromNode = updatedNodes[fromIndex];
+    const toNode = updatedNodes.find((n) => n.id === toNodeId);
+
+    if (fromNode && toNode && !fromNode.next.includes(toNodeId)) {
+      fromNode.next.push(toNodeId);
+      if (!toNode.prev.includes(fromNode.id)) {
+        toNode.prev.push(fromNode.id);
+      }
+
+      const finalNodes = recalculatePlayerAssignments(updatedNodes);
+      setNodes(finalNodes);
+      updateSequence(finalNodes, entryPoint);
+    }
   };
 
   const updateNode = (
@@ -224,23 +436,27 @@ export const DrillFormSequence = ({ onChange }: Props) => {
                   {node.isOpponent ? "Opponent" : "Player"}
                 </span>
               </div>
-              <button
-                type="button"
-                onClick={() => removeNode(index)}
-                disabled={nodes.length <= 1}
-                className={`p-2 rounded-lg ${
-                  nodes.length <= 1
-                    ? "bg-text-subtle text-text-muted cursor-not-allowed"
-                    : "bg-danger text-white hover:bg-danger-dark"
-                }`}
-                title={
-                  nodes.length <= 1
-                    ? "Cannot remove the last shot"
-                    : "Remove shot"
-                }
-              >
-                <X className="w-4 h-4" />
-              </button>
+              {node.id !== entryPoint && (
+                <button
+                  type="button"
+                  onClick={() => removeNode(index)}
+                  disabled={nodes.length <= 1 || node.id === entryPoint}
+                  className={`p-2 rounded-lg ${
+                    nodes.length <= 1 || node.id === entryPoint
+                      ? "bg-text-subtle text-text-muted cursor-not-allowed"
+                      : "bg-danger text-white hover:bg-danger-dark"
+                  }`}
+                  title={
+                    node.id === entryPoint
+                      ? "Cannot delete the starting shot"
+                      : nodes.length <= 1
+                      ? "Cannot remove the last shot"
+                      : "Remove shot"
+                  }
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-4 mb-4">
@@ -331,30 +547,230 @@ export const DrillFormSequence = ({ onChange }: Props) => {
               </div>
             </div>
 
-            {/* Add Next Shot Button */}
-            <div className="flex items-center justify-between pt-3 border-t border-border">
-              <div className="flex items-center gap-2 text-sm text-text-subtle">
-                {node.next.length > 0 ? (
-                  <>
-                    <ArrowRight className="w-4 h-4" />
-                    <span>Connects to: {node.next.join(", ")}</span>
-                  </>
-                ) : (
-                  <span>No next shot</span>
-                )}
+            {/* Connections Section */}
+            <div className="pt-3 border-t border-border space-y-3">
+              {/* Previous and Next shots display */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Previous shots */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium text-text">
+                    <span className="text-text-muted">←</span>
+                    Previous shots:
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {node.prev.length > 0 ? (
+                      node.prev.map((prevId) => {
+                        const prevNode = nodes.find((n) => n.id === prevId);
+                        const canRemove = canRemovePreviousConnection(
+                          node.id,
+                          prevId
+                        );
+                        return (
+                          <div
+                            key={prevId}
+                            className={`flex items-center gap-1 px-2 py-1 text-xs rounded border ${
+                              prevNode?.isOpponent
+                                ? "bg-warning/10 text-warning border-warning/30"
+                                : "bg-primary/10 text-primary border-primary/30"
+                            }`}
+                          >
+                            <span>
+                              {prevId} ({prevNode?.isOpponent ? "Opp" : "You"})
+                            </span>
+                            {canRemove && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  removePreviousConnection(node.id, prevId)
+                                }
+                                className="ml-1 text-danger hover:text-danger-dark"
+                                title="Remove this connection"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <span className="text-xs text-text-subtle italic">
+                        {node.id === entryPoint ? "Starting shot" : "None"}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Connect to existing (backwards only) */}
+                  {node.id !== entryPoint &&
+                    nodes.filter(
+                      (n) =>
+                        n.id !== node.id &&
+                        !node.prev.includes(n.id) &&
+                        n.isOpponent !== node.isOpponent && // Different player
+                        isValidBackwardConnection(node.id, n.id)
+                    ).length > 0 && (
+                      <div className="pt-1">
+                        <select
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              addPreviousConnection(node.id, e.target.value);
+                              e.target.value = ""; // Reset selection
+                            }
+                          }}
+                          className="text-xs px-2 py-1 rounded bg-surface text-text border border-border focus:border-primary focus:outline-none"
+                          defaultValue=""
+                        >
+                          <option value="" disabled>
+                            Add previous shot...
+                          </option>
+                          {nodes
+                            .filter(
+                              (n) =>
+                                n.id !== node.id &&
+                                !node.prev.includes(n.id) &&
+                                n.isOpponent !== node.isOpponent && // Different player
+                                isValidBackwardConnection(node.id, n.id)
+                            )
+                            .map((targetNode) => (
+                              <option key={targetNode.id} value={targetNode.id}>
+                                {targetNode.id} (
+                                {targetNode.isOpponent ? "Opp" : "You"})
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+                    )}
+                </div>
+
+                {/* Next shots */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium text-text">
+                    <span className="text-text-muted">→</span>
+                    Next shots:
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {node.next.length > 0 ? (
+                      node.next.map((nextId) => {
+                        const nextNode = nodes.find((n) => n.id === nextId);
+                        return (
+                          <span
+                            key={nextId}
+                            className={`px-2 py-1 text-xs rounded border ${
+                              nextNode?.isOpponent
+                                ? "bg-warning/10 text-warning border-warning/30"
+                                : "bg-primary/10 text-primary border-primary/30"
+                            }`}
+                          >
+                            {nextId} ({nextNode?.isOpponent ? "Opp" : "You"})
+                          </span>
+                        );
+                      })
+                    ) : (
+                      <span className="text-xs text-text-subtle italic">
+                        End of sequence
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={() => addNextShot(index)}
-                className="flex items-center gap-2 px-3 py-1 rounded-lg bg-success text-white hover:bg-success-dark text-sm"
-              >
-                <Plus className="w-4 h-4" />
-                Add Next Shot
-              </button>
+
+              {/* Action buttons */}
+              <div className="flex justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => addNextShot(index)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-success text-white hover:bg-success-dark text-sm"
+                >
+                  <Plus className="w-4 h-4" />
+                  Create Next Shot
+                </button>
+
+                {/* Loop back to start button */}
+                {!node.next.includes(entryPoint) &&
+                  node.id !== entryPoint &&
+                  nodes.find((n) => n.id === entryPoint)?.isOpponent !==
+                    node.isOpponent && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        addNextConnection(
+                          nodes.findIndex((n) => n.id === node.id),
+                          entryPoint
+                        )
+                      }
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-dark text-sm"
+                    >
+                      <ArrowRight className="w-4 h-4" />
+                      Loop to Start
+                    </button>
+                  )}
+              </div>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-surface border border-border rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <AlertTriangle className="w-6 h-6 text-warning" />
+              <h3 className="text-lg font-semibold text-text">Delete Shot</h3>
+            </div>
+
+            <div className="mb-4">
+              <p className="text-text-subtle mb-3">
+                Deleting{" "}
+                <span className="font-semibold text-text">
+                  {deleteConfirmation.nodeId}
+                </span>{" "}
+                will also delete the following connected shots:
+              </p>
+
+              <div className="bg-surface-light rounded p-3 mb-4">
+                <div className="flex flex-wrap gap-2">
+                  {deleteConfirmation.cascadeNodes.map((nodeId) => {
+                    const node = nodes.find((n) => n.id === nodeId);
+                    return (
+                      <span
+                        key={nodeId}
+                        className={`px-2 py-1 text-xs rounded border ${
+                          node?.isOpponent
+                            ? "bg-warning/10 text-warning border-warning/30"
+                            : "bg-primary/10 text-primary border-primary/30"
+                        }`}
+                      >
+                        {nodeId} ({node?.isOpponent ? "Opp" : "You"})
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <p className="text-text-subtle text-sm">
+                This action cannot be undone. Are you sure you want to continue?
+              </p>
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={cancelDelete}
+                className="px-4 py-2 rounded bg-surface-light text-text border border-border hover:bg-surface"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDelete}
+                className="px-4 py-2 rounded bg-danger text-white hover:bg-danger-dark"
+              >
+                Delete All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
