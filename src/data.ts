@@ -7,8 +7,8 @@ export const shotTypeShorthand: Record<ShotType, string> = {
 };
 
 export const shotTypeDisplay: Record<ShotType, string> = {
-  forehand: "FH",
-  backhand: "BH",
+  forehand: "Forehand",
+  backhand: "Backhand",
   serve: "Serve",
 };
 

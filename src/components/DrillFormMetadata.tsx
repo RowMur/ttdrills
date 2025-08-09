@@ -13,7 +13,6 @@ type Props = {
     categories: DrillCategory[];
     tips: string[];
     duration: string;
-    equipment: string[];
   };
   onChange: (
     field: string,
@@ -43,13 +42,6 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
       ? data.categories.filter((c) => c !== category)
       : [...data.categories, category];
     onChange("categories", categories);
-  };
-
-  const toggleEquipment = (equipment: string) => {
-    const equipmentList = data.equipment.includes(equipment)
-      ? data.equipment.filter((e) => e !== equipment)
-      : [...data.equipment, equipment];
-    onChange("equipment", equipmentList);
   };
 
   return (
@@ -129,7 +121,7 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
       {/* Categories */}
       <div>
         <label className="block text-sm font-medium text-white mb-2">
-          Categories * (select all that apply)
+          Categories (optional, select all that apply)
         </label>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {(Object.keys(categoryDisplay) as DrillCategory[]).map((category) => (
@@ -149,35 +141,10 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
         </div>
       </div>
 
-      {/* Equipment */}
-      <div>
-        <label className="block text-sm font-medium text-white mb-2">
-          Equipment (optional)
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {["multiball", "robot", "partner", "net", "cones"].map(
-            (equipment) => (
-              <button
-                key={equipment}
-                type="button"
-                onClick={() => toggleEquipment(equipment)}
-                className={`px-3 py-2 rounded-lg text-sm font-medium border capitalize ${
-                  data.equipment.includes(equipment)
-                    ? "bg-surface border-surface text-white"
-                    : "bg-transparent border-border text-text hover:border-text"
-                }`}
-              >
-                {equipment}
-              </button>
-            )
-          )}
-        </div>
-      </div>
-
       {/* Objectives */}
       <div>
         <label className="block text-sm font-medium text-white mb-2">
-          Learning Objectives *
+          Learning Objectives
         </label>
         <div className="space-y-2">
           {data.objectives.map((objective, index) => (
@@ -216,7 +183,7 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
       {/* Tips */}
       <div>
         <label className="block text-sm font-medium text-white mb-2">
-          Coaching Tips *
+          Coaching Tips
         </label>
         <div className="space-y-2">
           {data.tips.map((tip, index) => (

@@ -16,7 +16,6 @@ export default function CreateDrillPage() {
     categories: [] as DrillCategory[],
     tips: [""],
     duration: "",
-    equipment: [] as string[],
   });
 
   const [ballSequence, setBallSequence] = useState<StepGraph>({
@@ -53,7 +52,6 @@ export default function CreateDrillPage() {
       (obj) => obj.trim() !== ""
     );
     const cleanTips = drillData.tips.filter((tip) => tip.trim() !== "");
-    const cleanEquipment = drillData.equipment.filter((eq) => eq.trim() !== "");
 
     const drill: Drill = {
       name: drillData.name,
@@ -64,7 +62,6 @@ export default function CreateDrillPage() {
       categories: drillData.categories,
       tips: cleanTips,
       ...(drillData.duration && { duration: drillData.duration }),
-      ...(cleanEquipment.length > 0 && { equipment: cleanEquipment }),
       graph: ballSequence,
     };
 
@@ -77,12 +74,11 @@ export default function CreateDrillPage() {
   };
 
   const isFormValid = () => {
+    console.log(drillData);
+    console.log(ballSequence);
     return (
       drillData.name.trim() !== "" &&
       drillData.description.trim() !== "" &&
-      drillData.objectives.some((obj) => obj.trim() !== "") &&
-      drillData.categories.length > 0 &&
-      drillData.tips.some((tip) => tip.trim() !== "") &&
       ballSequence.entryPoint !== "" &&
       Object.keys(ballSequence.nodes).length > 0
     );

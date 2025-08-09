@@ -290,7 +290,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
               {/* Direction */}
               <div>
                 <label className="block text-sm font-medium text-text mb-1">
-                  Direction
+                  From
                 </label>
                 <select
                   value={node.direction}

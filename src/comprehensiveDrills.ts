@@ -767,13 +767,14 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
     },
   },
   {
-    name: "Straights and Xs",
-    slug: "straights-and-xs",
-    description: "abcd",
-    objectives: ["Learn"],
+    name: "Forehand (middle), Forehand (wide)",
+    slug: "forehand-middle-forehand-wide",
+    description:
+      "Forehand drive/topspin alternating between middle and wide to a passive blocker.",
+    objectives: [],
     difficulty: "beginner",
-    categories: ["footwork"],
-    tips: ["Tip"],
+    categories: ["attack", "consistency"],
+    tips: [],
     graph: {
       entryPoint: "node1",
       nodes: {
@@ -782,11 +783,11 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
           prev: ["node4"],
           next: ["node2"],
           ball: {
-            stroke: "backhand",
+            stroke: "forehand",
             spin: "top",
             placement: {
               depth: "long",
-              direction: "backhand",
+              direction: "middle",
             },
             isOpponent: false,
           },
@@ -797,7 +798,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
           next: ["node3"],
           ball: {
             stroke: "backhand",
-            spin: "top",
+            spin: "block",
             placement: {
               depth: "long",
               direction: "backhand",
@@ -824,11 +825,11 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
           prev: ["node3"],
           next: ["node1"],
           ball: {
-            stroke: "forehand",
-            spin: "top",
+            stroke: "backhand",
+            spin: "block",
             placement: {
               depth: "long",
-              direction: "forehand",
+              direction: "backhand",
             },
             isOpponent: true,
           },

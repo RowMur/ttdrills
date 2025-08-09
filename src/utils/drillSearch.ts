@@ -37,13 +37,6 @@ function getDrillSearchableText(drill: Drill): string {
     }
   });
 
-  // Add equipment if available
-  if (drill.equipment) {
-    drill.equipment.forEach((equipment) => {
-      searchableTerms.push(equipment.toLowerCase());
-    });
-  }
-
   // Extract terms from all nodes in the drill
   Object.values(drill.graph.nodes).forEach((node: Node) => {
     const { ball } = node;

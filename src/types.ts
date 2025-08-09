@@ -59,6 +59,5 @@ export type Drill = {
   categories: DrillCategory[];
   tips: string[];
   duration?: string; // e.g., "5-10 minutes"
-  equipment?: string[]; // e.g., ["multiball", "robot"]
   graph: StepGraph;
 };
