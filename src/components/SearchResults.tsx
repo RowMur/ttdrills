@@ -66,7 +66,12 @@ export const SearchResults = () => {
           </div>
         )}
       </div>
-      <div className="grid grid-cols-1 min-[560px]:grid-cols-2 min-[800px]:grid-cols-3 gap-4 w-fit mx-auto">
+      <div
+        className="grid grid-cols-1 gap-6"
+        style={{
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+        }}
+      >
         {filteredDrills.map((drill) => (
           <DrillCard key={drill.name} drill={drill} />
         ))}

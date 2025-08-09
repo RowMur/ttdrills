@@ -5,11 +5,18 @@ import { DrillDiagram } from "@/components/DrillDiagram/DrillDiagram";
 import { difficultyDisplay, categoryDisplay } from "@/data";
 import { useDrillState } from "@/hooks/useDrillState";
 import { Drill } from "@/types";
-import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  RotateCcw,
+  Clock,
+  Target,
+  Lightbulb,
+} from "lucide-react";
 import Link from "next/link";
 
-const DIAGRAM_HEIGHT = 360;
-const DIAGRAM_WIDTH = 200;
+const DIAGRAM_HEIGHT = 320;
+const DIAGRAM_WIDTH = 180;
 
 type Props = {
   drill: Drill;
@@ -29,9 +36,10 @@ export const DrillCard = ({ drill }: Props) => {
   } = useDrillState({ drill });
 
   return (
-    <div className="shadow-lg p-4 rounded-lg bg-surface border border-border w-[232px] flex flex-col hover:border-primary-light transition-colors">
-      <div className="mb-2 flex flex-col grow">
-        <h2 className="font-semibold text-wrap grow text-text">
+    <div className="shadow-lg p-6 rounded-lg bg-surface border border-border w-full flex flex-col hover:border-primary-light transition-colors">
+      {/* Header with title and metadata */}
+      <div className="flex-shrink-0">
+        <h2 className="font-semibold text-lg text-text mb-3">
           <Link
             href={`/drills/${drill.slug}`}
             className="hover:text-primary-light transition-colors"
@@ -40,8 +48,8 @@ export const DrillCard = ({ drill }: Props) => {
           </Link>
         </h2>
 
-        {/* Difficulty and primary category */}
-        <div className="flex items-center gap-2 mt-2 flex-wrap">
+        {/* Difficulty and categories */}
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
           <div
             className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium border ${
               drill.difficulty === "beginner"
@@ -54,15 +62,39 @@ export const DrillCard = ({ drill }: Props) => {
             <div className="w-1.5 h-1.5 rounded-full bg-white" />
             <span>{difficultyDisplay[drill.difficulty]}</span>
           </div>
-          {drill.categories[0] && (
-            <span className="text-xs bg-primary text-white px-2 py-1 rounded-full font-medium border border-primary">
-              {categoryDisplay[drill.categories[0]]}
+          {drill.categories.slice(0, 2).map((category) => (
+            <span
+              key={category}
+              className="text-xs bg-primary text-white px-2 py-1 rounded-full font-medium border border-primary"
+            >
+              {categoryDisplay[category]}
+            </span>
+          ))}
+          {drill.categories.length > 2 && (
+            <span className="text-xs bg-surface-light text-text-muted px-2 py-1 rounded-full font-medium border border-border">
+              +{drill.categories.length - 2} more
             </span>
           )}
         </div>
+
+        {/* Duration */}
+        {drill.duration && (
+          <div className="flex items-center gap-2 text-sm text-text-muted mb-2">
+            <Clock className="w-4 h-4" />
+            <span>{drill.duration}</span>
+          </div>
+        )}
+
+        {/* Description */}
+        {drill.description && (
+          <p className="text-sm text-text-muted mb-3 line-clamp-2">
+            {drill.description}
+          </p>
+        )}
       </div>
 
-      <div className="mx-auto">
+      {/* Drill diagram - fixed position */}
+      <div className="flex-shrink-0 mx-auto mb-4">
         <DrillDiagram
           drill={drill}
           nodeId={nodeId}
@@ -73,7 +105,9 @@ export const DrillCard = ({ drill }: Props) => {
           width={DIAGRAM_WIDTH}
         />
       </div>
-      <div className="flex justify-between gap-2 mt-4">
+
+      {/* Controls */}
+      <div className="flex-shrink-0 flex justify-between gap-2 mb-4">
         <ControlButton onClick={reset}>
           <RotateCcw />
         </ControlButton>
@@ -85,6 +119,37 @@ export const DrillCard = ({ drill }: Props) => {
             <ChevronRight />
           </ControlButton>
         </div>
+      </div>
+
+      {/* Additional metadata - grows to fill remaining space */}
+      <div className="flex-grow space-y-2 text-sm overflow-hidden">
+        {/* Objectives */}
+        {drill.objectives &&
+          drill.objectives.length > 0 &&
+          drill.objectives[0] && (
+            <div className="flex items-start gap-2 min-h-0">
+              <Target className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <span className="font-medium text-text">Objective:</span>
+                <p className="text-text-muted line-clamp-2 break-words">
+                  {drill.objectives[0]}
+                </p>
+              </div>
+            </div>
+          )}
+
+        {/* Tips */}
+        {drill.tips && drill.tips.length > 0 && drill.tips[0] && (
+          <div className="flex items-start gap-2 min-h-0">
+            <Lightbulb className="w-4 h-4 text-warning mt-0.5 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <span className="font-medium text-text">Tip:</span>
+              <p className="text-text-muted line-clamp-2 break-words">
+                {drill.tips[0]}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
