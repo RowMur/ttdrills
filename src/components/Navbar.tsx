@@ -1,4 +1,4 @@
-import { SearchboxWithPageCheckWrapper } from "@/components/Searchbox";
+import { Searchbox } from "@/components/Searchbox";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -12,7 +12,7 @@ export const Navbar = () => {
           </Link>
         </h1>
         <Suspense fallback={<div>Loading Search...</div>}>
-          <SearchboxWithPageCheckWrapper />
+          <Searchbox />
         </Suspense>
       </div>
     </nav>
