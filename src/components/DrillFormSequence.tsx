@@ -12,6 +12,7 @@ type Props = {
 
 type NodeFormData = {
   id: string;
+  name: string;
   stroke: ShotType;
   spin: Spin;
   depth: Placement["depth"];
@@ -19,13 +20,15 @@ type NodeFormData = {
   isOpponent: boolean;
   prev: string[];
   next: string[];
+  isPlaceholder?: boolean; // For empty shots that auto-remove
 };
 
 export const DrillFormSequence = ({ onChange }: Props) => {
   const [nodes, setNodes] = useState<NodeFormData[]>(() => {
     // Start with one default shot
     const initialNode: NodeFormData = {
-      id: "shot1",
+      id: "serve",
+      name: "Serve",
       stroke: "forehand",
       spin: "top",
       depth: "long",
@@ -36,17 +39,42 @@ export const DrillFormSequence = ({ onChange }: Props) => {
     };
     return [initialNode];
   });
-  const [entryPoint, setEntryPoint] = useState("shot1");
+  const [entryPoint, setEntryPoint] = useState("serve");
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     nodeId: string;
     cascadeNodes: string[];
   } | null>(null);
+  const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
 
   // Initialize the sequence with the default shot
   useEffect(() => {
     updateSequence(nodes, entryPoint);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run on mount
+  }, []);
+
+  // Generate unique ID from name
+  const generateUniqueId = (name: string): string => {
+    if (!name.trim()) return "";
+
+    // Convert to lowercase, replace spaces with hyphens, remove special chars
+    const baseId = name
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+
+    // Check if ID already exists
+    const existingIds = nodes.map((n) => n.id);
+    if (!existingIds.includes(baseId)) {
+      return baseId;
+    }
+
+    // If exists, append number
+    let counter = 1;
+    while (existingIds.includes(`${baseId}-${counter}`)) {
+      counter++;
+    }
+    return `${baseId}-${counter}`;
+  }; // Only run on mount
 
   const recalculatePlayerAssignments = (nodeList: NodeFormData[]) => {
     const updatedNodes = [...nodeList];
@@ -85,11 +113,14 @@ export const DrillFormSequence = ({ onChange }: Props) => {
   };
 
   const addNextShot = (currentIndex: number) => {
-    const newId = `shot${nodes.length + 1}`;
     const currentNode = nodes[currentIndex];
 
+    // Generate temporary ID for placeholder
+    const tempId = `temp-${Date.now()}`;
+
     const newNode: NodeFormData = {
-      id: newId,
+      id: tempId,
+      name: "",
       stroke: "forehand",
       spin: "top",
       depth: "long",
@@ -97,18 +128,22 @@ export const DrillFormSequence = ({ onChange }: Props) => {
       isOpponent: !currentNode.isOpponent, // Automatically alternate between player and opponent
       prev: [currentNode.id],
       next: [],
+      isPlaceholder: true,
     };
 
     // Update the current node to connect to the new node
     const updatedNodes = [...nodes];
     updatedNodes[currentIndex] = {
       ...currentNode,
-      next: [...currentNode.next, newId],
+      next: [...currentNode.next, tempId],
     };
 
     const finalNodes = recalculatePlayerAssignments([...updatedNodes, newNode]);
     setNodes(finalNodes);
     updateSequence(finalNodes, entryPoint);
+
+    // Start editing the new placeholder
+    setEditingNodeId(tempId);
   };
 
   const isValidBackwardConnection = (
@@ -335,6 +370,69 @@ export const DrillFormSequence = ({ onChange }: Props) => {
     setDeleteConfirmation(null);
   };
 
+  const generatePlaceholderName = () => {
+    const existingNames = nodes.map((n) => n.name.toLowerCase());
+    let counter = 1;
+    let placeholderName = `Shot ${counter}`;
+
+    while (existingNames.includes(placeholderName.toLowerCase())) {
+      counter++;
+      placeholderName = `Shot ${counter}`;
+    }
+
+    return placeholderName;
+  };
+
+  const finalizeShotName = (nodeId: string, name: string) => {
+    const nodeIndex = nodes.findIndex((n) => n.id === nodeId);
+    if (nodeIndex === -1) return;
+
+    const updatedNodes = [...nodes];
+    const node = updatedNodes[nodeIndex];
+
+    // Use provided name or generate placeholder
+    const finalName = name.trim() || generatePlaceholderName();
+
+    // Generate new ID from name
+    const newId = generateUniqueId(finalName);
+    if (!newId) return;
+
+    // Update the node
+    updatedNodes[nodeIndex] = {
+      ...node,
+      id: newId,
+      name: finalName,
+      isPlaceholder: false,
+    };
+
+    // Update all references to the old ID
+    if (node.id !== newId) {
+      updatedNodes.forEach((n) => {
+        if (n.prev.includes(node.id)) {
+          n.prev = n.prev.map((id) => (id === node.id ? newId : id));
+        }
+        if (n.next.includes(node.id)) {
+          n.next = n.next.map((id) => (id === node.id ? newId : id));
+        }
+      });
+
+      // Update entry point if needed
+      let newEntryPoint = entryPoint;
+      if (entryPoint === node.id) {
+        newEntryPoint = newId;
+        setEntryPoint(newId);
+      }
+
+      setNodes(updatedNodes);
+      updateSequence(updatedNodes, newEntryPoint);
+    } else {
+      setNodes(updatedNodes);
+      updateSequence(updatedNodes, entryPoint);
+    }
+
+    setEditingNodeId(null);
+  };
+
   const addNextConnection = (fromIndex: number, toNodeId: string) => {
     const updatedNodes = [...nodes];
     const fromNode = updatedNodes[fromIndex];
@@ -365,7 +463,50 @@ export const DrillFormSequence = ({ onChange }: Props) => {
       | Placement["direction"]
   ) => {
     const updatedNodes = [...nodes];
-    updatedNodes[index] = { ...updatedNodes[index], [field]: value };
+    const currentNode = updatedNodes[index];
+
+    // Handle name changes - regenerate ID
+    if (field === "name" && typeof value === "string") {
+      if (!value.trim()) {
+        return; // Don't allow empty names
+      }
+
+      const oldId = currentNode.id;
+      const newId = generateUniqueId(value);
+
+      if (newId && newId !== oldId) {
+        // Update the node with new ID and name
+        updatedNodes[index] = { ...currentNode, id: newId, name: value.trim() };
+
+        // Update all references to the old ID
+        updatedNodes.forEach((node) => {
+          if (node.prev.includes(oldId)) {
+            node.prev = node.prev.map((id) => (id === oldId ? newId : id));
+          }
+          if (node.next.includes(oldId)) {
+            node.next = node.next.map((id) => (id === oldId ? newId : id));
+          }
+        });
+
+        // Update entry point if needed
+        let newEntryPoint = entryPoint;
+        if (entryPoint === oldId) {
+          newEntryPoint = newId;
+          setEntryPoint(newId);
+        }
+
+        setNodes(updatedNodes);
+        updateSequence(updatedNodes, newEntryPoint);
+        return;
+      } else {
+        // Just update the name if ID doesn't change
+        updatedNodes[index] = { ...currentNode, name: value.trim() };
+      }
+    } else {
+      // Handle other field updates
+      updatedNodes[index] = { ...updatedNodes[index], [field]: value };
+    }
+
     setNodes(updatedNodes);
     updateSequence(updatedNodes, entryPoint);
   };
@@ -418,14 +559,47 @@ export const DrillFormSequence = ({ onChange }: Props) => {
           >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <h3 className="font-semibold text-text">
-                  Shot {index + 1}: {node.id}
+                <div className="flex items-center gap-2">
+                  {editingNodeId === node.id ? (
+                    <input
+                      type="text"
+                      defaultValue={node.name}
+                      autoFocus
+                      className="font-semibold text-text bg-transparent border-b-2 border-primary focus:outline-none"
+                      onBlur={(e) => finalizeShotName(node.id, e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          finalizeShotName(node.id, e.currentTarget.value);
+                        }
+                        if (e.key === "Escape") {
+                          if (node.isPlaceholder) {
+                            // For placeholders, finalize with empty name (will get placeholder name)
+                            finalizeShotName(node.id, "");
+                          } else {
+                            setEditingNodeId(null);
+                          }
+                        }
+                      }}
+                      placeholder="Enter shot name..."
+                    />
+                  ) : (
+                    <h3
+                      className={`font-semibold cursor-pointer hover:text-primary transition-colors ${
+                        node.isPlaceholder
+                          ? "text-text-muted italic"
+                          : "text-text"
+                      }`}
+                      onClick={() => setEditingNodeId(node.id)}
+                    >
+                      {node.name || "Click to name shot"}
+                    </h3>
+                  )}
                   {node.id === entryPoint && (
-                    <span className="ml-2 px-2 py-1 bg-success text-white text-xs rounded">
+                    <span className="px-2 py-1 bg-success text-white text-xs rounded">
                       START
                     </span>
                   )}
-                </h3>
+                </div>
                 <span
                   className={`px-2 py-1 text-xs rounded border ${
                     node.isOpponent
@@ -575,7 +749,8 @@ export const DrillFormSequence = ({ onChange }: Props) => {
                             }`}
                           >
                             <span>
-                              {prevId} ({prevNode?.isOpponent ? "Opp" : "You"})
+                              {prevNode?.name || prevId} (
+                              {prevNode?.isOpponent ? "Opp" : "You"})
                             </span>
                             {canRemove && (
                               <button
@@ -632,7 +807,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
                             )
                             .map((targetNode) => (
                               <option key={targetNode.id} value={targetNode.id}>
-                                {targetNode.id} (
+                                {targetNode.name} (
                                 {targetNode.isOpponent ? "Opp" : "You"})
                               </option>
                             ))}
@@ -660,7 +835,8 @@ export const DrillFormSequence = ({ onChange }: Props) => {
                                 : "bg-primary/10 text-primary border-primary/30"
                             }`}
                           >
-                            {nextId} ({nextNode?.isOpponent ? "Opp" : "You"})
+                            {nextNode?.name || nextId} (
+                            {nextNode?.isOpponent ? "Opp" : "You"})
                           </span>
                         );
                       })
@@ -700,7 +876,8 @@ export const DrillFormSequence = ({ onChange }: Props) => {
                       className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-dark text-sm"
                     >
                       <ArrowRight className="w-4 h-4" />
-                      Loop to Start
+                      Loop to{" "}
+                      {nodes.find((n) => n.id === entryPoint)?.name || "Start"}
                     </button>
                   )}
               </div>
