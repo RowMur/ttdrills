@@ -416,7 +416,7 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
 
     const updatedNodes = [...nodes];
     const node = updatedNodes[nodeIndex];
-    if (node.name === name) return setEditingNodeId(null);
+    if (node.name === name && name) return setEditingNodeId(null);
 
     // Use provided name or generate placeholder
     const finalName = name.trim() || generatePlaceholderName();
@@ -446,7 +446,7 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
       });
 
       setNodes(updatedNodes);
-      updateSequence(updatedNodes, newId);
+      updateSequence(updatedNodes, entryPoint);
     } else {
       setNodes(updatedNodes);
       updateSequence(updatedNodes, entryPoint);
@@ -567,338 +567,352 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
       </div>
 
       <div className="space-y-4">
-        {nodes.map((node, index) => (
-          <div
-            key={node.id}
-            className="bg-surface-light rounded-lg p-4 border border-border"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  {editingNodeId === node.id ? (
-                    <input
-                      type="text"
-                      defaultValue={node.name}
-                      autoFocus
-                      className="font-semibold text-text bg-transparent border-b-2 border-primary focus:outline-none"
-                      onBlur={(e) => finalizeShotName(node.id, e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          finalizeShotName(node.id, e.currentTarget.value);
+        {nodes.map((node, index) => {
+          const prevNodesToDisplay = node.prev.filter(
+            (prevId) => nodes.find((n) => n.id === prevId)?.name
+          );
+          const nextNodesToDisplay = node.next.filter(
+            (nextId) => nodes.find((n) => n.id === nextId)?.name
+          );
+          return (
+            <div
+              key={node.id}
+              className="bg-surface-light rounded-lg p-4 border border-border"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    {editingNodeId === node.id ? (
+                      <input
+                        type="text"
+                        defaultValue={node.name}
+                        autoFocus
+                        className="font-semibold text-text bg-transparent border-b-2 border-primary focus:outline-none"
+                        onBlur={(e) =>
+                          finalizeShotName(node.id, e.target.value)
                         }
-                        if (e.key === "Escape") {
-                          if (node.isPlaceholder) {
-                            // For placeholders, finalize with empty name (will get placeholder name)
-                            finalizeShotName(node.id, "");
-                          } else {
-                            setEditingNodeId(null);
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            finalizeShotName(node.id, e.currentTarget.value);
                           }
-                        }
-                      }}
-                      placeholder="Enter shot name..."
-                    />
-                  ) : (
-                    <h3
-                      className={`font-semibold cursor-pointer hover:text-primary transition-colors ${
-                        node.isPlaceholder
-                          ? "text-text-muted italic"
-                          : "text-text"
-                      }`}
-                      onClick={() => setEditingNodeId(node.id)}
-                    >
-                      {node.name || "Click to name shot"}
-                    </h3>
-                  )}
-                  {node.id === entryPoint && (
-                    <span className="px-2 py-1 bg-success text-white text-xs rounded">
-                      START
-                    </span>
-                  )}
-                </div>
-                <span
-                  className={`px-2 py-1 text-xs rounded border ${
-                    node.isOpponent
-                      ? "bg-warning text-white border-warning"
-                      : "bg-primary text-white border-primary"
-                  }`}
-                >
-                  {node.isOpponent ? "Opponent" : "Player"}
-                </span>
-              </div>
-              {node.id !== entryPoint && (
-                <button
-                  type="button"
-                  onClick={() => removeNode(index)}
-                  disabled={nodes.length <= 1 || node.id === entryPoint}
-                  className={`p-2 rounded-lg ${
-                    nodes.length <= 1 || node.id === entryPoint
-                      ? "bg-text-subtle text-text-muted cursor-not-allowed"
-                      : "bg-danger text-white hover:bg-danger-dark"
-                  }`}
-                  title={
-                    node.id === entryPoint
-                      ? "Cannot delete the starting shot"
-                      : nodes.length <= 1
-                      ? "Cannot remove the last shot"
-                      : "Remove shot"
-                  }
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-
-            <div className="flex flex-wrap gap-4 mb-4">
-              {/* Stroke */}
-              <div>
-                <label className="block text-sm font-medium text-text mb-1">
-                  Stroke
-                </label>
-                <select
-                  value={node.stroke}
-                  onChange={(e) =>
-                    updateNode(index, "stroke", e.target.value as ShotType)
-                  }
-                  className="w-full p-2 rounded-lg bg-surface text-text border border-border focus:border-primary focus:outline-none"
-                >
-                  {(Object.keys(shotTypeDisplay) as ShotType[]).map(
-                    (stroke) => (
-                      <option key={stroke} value={stroke}>
-                        {shotTypeDisplay[stroke]}
-                      </option>
-                    )
-                  )}
-                </select>
-              </div>
-
-              {/* Spin */}
-              <div>
-                <label className="block text-sm font-medium text-text mb-1">
-                  Spin
-                </label>
-                <select
-                  value={node.spin}
-                  onChange={(e) =>
-                    updateNode(index, "spin", e.target.value as Spin)
-                  }
-                  className="w-full p-2 rounded-lg bg-surface text-text border border-border focus:border-primary focus:outline-none"
-                >
-                  {(Object.keys(spinDisplay) as Spin[]).map((spin) => (
-                    <option key={spin} value={spin}>
-                      {spinDisplay[spin]}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Direction */}
-              <div>
-                <label className="block text-sm font-medium text-text mb-1">
-                  From
-                </label>
-                <select
-                  value={node.direction}
-                  onChange={(e) =>
-                    updateNode(
-                      index,
-                      "direction",
-                      e.target.value as Placement["direction"]
-                    )
-                  }
-                  className="w-full p-2 rounded-lg bg-surface text-text border border-border focus:border-primary focus:outline-none"
-                >
-                  <option value="backhand">Backhand</option>
-                  <option value="middle">Middle</option>
-                  <option value="forehand">Forehand</option>
-                </select>
-              </div>
-
-              {/* Depth */}
-              <div>
-                <label className="block text-sm font-medium text-text mb-1">
-                  Depth (from)
-                </label>
-                <select
-                  value={node.depth}
-                  onChange={(e) =>
-                    updateNode(
-                      index,
-                      "depth",
-                      e.target.value as Placement["depth"]
-                    )
-                  }
-                  className="w-full p-2 rounded-lg bg-surface text-text border border-border focus:border-primary focus:outline-none"
-                >
-                  <option value="short">Short</option>
-                  <option value="halflong">Half-Long</option>
-                  <option value="long">Long</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Connections Section */}
-            <div className="pt-3 border-t border-border space-y-3">
-              {/* Previous and Next shots display */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {/* Previous shots */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm font-medium text-text">
-                    <span className="text-text-muted">←</span>
-                    Previous shots:
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    {node.prev.length > 0 ? (
-                      node.prev.map((prevId) => {
-                        const prevNode = nodes.find((n) => n.id === prevId);
-                        const canRemove = canRemovePreviousConnection(
-                          node.id,
-                          prevId
-                        );
-                        return (
-                          <div
-                            key={prevId}
-                            className={`flex items-center gap-1 px-2 py-1 text-xs rounded border ${
-                              prevNode?.isOpponent
-                                ? "bg-warning/10 text-warning border-warning/30"
-                                : "bg-primary/10 text-primary border-primary/30"
-                            }`}
-                          >
-                            <span>
-                              {prevNode?.name || prevId} (
-                              {prevNode?.isOpponent ? "Opp" : "You"})
-                            </span>
-                            {canRemove && (
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  removePreviousConnection(node.id, prevId)
-                                }
-                                className="ml-1 text-danger hover:text-danger-dark"
-                                title="Remove this connection"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            )}
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <span className="text-xs text-text-subtle italic">
-                        {node.id === entryPoint ? "Starting shot" : "None"}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Connect to existing (backwards only) */}
-                  {node.id !== entryPoint &&
-                    nodes.filter(
-                      (n) =>
-                        n.id !== node.id &&
-                        !node.prev.includes(n.id) &&
-                        n.isOpponent !== node.isOpponent && // Different player
-                        isValidBackwardConnection(node.id, n.id)
-                    ).length > 0 && (
-                      <div className="pt-1">
-                        <select
-                          onChange={(e) => {
-                            if (e.target.value) {
-                              addPreviousConnection(node.id, e.target.value);
-                              e.target.value = ""; // Reset selection
+                          if (e.key === "Escape") {
+                            if (node.isPlaceholder) {
+                              // For placeholders, finalize with empty name (will get placeholder name)
+                              finalizeShotName(node.id, "");
+                            } else {
+                              setEditingNodeId(null);
                             }
-                          }}
-                          className="text-xs px-2 py-1 rounded bg-surface text-text border border-border focus:border-primary focus:outline-none"
-                          defaultValue=""
-                        >
-                          <option value="" disabled>
-                            Add previous shot...
-                          </option>
-                          {nodes
-                            .filter(
-                              (n) =>
-                                n.id !== node.id &&
-                                !node.prev.includes(n.id) &&
-                                n.isOpponent !== node.isOpponent && // Different player
-                                isValidBackwardConnection(node.id, n.id)
-                            )
-                            .map((targetNode) => (
-                              <option key={targetNode.id} value={targetNode.id}>
-                                {targetNode.name} (
-                                {targetNode.isOpponent ? "Opp" : "You"})
-                              </option>
-                            ))}
-                        </select>
-                      </div>
-                    )}
-                </div>
-
-                {/* Next shots */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm font-medium text-text">
-                    <span className="text-text-muted">→</span>
-                    Next shots:
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    {node.next.length > 0 ? (
-                      node.next.map((nextId) => {
-                        const nextNode = nodes.find((n) => n.id === nextId);
-                        return (
-                          <span
-                            key={nextId}
-                            className={`px-2 py-1 text-xs rounded border ${
-                              nextNode?.isOpponent
-                                ? "bg-warning/10 text-warning border-warning/30"
-                                : "bg-primary/10 text-primary border-primary/30"
-                            }`}
-                          >
-                            {nextNode?.name || nextId} (
-                            {nextNode?.isOpponent ? "Opp" : "You"})
-                          </span>
-                        );
-                      })
+                          }
+                        }}
+                        placeholder="Enter shot name..."
+                      />
                     ) : (
-                      <span className="text-xs text-text-subtle italic">
-                        End of sequence
+                      <h3
+                        className={`font-semibold cursor-pointer hover:text-primary transition-colors ${
+                          node.isPlaceholder
+                            ? "text-text-muted italic"
+                            : "text-text"
+                        }`}
+                        onClick={() => setEditingNodeId(node.id)}
+                      >
+                        {node.name || "Click to name shot"}
+                      </h3>
+                    )}
+                    {node.id === entryPoint && (
+                      <span className="px-2 py-1 bg-success text-white text-xs rounded">
+                        START
                       </span>
                     )}
                   </div>
+                  <span
+                    className={`px-2 py-1 text-xs rounded border ${
+                      node.isOpponent
+                        ? "bg-warning text-white border-warning"
+                        : "bg-primary text-white border-primary"
+                    }`}
+                  >
+                    {node.isOpponent ? "Opponent" : "Player"}
+                  </span>
+                </div>
+                {node.id !== entryPoint && (
+                  <button
+                    type="button"
+                    onClick={() => removeNode(index)}
+                    disabled={nodes.length <= 1 || node.id === entryPoint}
+                    className={`p-2 rounded-lg ${
+                      nodes.length <= 1 || node.id === entryPoint
+                        ? "bg-text-subtle text-text-muted cursor-not-allowed"
+                        : "bg-danger text-white hover:bg-danger-dark"
+                    }`}
+                    title={
+                      node.id === entryPoint
+                        ? "Cannot delete the starting shot"
+                        : nodes.length <= 1
+                        ? "Cannot remove the last shot"
+                        : "Remove shot"
+                    }
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-4 mb-4">
+                {/* Stroke */}
+                <div>
+                  <label className="block text-sm font-medium text-text mb-1">
+                    Stroke
+                  </label>
+                  <select
+                    value={node.stroke}
+                    onChange={(e) =>
+                      updateNode(index, "stroke", e.target.value as ShotType)
+                    }
+                    className="w-full p-2 rounded-lg bg-surface text-text border border-border focus:border-primary focus:outline-none"
+                  >
+                    {(Object.keys(shotTypeDisplay) as ShotType[]).map(
+                      (stroke) => (
+                        <option key={stroke} value={stroke}>
+                          {shotTypeDisplay[stroke]}
+                        </option>
+                      )
+                    )}
+                  </select>
+                </div>
+
+                {/* Spin */}
+                <div>
+                  <label className="block text-sm font-medium text-text mb-1">
+                    Spin
+                  </label>
+                  <select
+                    value={node.spin}
+                    onChange={(e) =>
+                      updateNode(index, "spin", e.target.value as Spin)
+                    }
+                    className="w-full p-2 rounded-lg bg-surface text-text border border-border focus:border-primary focus:outline-none"
+                  >
+                    {(Object.keys(spinDisplay) as Spin[]).map((spin) => (
+                      <option key={spin} value={spin}>
+                        {spinDisplay[spin]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Direction */}
+                <div>
+                  <label className="block text-sm font-medium text-text mb-1">
+                    From
+                  </label>
+                  <select
+                    value={node.direction}
+                    onChange={(e) =>
+                      updateNode(
+                        index,
+                        "direction",
+                        e.target.value as Placement["direction"]
+                      )
+                    }
+                    className="w-full p-2 rounded-lg bg-surface text-text border border-border focus:border-primary focus:outline-none"
+                  >
+                    <option value="backhand">Backhand</option>
+                    <option value="middle">Middle</option>
+                    <option value="forehand">Forehand</option>
+                  </select>
+                </div>
+
+                {/* Depth */}
+                <div>
+                  <label className="block text-sm font-medium text-text mb-1">
+                    Depth (from)
+                  </label>
+                  <select
+                    value={node.depth}
+                    onChange={(e) =>
+                      updateNode(
+                        index,
+                        "depth",
+                        e.target.value as Placement["depth"]
+                      )
+                    }
+                    className="w-full p-2 rounded-lg bg-surface text-text border border-border focus:border-primary focus:outline-none"
+                  >
+                    <option value="short">Short</option>
+                    <option value="halflong">Half-Long</option>
+                    <option value="long">Long</option>
+                  </select>
                 </div>
               </div>
 
-              {/* Action buttons */}
-              <div className="flex justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => addNextShot(index)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-success text-white hover:bg-success-dark text-sm"
-                >
-                  <Plus className="w-4 h-4" />
-                  Create Next Shot
-                </button>
+              {/* Connections Section */}
+              <div className="pt-3 border-t border-border space-y-3">
+                {/* Previous and Next shots display */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {/* Previous shots */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-medium text-text">
+                      <span className="text-text-muted">←</span>
+                      Previous shots:
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {prevNodesToDisplay.length > 0 ? (
+                        prevNodesToDisplay.map((prevId) => {
+                          const prevNode = nodes.find((n) => n.id === prevId);
+                          const canRemove = canRemovePreviousConnection(
+                            node.id,
+                            prevId
+                          );
+                          return (
+                            <div
+                              key={prevId}
+                              className={`flex items-center gap-1 px-2 py-1 text-xs rounded border ${
+                                prevNode?.isOpponent
+                                  ? "bg-warning/10 text-warning border-warning/30"
+                                  : "bg-primary/10 text-primary border-primary/30"
+                              }`}
+                            >
+                              <span>
+                                {prevNode?.name || prevId} (
+                                {prevNode?.isOpponent ? "Opp" : "You"})
+                              </span>
+                              {canRemove && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    removePreviousConnection(node.id, prevId)
+                                  }
+                                  className="ml-1 text-danger hover:text-danger-dark"
+                                  title="Remove this connection"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <span className="text-xs text-text-subtle italic">
+                          {node.id === entryPoint ? "Starting shot" : "None"}
+                        </span>
+                      )}
+                    </div>
 
-                {/* Loop back to start button */}
-                {!node.next.includes(entryPoint) &&
-                  node.id !== entryPoint &&
-                  nodes.find((n) => n.id === entryPoint)?.isOpponent !==
-                    node.isOpponent && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        addNextConnection(
-                          nodes.findIndex((n) => n.id === node.id),
-                          entryPoint
-                        )
-                      }
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-dark text-sm"
-                    >
-                      <ArrowRight className="w-4 h-4" />
-                      Loop to{" "}
-                      {nodes.find((n) => n.id === entryPoint)?.name || "Start"}
-                    </button>
-                  )}
+                    {/* Connect to existing (backwards only) */}
+                    {node.id !== entryPoint &&
+                      nodes.filter(
+                        (n) =>
+                          n.id !== node.id &&
+                          !node.prev.includes(n.id) &&
+                          n.isOpponent !== node.isOpponent && // Different player
+                          isValidBackwardConnection(node.id, n.id)
+                      ).length > 0 && (
+                        <div className="pt-1">
+                          <select
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                addPreviousConnection(node.id, e.target.value);
+                                e.target.value = ""; // Reset selection
+                              }
+                            }}
+                            className="text-xs px-2 py-1 rounded bg-surface text-text border border-border focus:border-primary focus:outline-none"
+                            defaultValue=""
+                          >
+                            <option value="" disabled>
+                              Add previous shot...
+                            </option>
+                            {nodes
+                              .filter(
+                                (n) =>
+                                  n.id !== node.id &&
+                                  !node.prev.includes(n.id) &&
+                                  n.isOpponent !== node.isOpponent && // Different player
+                                  isValidBackwardConnection(node.id, n.id)
+                              )
+                              .map((targetNode) => (
+                                <option
+                                  key={targetNode.id}
+                                  value={targetNode.id}
+                                >
+                                  {targetNode.name} (
+                                  {targetNode.isOpponent ? "Opp" : "You"})
+                                </option>
+                              ))}
+                          </select>
+                        </div>
+                      )}
+                  </div>
+
+                  {/* Next shots */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-medium text-text">
+                      <span className="text-text-muted">→</span>
+                      Next shots:
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {nextNodesToDisplay.length > 0 ? (
+                        nextNodesToDisplay.map((nextId) => {
+                          const nextNode = nodes.find((n) => n.id === nextId);
+                          return (
+                            <span
+                              key={nextId}
+                              className={`px-2 py-1 text-xs rounded border ${
+                                nextNode?.isOpponent
+                                  ? "bg-warning/10 text-warning border-warning/30"
+                                  : "bg-primary/10 text-primary border-primary/30"
+                              }`}
+                            >
+                              {nextNode?.name || nextId} (
+                              {nextNode?.isOpponent ? "Opp" : "You"})
+                            </span>
+                          );
+                        })
+                      ) : (
+                        <span className="text-xs text-text-subtle italic">
+                          End of sequence
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => addNextShot(index)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-success text-white hover:bg-success-dark text-sm"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Create Next Shot
+                  </button>
+
+                  {/* Loop back to start button */}
+                  {!node.next.includes(entryPoint) &&
+                    node.id !== entryPoint &&
+                    nodes.find((n) => n.id === entryPoint)?.isOpponent !==
+                      node.isOpponent && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          addNextConnection(
+                            nodes.findIndex((n) => n.id === node.id),
+                            entryPoint
+                          )
+                        }
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-dark text-sm"
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                        Loop to{" "}
+                        {nodes.find((n) => n.id === entryPoint)?.name ||
+                          "Start"}
+                      </button>
+                    )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Delete Confirmation Modal */}
