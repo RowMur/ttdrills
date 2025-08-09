@@ -79,7 +79,7 @@ export const DrillDetails = ({ drill }: Props) => {
                   key={index}
                   className="text-text-muted flex items-start gap-2"
                 >
-                  <span className="text-success mt-1">•</span>
+                  <span className="text-success">•</span>
                   {objective}
                 </li>
               ))}
@@ -100,7 +100,7 @@ export const DrillDetails = ({ drill }: Props) => {
                   key={index}
                   className="text-text-muted flex items-start gap-2"
                 >
-                  <span className="text-warning mt-1">💡</span>
+                  <span className="text-warning">•</span>
                   {tip}
                 </li>
               ))}
