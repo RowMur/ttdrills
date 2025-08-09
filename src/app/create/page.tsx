@@ -153,8 +153,6 @@ export default function CreateDrillPage() {
   };
 
   const isFormValid = () => {
-    console.log(drillData);
-    console.log(ballSequence);
     return (
       drillData.name.trim() !== "" &&
       drillData.description.trim() !== "" &&

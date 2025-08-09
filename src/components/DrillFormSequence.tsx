@@ -435,7 +435,6 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
 
     // Update all references to the old ID
     if (node.id !== newId) {
-      console.log("finalizeShotName", node.id, newId);
       updatedNodes.forEach((n) => {
         if (n.prev.includes(node.id)) {
           n.prev = n.prev.map((id) => (id === node.id ? newId : id));
