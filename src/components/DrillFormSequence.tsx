@@ -23,9 +23,24 @@ type NodeFormData = {
   isPlaceholder?: boolean; // For empty shots that auto-remove
 };
 
-export const DrillFormSequence = ({ onChange }: Props) => {
+export const DrillFormSequence = ({ sequence, onChange }: Props) => {
   const [nodes, setNodes] = useState<NodeFormData[]>(() => {
-    // Start with one default shot
+    // Initialize from the passed sequence or create default
+    if (sequence.entryPoint && Object.keys(sequence.nodes).length > 0) {
+      return Object.values(sequence.nodes).map((node) => ({
+        id: node.id,
+        name: node.id, // Use ID as name initially
+        stroke: node.ball.stroke,
+        spin: node.ball.spin,
+        depth: node.ball.placement.depth,
+        direction: node.ball.placement.direction,
+        isOpponent: node.ball.isOpponent,
+        prev: node.prev || [],
+        next: node.next || [],
+      }));
+    }
+
+    // Fallback to default if no sequence provided
     const initialNode: NodeFormData = {
       id: "serve",
       name: "Serve",
@@ -39,7 +54,9 @@ export const DrillFormSequence = ({ onChange }: Props) => {
     };
     return [initialNode];
   });
-  const [entryPoint, setEntryPoint] = useState("serve");
+  const [entryPoint, setEntryPoint] = useState(
+    () => sequence.entryPoint || "serve"
+  );
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     nodeId: string;
     cascadeNodes: string[];

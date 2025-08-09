@@ -5,8 +5,8 @@ import { Plus } from "lucide-react";
 
 export const Navbar = () => {
   return (
-    <nav className="max-w-4xl mx-auto mb-4 px-4 text-text">
-      <div className="flex flex-col lg:flex-row justify-between items-center gap-4 min-h-20 bg-surface rounded-b-3xl p-4 border border-border">
+    <nav className="max-w-6xl mx-auto mb-4 px-4 text-text">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 min-h-20 bg-surface rounded-b-3xl p-4 border border-border">
         <div className="flex items-center gap-6">
           <h1 className="text-xl sm:text-2xl font-bold text-center">
             <Link
