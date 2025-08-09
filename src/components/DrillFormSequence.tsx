@@ -24,9 +24,16 @@ type NodeFormData = {
 };
 
 export const DrillFormSequence = ({ sequence, onChange }: Props) => {
+  const entryPoint = sequence.entryPoint;
+  const setEntryPoint = (entryPoint: string) => {
+    onChange({
+      ...sequence,
+      entryPoint,
+    });
+  };
   const [nodes, setNodes] = useState<NodeFormData[]>(() => {
     // Initialize from the passed sequence or create default
-    if (sequence.entryPoint && Object.keys(sequence.nodes).length > 0) {
+    if (entryPoint && Object.keys(sequence.nodes).length > 0) {
       return Object.values(sequence.nodes).map((node) => ({
         id: node.id,
         name: node.id, // Use ID as name initially
@@ -54,9 +61,7 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
     };
     return [initialNode];
   });
-  const [entryPoint, setEntryPoint] = useState(
-    () => sequence.entryPoint || "serve"
-  );
+
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     nodeId: string;
     cascadeNodes: string[];
@@ -407,17 +412,18 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
 
   const finalizeShotName = (nodeId: string, name: string) => {
     const nodeIndex = nodes.findIndex((n) => n.id === nodeId);
-    if (nodeIndex === -1) return;
+    if (nodeIndex === -1) return setEditingNodeId(null);
 
     const updatedNodes = [...nodes];
     const node = updatedNodes[nodeIndex];
+    if (node.name === name) return setEditingNodeId(null);
 
     // Use provided name or generate placeholder
     const finalName = name.trim() || generatePlaceholderName();
 
     // Generate new ID from name
     const newId = generateUniqueId(finalName);
-    if (!newId) return;
+    if (!newId) return setEditingNodeId(null);
 
     // Update the node
     updatedNodes[nodeIndex] = {
@@ -429,6 +435,7 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
 
     // Update all references to the old ID
     if (node.id !== newId) {
+      console.log("finalizeShotName", node.id, newId);
       updatedNodes.forEach((n) => {
         if (n.prev.includes(node.id)) {
           n.prev = n.prev.map((id) => (id === node.id ? newId : id));
@@ -438,15 +445,8 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
         }
       });
 
-      // Update entry point if needed
-      let newEntryPoint = entryPoint;
-      if (entryPoint === node.id) {
-        newEntryPoint = newId;
-        setEntryPoint(newId);
-      }
-
       setNodes(updatedNodes);
-      updateSequence(updatedNodes, newEntryPoint);
+      updateSequence(updatedNodes, newId);
     } else {
       setNodes(updatedNodes);
       updateSequence(updatedNodes, entryPoint);
@@ -510,15 +510,8 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
           }
         });
 
-        // Update entry point if needed
-        let newEntryPoint = entryPoint;
-        if (entryPoint === oldId) {
-          newEntryPoint = newId;
-          setEntryPoint(newId);
-        }
-
         setNodes(updatedNodes);
-        updateSequence(updatedNodes, newEntryPoint);
+        updateSequence(updatedNodes, newId);
         return;
       } else {
         // Just update the name if ID doesn't change
