@@ -33,7 +33,7 @@ export type Node = {
   ball: Ball;
 };
 
-type StepGraph = {
+export type StepGraph = {
   entryPoint: string;
   nodes: Record<string, Node>;
 };

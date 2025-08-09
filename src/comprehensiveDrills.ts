@@ -766,4 +766,74 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
       },
     },
   },
+  {
+    name: "Straights and Xs",
+    slug: "straights-and-xs",
+    description: "abcd",
+    objectives: ["Learn"],
+    difficulty: "beginner",
+    categories: ["footwork"],
+    tips: ["Tip"],
+    graph: {
+      entryPoint: "node1",
+      nodes: {
+        node1: {
+          id: "node1",
+          prev: ["node4"],
+          next: ["node2"],
+          ball: {
+            stroke: "backhand",
+            spin: "top",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: false,
+          },
+        },
+        node2: {
+          id: "node2",
+          prev: ["node1"],
+          next: ["node3"],
+          ball: {
+            stroke: "backhand",
+            spin: "top",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: true,
+          },
+        },
+        node3: {
+          id: "node3",
+          prev: ["node2"],
+          next: ["node4"],
+          ball: {
+            stroke: "forehand",
+            spin: "top",
+            placement: {
+              depth: "long",
+              direction: "forehand",
+            },
+            isOpponent: false,
+          },
+        },
+        node4: {
+          id: "node4",
+          prev: ["node3"],
+          next: ["node1"],
+          ball: {
+            stroke: "forehand",
+            spin: "top",
+            placement: {
+              depth: "long",
+              direction: "forehand",
+            },
+            isOpponent: true,
+          },
+        },
+      },
+    },
+  },
 ];
