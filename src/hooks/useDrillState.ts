@@ -14,8 +14,6 @@ export const useDrillState = (input: Input) => {
   const [selectingNextNode, setSelectingNextNode] = useState(false);
 
   const availableNextNodes: Node[] = useMemo(() => {
-    console.log("nodeId", nodeId);
-    console.log("drill.graph.nodes", drill.graph.nodes);
     const nextNodeIds = drill.graph.nodes[nodeId].next;
     if (!nextNodeIds || nextNodeIds.length === 0) {
       return [];

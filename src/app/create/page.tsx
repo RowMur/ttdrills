@@ -65,7 +65,8 @@ export default function CreateDrillPage() {
   const previewDrill: Drill | null = useMemo(() => {
     if (
       !ballSequence.entryPoint ||
-      Object.keys(ballSequence.nodes).length === 0
+      Object.keys(ballSequence.nodes).length === 0 ||
+      !ballSequence.nodes[ballSequence.entryPoint]
     ) {
       return null;
     }
@@ -228,19 +229,28 @@ export default function CreateDrillPage() {
                   <div className="space-y-4">
                     {/* Interactive Controls */}
                     <div className="flex justify-between items-center">
-                      <ControlButton onClick={drillState.reset}>
+                      <ControlButton
+                        onClick={drillState.reset}
+                        title="Reset to start"
+                      >
                         <RotateCcw className="w-4 h-4" />
                       </ControlButton>
                       <div className="flex gap-2">
                         <ControlButton
                           onClick={drillState.goBack}
                           disabled={!drillState.canGoBack}
+                          title="Previous step"
                         >
                           <ChevronLeft className="w-4 h-4" />
                         </ControlButton>
                         <ControlButton
                           onClick={drillState.goForward}
                           disabled={!drillState.canGoForward}
+                          title={
+                            drillState.availableNextNodes.length > 1
+                              ? "Click diagram to choose path"
+                              : "Next step"
+                          }
                         >
                           <ChevronRight className="w-4 h-4" />
                         </ControlButton>
@@ -248,16 +258,25 @@ export default function CreateDrillPage() {
                     </div>
 
                     {/* Interactive Diagram */}
-                    <div className="flex justify-center bg-surface-light rounded-lg p-4">
-                      <DrillDiagram
-                        drill={previewDrill}
-                        nodeId={drillState.nodeId}
-                        height={300}
-                        width={200}
-                        selectingNextNode={drillState.selectingNextNode}
-                        availableNextNodes={drillState.availableNextNodes}
-                        goToNextNodeOption={drillState.goToNextNodeOption}
-                      />
+                    <div className="bg-surface-light rounded-lg p-4">
+                      {drillState.selectingNextNode && (
+                        <div className="text-center mb-3">
+                          <p className="text-sm font-medium text-primary">
+                            Click on a ball to choose your path
+                          </p>
+                        </div>
+                      )}
+                      <div className="flex justify-center">
+                        <DrillDiagram
+                          drill={previewDrill}
+                          nodeId={drillState.nodeId}
+                          height={300}
+                          width={200}
+                          selectingNextNode={drillState.selectingNextNode}
+                          availableNextNodes={drillState.availableNextNodes}
+                          goToNextNodeOption={drillState.goToNextNodeOption}
+                        />
+                      </div>
                     </div>
 
                     {/* Current Step Info */}
@@ -396,19 +415,28 @@ export default function CreateDrillPage() {
                   <div className="flex flex-col items-center space-y-4">
                     {/* Interactive Controls */}
                     <div className="flex justify-between items-center w-full max-w-sm">
-                      <ControlButton onClick={drillState.reset}>
+                      <ControlButton
+                        onClick={drillState.reset}
+                        title="Reset to start"
+                      >
                         <RotateCcw className="w-4 h-4" />
                       </ControlButton>
                       <div className="flex gap-2">
                         <ControlButton
                           onClick={drillState.goBack}
                           disabled={!drillState.canGoBack}
+                          title="Previous step"
                         >
                           <ChevronLeft className="w-4 h-4" />
                         </ControlButton>
                         <ControlButton
                           onClick={drillState.goForward}
                           disabled={!drillState.canGoForward}
+                          title={
+                            drillState.availableNextNodes.length > 1
+                              ? "Click diagram to choose path"
+                              : "Next step"
+                          }
                         >
                           <ChevronRight className="w-4 h-4" />
                         </ControlButton>
@@ -417,15 +445,24 @@ export default function CreateDrillPage() {
 
                     {/* Diagram */}
                     <div className="bg-surface-light rounded-lg p-4">
-                      <DrillDiagram
-                        drill={previewDrill}
-                        nodeId={drillState.nodeId}
-                        height={360}
-                        width={200}
-                        selectingNextNode={drillState.selectingNextNode}
-                        availableNextNodes={drillState.availableNextNodes}
-                        goToNextNodeOption={drillState.goToNextNodeOption}
-                      />
+                      {drillState.selectingNextNode && (
+                        <div className="text-center mb-3">
+                          <p className="text-sm font-medium text-primary">
+                            Click on a ball to choose your path
+                          </p>
+                        </div>
+                      )}
+                      <div className="flex justify-center">
+                        <DrillDiagram
+                          drill={previewDrill}
+                          nodeId={drillState.nodeId}
+                          height={360}
+                          width={200}
+                          selectingNextNode={drillState.selectingNextNode}
+                          availableNextNodes={drillState.availableNextNodes}
+                          goToNextNodeOption={drillState.goToNextNodeOption}
+                        />
+                      </div>
                     </div>
                   </div>
 

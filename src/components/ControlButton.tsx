@@ -1,17 +1,17 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, ButtonHTMLAttributes } from "react";
 
-type Props = {
-  onClick?: () => void;
-  disabled?: boolean;
-};
+type Props = ButtonHTMLAttributes<HTMLButtonElement>;
 
 export const ControlButton = ({
   children,
+  className,
   ...rest
 }: PropsWithChildren<Props>) => {
   return (
     <button
-      className="text-text disabled:text-text-subtle hover:not-disabled:text-primary hover:not-disabled:cursor-pointer disabled:cursor-not-allowed"
+      className={`text-text disabled:text-text-subtle hover:not-disabled:text-primary hover:not-disabled:cursor-pointer disabled:cursor-not-allowed ${
+        className || ""
+      }`}
       {...rest}
     >
       {children}
