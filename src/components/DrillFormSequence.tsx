@@ -173,8 +173,8 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
       return true;
     }
 
-    // Prevent other cycles by checking if fromNodeId is reachable from toNodeId
-    // If it is, then adding this connection would create a cycle
+    // Prevent direct cycles by checking if fromNodeId is reachable from toNodeId
+    // WITHOUT going through the entry point
     const visited = new Set<string>();
     const queue = [toNodeId];
 
@@ -183,7 +183,7 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
       if (visited.has(currentId)) continue;
 
       // If we reach the fromNode while traversing forward from toNode,
-      // then adding this connection would create a cycle
+      // then adding this connection would create a direct cycle
       if (currentId === fromNodeId) {
         return false;
       }
@@ -191,7 +191,12 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
       visited.add(currentId);
       const currentNode = nodes.find((n) => n.id === currentId);
       if (currentNode) {
-        queue.push(...currentNode.next);
+        // Only follow paths that don't go through the entry point
+        // This allows connections that would create loops through the entry point
+        const nextNodes = currentNode.next.filter(
+          (nextId) => nextId !== entryPoint
+        );
+        queue.push(...nextNodes);
       }
     }
 
