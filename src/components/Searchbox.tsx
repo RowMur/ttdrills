@@ -41,7 +41,7 @@ export const Searchbox = () => {
   }, [searchInput, router]);
 
   return (
-    <div className="flex gap-2 w-72">
+    <div className="flex gap-2">
       <input
         type="text"
         placeholder="Search drills..."
@@ -53,6 +53,7 @@ export const Searchbox = () => {
           }
         }}
         className="border border-border bg-surface-light text-text rounded-md p-2 grow focus:border-primary focus:outline-none"
+        name="search"
       />
       <button
         onClick={() => handleSearch(searchInput)}
