@@ -31,7 +31,9 @@ export const SearchResults = () => {
       <div className="text-center mb-6">
         {filteredDrills.length === 0 ? (
           <div>
-            <p className="mb-4">No drills found for "{searchTerm}".</p>
+            <p className="mb-4">
+              No drills found for &quot;{searchTerm}&quot;.
+            </p>
             <p className="text-sm text-gray-600 mb-4">
               Try searching for terms like: forehand, backhand, topspin,
               backspin, serve, attack, defense
