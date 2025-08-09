@@ -1,6 +1,6 @@
 import { difficultyDisplay, categoryDisplay } from "@/data";
 import { Drill } from "@/types";
-import { Clock, Target, Lightbulb, Award, Tag, Wrench } from "lucide-react";
+import { Clock, Target, Lightbulb, Award, Wrench } from "lucide-react";
 
 type Props = {
   drill: Drill;
@@ -9,107 +9,53 @@ type Props = {
 export const DrillDetails = ({ drill }: Props) => {
   return (
     <div className="bg-grey rounded-lg p-6 mb-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column */}
-        <div className="space-y-4">
-          {/* Description */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-              <Target className="w-5 h-5 text-blue-600" />
-              Description
-            </h3>
-            <p className="text-gray-700 leading-relaxed">{drill.description}</p>
-          </div>
-
-          {/* Objectives */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-              <Award className="w-5 h-5 text-green-600" />
-              Objectives
-            </h3>
-            <ul className="space-y-1">
-              {drill.objectives.map((objective, index) => (
-                <li
-                  key={index}
-                  className="text-gray-700 flex items-start gap-2"
-                >
-                  <span className="text-green-600 mt-1">•</span>
-                  {objective}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Tips */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-              <Lightbulb className="w-5 h-5 text-yellow-600" />
-              Coaching Tips
-            </h3>
-            <ul className="space-y-1">
-              {drill.tips.map((tip, index) => (
-                <li
-                  key={index}
-                  className="text-gray-700 flex items-start gap-2"
-                >
-                  <span className="text-yellow-600 mt-1">💡</span>
-                  {tip}
-                </li>
-              ))}
-            </ul>
-          </div>
+      <div className="space-y-6">
+        {/* Description */}
+        <div>
+          <h3 className="text-lg font-semibold mb-2 flex items-center gap-2 text-white">
+            <Target className="w-5 h-5 text-white" />
+            Description
+          </h3>
+          <p className="text-white leading-relaxed">{drill.description}</p>
         </div>
 
-        {/* Right Column */}
-        <div className="space-y-4">
-          {/* Metadata Grid */}
-          <div className="grid grid-cols-1 text-grey sm:grid-cols-2 gap-4">
-            {/* Difficulty */}
-            <div className="bg-white rounded-lg p-4 border">
-              <h4 className="font-medium text-gray-600 mb-1 text-sm uppercase tracking-wide">
-                Difficulty
-              </h4>
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-3 h-3 rounded-full ${
-                    drill.difficulty === "beginner"
-                      ? "bg-green-500"
-                      : drill.difficulty === "intermediate"
-                      ? "bg-yellow-500"
-                      : "bg-red-500"
-                  }`}
-                />
-                <span className="font-semibold">
-                  {difficultyDisplay[drill.difficulty]}
-                </span>
-              </div>
+        {/* Metadata Row */}
+        <div className="flex flex-wrap gap-4 items-center text-sm">
+          {/* Difficulty */}
+          <div className="flex items-center gap-2">
+            <span className="text-white font-medium">Difficulty:</span>
+            <div className="flex items-center gap-1.5">
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  drill.difficulty === "beginner"
+                    ? "bg-green"
+                    : drill.difficulty === "intermediate"
+                    ? "bg-light-grey"
+                    : "bg-red"
+                }`}
+              />
+              <span className="text-white font-medium">
+                {difficultyDisplay[drill.difficulty]}
+              </span>
             </div>
-
-            {/* Duration */}
-            {drill.duration && (
-              <div className="bg-white rounded-lg p-4 border">
-                <h4 className="font-medium text-gray-600 mb-1 text-sm uppercase tracking-wide">
-                  Duration
-                </h4>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-blue-600" />
-                  <span className="font-semibold">{drill.duration}</span>
-                </div>
-              </div>
-            )}
           </div>
 
+          {/* Duration */}
+          {drill.duration && (
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-white" />
+              <span className="text-white">{drill.duration}</span>
+            </div>
+          )}
+
           {/* Categories */}
-          <div className="bg-white rounded-lg p-4 border text-grey">
-            <h4 className="font-medium text-gray-600 mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
-              <Tag className="w-4 h-4" />
-              Categories
-            </h4>
-            <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-white font-medium">Categories:</span>
+            <div className="flex flex-wrap gap-1">
               {drill.categories.map((category) => (
                 <span
                   key={category}
-                  className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                  className="px-2 py-1 bg-table-blue text-white rounded text-xs font-medium"
                 >
                   {categoryDisplay[category]}
                 </span>
@@ -119,23 +65,47 @@ export const DrillDetails = ({ drill }: Props) => {
 
           {/* Equipment */}
           {drill.equipment && drill.equipment.length > 0 && (
-            <div className="bg-white rounded-lg p-4 border">
-              <h4 className="font-medium text-gray-600 mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
-                <Wrench className="w-4 h-4" />
-                Equipment Needed
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {drill.equipment.map((item) => (
-                  <span
-                    key={item}
-                    className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium capitalize"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
+            <div className="flex items-center gap-2">
+              <Wrench className="w-4 h-4 text-white" />
+              <span className="text-white">
+                {drill.equipment
+                  .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
+                  .join(", ")}
+              </span>
             </div>
           )}
+        </div>
+
+        {/* Objectives */}
+        <div>
+          <h3 className="text-lg font-semibold mb-2 flex items-center gap-2 text-white">
+            <Award className="w-5 h-5 text-white" />
+            Objectives
+          </h3>
+          <ul className="space-y-1">
+            {drill.objectives.map((objective, index) => (
+              <li key={index} className="text-white flex items-start gap-2">
+                <span className="text-white mt-1">•</span>
+                {objective}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Tips */}
+        <div>
+          <h3 className="text-lg font-semibold mb-2 flex items-center gap-2 text-white">
+            <Lightbulb className="w-5 h-5 text-white" />
+            Coaching Tips
+          </h3>
+          <ul className="space-y-1">
+            {drill.tips.map((tip, index) => (
+              <li key={index} className="text-white flex items-start gap-2">
+                <span className="text-white mt-1">💡</span>
+                {tip}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>
