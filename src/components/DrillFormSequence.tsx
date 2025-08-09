@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StepGraph, Node, ShotType, Spin, Placement } from "@/types";
 import { shotTypeDisplay, spinDisplay } from "@/data";
 import { Plus, X, ArrowRight } from "lucide-react";
@@ -22,13 +22,10 @@ type NodeFormData = {
 };
 
 export const DrillFormSequence = ({ onChange }: Props) => {
-  const [nodes, setNodes] = useState<NodeFormData[]>([]);
-  const [entryPoint, setEntryPoint] = useState("");
-
-  const addNode = () => {
-    const newId = `node${nodes.length + 1}`;
-    const newNode: NodeFormData = {
-      id: newId,
+  const [nodes, setNodes] = useState<NodeFormData[]>(() => {
+    // Start with one default shot
+    const initialNode: NodeFormData = {
+      id: "shot1",
       stroke: "forehand",
       spin: "top",
       depth: "long",
@@ -37,15 +34,85 @@ export const DrillFormSequence = ({ onChange }: Props) => {
       prev: [],
       next: [],
     };
+    return [initialNode];
+  });
+  const [entryPoint, setEntryPoint] = useState("shot1");
 
-    setNodes([...nodes, newNode]);
+  // Initialize the sequence with the default shot
+  useEffect(() => {
+    updateSequence(nodes, entryPoint);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run on mount
 
-    if (nodes.length === 0) {
-      setEntryPoint(newId);
+  const recalculatePlayerAssignments = (nodeList: NodeFormData[]) => {
+    const updatedNodes = [...nodeList];
+
+    // Find the entry point (should be shot1)
+    const entryNode = updatedNodes.find((node) => node.id === entryPoint);
+    if (!entryNode) return updatedNodes;
+
+    // Start with entry point as player
+    entryNode.isOpponent = false;
+
+    // Use BFS to assign players based on sequence depth
+    const visited = new Set<string>();
+    const queue: Array<{ node: NodeFormData; depth: number }> = [
+      { node: entryNode, depth: 0 },
+    ];
+    visited.add(entryNode.id);
+
+    while (queue.length > 0) {
+      const { node, depth } = queue.shift()!;
+
+      // Assign player based on depth: even depth = player, odd depth = opponent
+      node.isOpponent = depth % 2 === 1;
+
+      // Add next nodes to queue
+      node.next.forEach((nextId) => {
+        const nextNode = updatedNodes.find((n) => n.id === nextId);
+        if (nextNode && !visited.has(nextId)) {
+          visited.add(nextId);
+          queue.push({ node: nextNode, depth: depth + 1 });
+        }
+      });
     }
+
+    return updatedNodes;
+  };
+
+  const addNextShot = (currentIndex: number) => {
+    const newId = `shot${nodes.length + 1}`;
+    const currentNode = nodes[currentIndex];
+
+    const newNode: NodeFormData = {
+      id: newId,
+      stroke: "forehand",
+      spin: "top",
+      depth: "long",
+      direction: "forehand",
+      isOpponent: !currentNode.isOpponent, // Automatically alternate between player and opponent
+      prev: [currentNode.id],
+      next: [],
+    };
+
+    // Update the current node to connect to the new node
+    const updatedNodes = [...nodes];
+    updatedNodes[currentIndex] = {
+      ...currentNode,
+      next: [...currentNode.next, newId],
+    };
+
+    const finalNodes = recalculatePlayerAssignments([...updatedNodes, newNode]);
+    setNodes(finalNodes);
+    updateSequence(finalNodes, entryPoint);
   };
 
   const removeNode = (index: number) => {
+    // Don't allow removing the last shot
+    if (nodes.length <= 1) {
+      return;
+    }
+
     const nodeToRemove = nodes[index];
     const updatedNodes = nodes.filter((_, i) => i !== index);
 
@@ -55,17 +122,19 @@ export const DrillFormSequence = ({ onChange }: Props) => {
       node.next = node.next.filter((id) => id !== nodeToRemove.id);
     });
 
-    setNodes(updatedNodes);
+    // Recalculate player assignments to maintain alternating pattern
+    const finalNodes = recalculatePlayerAssignments(updatedNodes);
+    setNodes(finalNodes);
 
     if (entryPoint === nodeToRemove.id) {
       setEntryPoint(updatedNodes.length > 0 ? updatedNodes[0].id : "");
     }
 
     updateSequence(
-      updatedNodes,
+      finalNodes,
       entryPoint === nodeToRemove.id
-        ? updatedNodes.length > 0
-          ? updatedNodes[0].id
+        ? finalNodes.length > 0
+          ? finalNodes[0].id
           : ""
         : entryPoint
     );
@@ -120,84 +189,14 @@ export const DrillFormSequence = ({ onChange }: Props) => {
     });
   };
 
-  const addConnection = (fromIndex: number, toNodeId: string) => {
-    const updatedNodes = [...nodes];
-    const fromNode = updatedNodes[fromIndex];
-
-    if (!fromNode.next.includes(toNodeId)) {
-      fromNode.next.push(toNodeId);
-
-      // Add reverse connection
-      const toNodeIndex = updatedNodes.findIndex((n) => n.id === toNodeId);
-      if (
-        toNodeIndex !== -1 &&
-        !updatedNodes[toNodeIndex].prev.includes(fromNode.id)
-      ) {
-        updatedNodes[toNodeIndex].prev.push(fromNode.id);
-      }
-    }
-
-    setNodes(updatedNodes);
-    updateSequence(updatedNodes, entryPoint);
-  };
-
-  const removeConnection = (fromIndex: number, toNodeId: string) => {
-    const updatedNodes = [...nodes];
-    const fromNode = updatedNodes[fromIndex];
-
-    fromNode.next = fromNode.next.filter((id) => id !== toNodeId);
-
-    // Remove reverse connection
-    const toNodeIndex = updatedNodes.findIndex((n) => n.id === toNodeId);
-    if (toNodeIndex !== -1) {
-      updatedNodes[toNodeIndex].prev = updatedNodes[toNodeIndex].prev.filter(
-        (id) => id !== fromNode.id
-      );
-    }
-
-    setNodes(updatedNodes);
-    updateSequence(updatedNodes, entryPoint);
-  };
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div>
         <p className="text-text-muted text-sm">
-          Create the sequence of shots in your drill. Each node represents a
-          ball hit by either the player or opponent.
+          Create the sequence of shots in your drill. Use &quot;Add Next
+          Shot&quot; to extend the sequence.
         </p>
-        <button
-          type="button"
-          onClick={addNode}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-success text-white hover:bg-success-dark"
-        >
-          <Plus className="w-4 h-4" />
-          Add Shot
-        </button>
       </div>
-
-      {nodes.length > 0 && (
-        <div>
-          <label className="block text-sm font-medium text-text mb-2">
-            Starting Shot
-          </label>
-          <select
-            value={entryPoint}
-            onChange={(e) => {
-              setEntryPoint(e.target.value);
-              updateSequence(nodes, e.target.value);
-            }}
-            className="p-2 rounded-lg bg-surface-light text-text border border-border focus:border-primary focus:outline-none"
-          >
-            {nodes.map((node) => (
-              <option key={node.id} value={node.id}>
-                {node.id} - {shotTypeDisplay[node.stroke]} (
-                {node.isOpponent ? "Opponent" : "Player"})
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
 
       <div className="space-y-4">
         {nodes.map((node, index) => (
@@ -206,45 +205,45 @@ export const DrillFormSequence = ({ onChange }: Props) => {
             className="bg-surface-light rounded-lg p-4 border border-border"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-text">
-                Shot {index + 1}: {node.id}
-                {node.id === entryPoint && (
-                  <span className="ml-2 px-2 py-1 bg-success text-white text-xs rounded">
-                    START
-                  </span>
-                )}
-              </h3>
+              <div className="flex items-center gap-3">
+                <h3 className="font-semibold text-text">
+                  Shot {index + 1}: {node.id}
+                  {node.id === entryPoint && (
+                    <span className="ml-2 px-2 py-1 bg-success text-white text-xs rounded">
+                      START
+                    </span>
+                  )}
+                </h3>
+                <span
+                  className={`px-2 py-1 text-xs rounded border ${
+                    node.isOpponent
+                      ? "bg-warning text-white border-warning"
+                      : "bg-primary text-white border-primary"
+                  }`}
+                >
+                  {node.isOpponent ? "Opponent" : "Player"}
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => removeNode(index)}
-                className="p-2 rounded-lg bg-danger text-white hover:bg-danger-dark"
+                disabled={nodes.length <= 1}
+                className={`p-2 rounded-lg ${
+                  nodes.length <= 1
+                    ? "bg-text-subtle text-text-muted cursor-not-allowed"
+                    : "bg-danger text-white hover:bg-danger-dark"
+                }`}
+                title={
+                  nodes.length <= 1
+                    ? "Cannot remove the last shot"
+                    : "Remove shot"
+                }
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-              {/* Player/Opponent */}
-              <div>
-                <label className="block text-sm font-medium text-text mb-1">
-                  Player
-                </label>
-                <select
-                  value={node.isOpponent ? "opponent" : "player"}
-                  onChange={(e) =>
-                    updateNode(
-                      index,
-                      "isOpponent",
-                      e.target.value === "opponent"
-                    )
-                  }
-                  className="w-full p-2 rounded-lg bg-surface text-text border border-border focus:border-primary focus:outline-none"
-                >
-                  <option value="player">Player</option>
-                  <option value="opponent">Opponent</option>
-                </select>
-              </div>
-
+            <div className="flex flex-wrap gap-4 mb-4">
               {/* Stroke */}
               <div>
                 <label className="block text-sm font-medium text-text mb-1">
@@ -308,13 +307,11 @@ export const DrillFormSequence = ({ onChange }: Props) => {
                   <option value="forehand">Forehand</option>
                 </select>
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Depth */}
               <div>
                 <label className="block text-sm font-medium text-text mb-1">
-                  Depth
+                  Depth (from)
                 </label>
                 <select
                   value={node.depth}
@@ -332,58 +329,32 @@ export const DrillFormSequence = ({ onChange }: Props) => {
                   <option value="long">Long</option>
                 </select>
               </div>
-
-              {/* Connections */}
-              <div>
-                <label className="block text-sm font-medium text-text mb-1">
-                  Next Shots
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {nodes
-                    .filter((n) => n.id !== node.id)
-                    .map((targetNode) => (
-                      <button
-                        key={targetNode.id}
-                        type="button"
-                        onClick={() =>
-                          node.next.includes(targetNode.id)
-                            ? removeConnection(index, targetNode.id)
-                            : addConnection(index, targetNode.id)
-                        }
-                        className={`px-2 py-1 text-xs rounded border ${
-                          node.next.includes(targetNode.id)
-                            ? "bg-primary border-primary text-white"
-                            : "bg-transparent border-border text-text hover:border-text"
-                        }`}
-                      >
-                        {targetNode.id}
-                      </button>
-                    ))}
-                </div>
-              </div>
             </div>
 
-            {/* Visual connections */}
-            {node.next.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-grey">
-                <div className="flex items-center gap-2 text-sm text-white/80">
-                  <ArrowRight className="w-4 h-4" />
-                  <span>Connects to: {node.next.join(", ")}</span>
-                </div>
+            {/* Add Next Shot Button */}
+            <div className="flex items-center justify-between pt-3 border-t border-border">
+              <div className="flex items-center gap-2 text-sm text-text-subtle">
+                {node.next.length > 0 ? (
+                  <>
+                    <ArrowRight className="w-4 h-4" />
+                    <span>Connects to: {node.next.join(", ")}</span>
+                  </>
+                ) : (
+                  <span>No next shot</span>
+                )}
               </div>
-            )}
+              <button
+                type="button"
+                onClick={() => addNextShot(index)}
+                className="flex items-center gap-2 px-3 py-1 rounded-lg bg-success text-white hover:bg-success-dark text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                Add Next Shot
+              </button>
+            </div>
           </div>
         ))}
       </div>
-
-      {nodes.length === 0 && (
-        <div className="text-center py-8 text-text-subtle">
-          <p>
-            No shots created yet. Click &quot;Add Shot&quot; to start building
-            your drill sequence.
-          </p>
-        </div>
-      )}
     </div>
   );
 };
