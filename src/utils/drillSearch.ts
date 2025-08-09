@@ -1,11 +1,48 @@
-import { DRILLS } from "@/data";
+import { DRILLS, difficultyDisplay, categoryDisplay } from "@/data";
 import { Drill, Node } from "@/types";
 
 /**
- * Extracts searchable text from a drill including name, strokes, spins, and placements
+ * Extracts searchable text from a drill including name, strokes, spins, placements, and metadata
  */
 function getDrillSearchableText(drill: Drill): string {
-  const searchableTerms: string[] = [drill.name.toLowerCase()];
+  const searchableTerms: string[] = [
+    drill.name.toLowerCase(),
+    drill.description.toLowerCase(),
+  ];
+
+  // Add objectives
+  drill.objectives.forEach((objective) => {
+    searchableTerms.push(objective.toLowerCase());
+  });
+
+  // Add tips
+  drill.tips.forEach((tip) => {
+    searchableTerms.push(tip.toLowerCase());
+  });
+
+  // Add difficulty
+  searchableTerms.push(drill.difficulty.toLowerCase());
+  searchableTerms.push(difficultyDisplay[drill.difficulty].toLowerCase());
+
+  // Add categories
+  drill.categories.forEach((category) => {
+    searchableTerms.push(category.toLowerCase());
+    searchableTerms.push(categoryDisplay[category].toLowerCase());
+    // Add alternative terms for categories
+    if (category === "serve-receive") {
+      searchableTerms.push("serve", "receive", "return", "service");
+    }
+    if (category === "match-play") {
+      searchableTerms.push("match", "game", "competition");
+    }
+  });
+
+  // Add equipment if available
+  if (drill.equipment) {
+    drill.equipment.forEach((equipment) => {
+      searchableTerms.push(equipment.toLowerCase());
+    });
+  }
 
   // Extract terms from all nodes in the drill
   Object.values(drill.graph.nodes).forEach((node: Node) => {
@@ -31,9 +68,9 @@ function getDrillSearchableText(drill: Drill): string {
 
     // Add opponent/player context
     if (ball.isOpponent) {
-      searchableTerms.push("opponent", "defense", "block");
+      searchableTerms.push("opponent", "defense", "defensive");
     } else {
-      searchableTerms.push("attack", "offense");
+      searchableTerms.push("attack", "offense", "offensive");
     }
   });
 

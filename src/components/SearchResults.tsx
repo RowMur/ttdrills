@@ -35,8 +35,11 @@ export const SearchResults = () => {
               No drills found for &quot;{searchTerm}&quot;.
             </p>
             <p className="text-sm text-gray-600 mb-4">
-              Try searching for terms like: forehand, backhand, topspin,
-              backspin, serve, attack, defense
+              Try searching for: <strong>strokes</strong> (forehand, backhand),{" "}
+              <strong>spins</strong> (topspin, backspin),
+              <strong>skills</strong> (attack, defense, footwork),{" "}
+              <strong>difficulty</strong> (beginner, intermediate, advanced), or{" "}
+              <strong>equipment</strong> (multiball, robot)
             </p>
           </div>
         ) : (

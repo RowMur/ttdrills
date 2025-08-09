@@ -1,4 +1,5 @@
 import { DiagramSection } from "@/app/drills/[drill]/_components/DiagramSection";
+import { DrillDetails } from "@/components/DrillDetails";
 import { Main } from "@/components/Main";
 import { DRILLS } from "@/data";
 import { notFound } from "next/navigation";
@@ -19,9 +20,10 @@ const Page = async (props: Props) => {
 
   return (
     <Main>
-      <h2 className="text-xl font-bold text-center sm:text-left">
+      <h2 className="text-2xl font-bold text-center sm:text-left mb-4">
         {drill.name}
       </h2>
+      <DrillDetails drill={drill} />
       <DiagramSection drill={drill} />
     </Main>
   );

@@ -38,8 +38,27 @@ type StepGraph = {
   nodes: Record<string, Node>;
 };
 
+export type DifficultyLevel = "beginner" | "intermediate" | "advanced";
+
+export type DrillCategory =
+  | "footwork"
+  | "attack"
+  | "defense"
+  | "serve-receive"
+  | "multiball"
+  | "match-play"
+  | "technique"
+  | "consistency";
+
 export type Drill = {
   name: string;
   slug: string;
+  description: string;
+  objectives: string[];
+  difficulty: DifficultyLevel;
+  categories: DrillCategory[];
+  tips: string[];
+  duration?: string; // e.g., "5-10 minutes"
+  equipment?: string[]; // e.g., ["multiball", "robot"]
   graph: StepGraph;
 };
