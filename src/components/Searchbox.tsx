@@ -2,8 +2,7 @@
 
 import { SEARCH_KEY } from "@/constants";
 import { useSearchTerm } from "@/hooks/useSearchTerm";
-import { getRandomDrill } from "@/utils/drillSearch";
-import { Dice6, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
@@ -23,24 +22,6 @@ export const Searchbox = () => {
     },
     [router]
   );
-
-  const handleRandomDrill = useCallback(() => {
-    const randomDrill = getRandomDrill(searchInput);
-    if (randomDrill) {
-      router.push(`/drills/${randomDrill.slug}`);
-    } else {
-      // If no matching drills found, redirect to search results page to show the "no results" message
-      if (searchInput.trim()) {
-        router.push(`/?${SEARCH_KEY}=${encodeURIComponent(searchInput)}`);
-      } else {
-        // If empty search, pick any random drill
-        const anyRandomDrill = getRandomDrill("");
-        if (anyRandomDrill) {
-          router.push(`/drills/${anyRandomDrill.slug}`);
-        }
-      }
-    }
-  }, [searchInput, router]);
 
   return (
     <div className="flex gap-2 w-72">
@@ -62,13 +43,6 @@ export const Searchbox = () => {
         title="Search drills"
       >
         <Search size={16} />
-      </button>
-      <button
-        onClick={handleRandomDrill}
-        className="bg-blue-600 text-white rounded-md hover:bg-blue-700 hover:cursor-pointer px-3 transition-colors"
-        title="Get a random drill based on your search"
-      >
-        <Dice6 size={16} />
       </button>
     </div>
   );

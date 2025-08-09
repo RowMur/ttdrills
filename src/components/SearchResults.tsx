@@ -28,9 +28,9 @@ export const SearchResults = () => {
 
   return (
     <>
-      <div className="text-center mb-6">
+      <div className="mb-6">
         {filteredDrills.length === 0 ? (
-          <div>
+          <div className="text-center ">
             <p className="mb-4">
               No drills found for &quot;{searchTerm}&quot;.
             </p>
@@ -43,25 +43,25 @@ export const SearchResults = () => {
             </p>
           </div>
         ) : (
-          <div>
-            <p className="mb-4">
-              Found {filteredDrills.length} drills
+          <div className="flex wrap flex-col sm:flex-row items-center justify-between">
+            <p>
+              Found {filteredDrills.length} drill
+              {filteredDrills.length === 1 ? "" : "s"}
               {searchTerm ? ` for "${searchTerm}"` : ""}.
             </p>
-            {searchTerm && (
-              <button
-                onClick={handleRandomDrill}
-                className="bg-green-600 text-white rounded-md hover:bg-green-700 hover:cursor-pointer px-4 py-2 transition-colors flex items-center justify-center gap-2 mx-auto mb-4"
-                title="Get a random drill from these results"
-              >
-                <Dice6 size={16} />
-                <span className="font-medium">Try a Random One!</span>
-              </button>
-            )}
+
+            <button
+              onClick={handleRandomDrill}
+              className="bg-green-600 text-white rounded-md hover:bg-green-700 hover:cursor-pointer px-4 py-2 transition-colors flex items-center justify-center gap-2"
+              title="Get a random drill from these results"
+            >
+              <Dice6 size={16} />
+              <span className="font-medium text-nowrap">Try a Random One!</span>
+            </button>
           </div>
         )}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-fit mx-auto">
+      <div className="grid grid-cols-1 min-[560px]:grid-cols-2 min-[800px]:grid-cols-3 gap-4 w-fit mx-auto">
         {filteredDrills.map((drill) => (
           <DrillCard key={drill.name} drill={drill} />
         ))}
