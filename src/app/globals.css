@@ -5,6 +5,29 @@
   --font-mono: var(--font-geist-mono);
 
   --color-*: initial;
+
+  /* Primary Brand Colors */
+  --color-primary: #3b82f6; /* Modern blue */
+  --color-primary-dark: #1d4ed8; /* Darker blue for hover states */
+  --color-primary-light: #60a5fa; /* Lighter blue for accents */
+
+  /* Success & Error States */
+  --color-success: #6366f1; /* Indigo - more sophisticated */
+  --color-success-dark: #4f46e5; /* Darker indigo */
+  --color-warning: #f59e0b; /* Amber warning */
+  --color-danger: #ef4444; /* Modern red */
+  --color-danger-dark: #dc2626; /* Darker red */
+
+  /* Neutral Palette */
+  --color-background: #0f172a; /* Deep slate background */
+  --color-surface: #1e293b; /* Card/surface color */
+  --color-surface-light: #334155; /* Lighter surface */
+  --color-border: #475569; /* Border color */
+  --color-text: #f8fafc; /* Primary text */
+  --color-text-muted: #cbd5e1; /* Secondary text */
+  --color-text-subtle: #94a3b8; /* Subtle text */
+
+  /* Legacy colors for drill diagrams (DO NOT CHANGE) */
   --color-red: #c62828;
   --color-green: #26a69a;
   --color-slate: #1a1a1a;
@@ -15,7 +38,7 @@
 }
 
 body {
-  background: var(--color-slate);
-  color: var(--color-white);
+  background: var(--color-background);
+  color: var(--color-text);
   font-family: Arial, Helvetica, sans-serif;
 }

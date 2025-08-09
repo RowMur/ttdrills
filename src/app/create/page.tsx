@@ -91,14 +91,16 @@ export default function CreateDrillPage() {
   return (
     <Main>
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">
+        <h1 className="text-3xl font-bold text-center mb-8 text-text">
           Create New Drill
         </h1>
 
         <div className="space-y-8">
           {/* Drill Metadata Form */}
-          <div className="bg-grey rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Drill Information</h2>
+          <div className="bg-surface border border-border rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-4 text-text">
+              Drill Information
+            </h2>
             <DrillFormMetadata
               data={drillData}
               onChange={handleMetadataChange}
@@ -106,8 +108,10 @@ export default function CreateDrillPage() {
           </div>
 
           {/* Ball Sequence Builder */}
-          <div className="bg-grey rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Ball Sequence</h2>
+          <div className="bg-surface border border-border rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-4 text-text">
+              Ball Sequence
+            </h2>
             <DrillFormSequence
               sequence={ballSequence}
               onChange={handleSequenceChange}
@@ -121,14 +125,14 @@ export default function CreateDrillPage() {
               disabled={!isFormValid()}
               className={`px-8 py-3 rounded-lg font-semibold ${
                 isFormValid()
-                  ? "bg-green text-white hover:bg-green/80"
-                  : "bg-light-grey text-white/50 cursor-not-allowed"
+                  ? "bg-success text-white hover:bg-success-dark"
+                  : "bg-surface-light text-text-subtle cursor-not-allowed"
               }`}
             >
               Create Drill (Console Log)
             </Button>
             {!isFormValid() && (
-              <p className="text-white/60 text-sm mt-2">
+              <p className="text-text-subtle text-sm mt-2">
                 Please fill in all required fields and create at least one ball
                 sequence
               </p>

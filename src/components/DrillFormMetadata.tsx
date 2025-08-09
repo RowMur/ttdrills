@@ -57,27 +57,27 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
       {/* Basic Information */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-white mb-2">
+          <label className="block text-sm font-medium text-text mb-2">
             Drill Name *
           </label>
           <input
             type="text"
             value={data.name}
             onChange={(e) => onChange("name", e.target.value)}
-            className="w-full p-3 rounded-lg bg-light-grey text-white border border-light-grey focus:border-table-blue focus:outline-none"
+            className="w-full p-3 rounded-lg bg-surface-light text-text border border-border focus:border-primary focus:outline-none"
             placeholder="Enter drill name..."
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-white mb-2">
+          <label className="block text-sm font-medium text-text mb-2">
             Duration (optional)
           </label>
           <input
             type="text"
             value={data.duration}
             onChange={(e) => onChange("duration", e.target.value)}
-            className="w-full p-3 rounded-lg bg-light-grey text-white border border-light-grey focus:border-table-blue focus:outline-none"
+            className="w-full p-3 rounded-lg bg-surface-light text-text border border-border focus:border-primary focus:outline-none"
             placeholder="e.g., 5-10 minutes"
           />
         </div>
@@ -92,7 +92,7 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
           value={data.description}
           onChange={(e) => onChange("description", e.target.value)}
           rows={3}
-          className="w-full p-3 rounded-lg bg-light-grey text-white border border-light-grey focus:border-table-blue focus:outline-none resize-none"
+          className="w-full p-3 rounded-lg bg-surface-light text-text border border-border focus:border-primary focus:outline-none resize-none"
           placeholder="Describe what this drill teaches and how it works..."
         />
       </div>
@@ -112,11 +112,11 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
                 className={`px-4 py-2 rounded-lg border font-medium ${
                   data.difficulty === level
                     ? level === "beginner"
-                      ? "bg-green border-green text-white"
+                      ? "bg-success border-success text-white"
                       : level === "intermediate"
-                      ? "bg-light-grey border-light-grey text-white"
-                      : "bg-red border-red text-white"
-                    : "bg-transparent border-light-grey text-white hover:border-white"
+                      ? "bg-warning border-warning text-white"
+                      : "bg-danger border-danger text-white"
+                    : "bg-transparent border-border text-text hover:border-text"
                 }`}
               >
                 {difficultyDisplay[level]}
@@ -139,8 +139,8 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
               onClick={() => toggleCategory(category)}
               className={`px-3 py-2 rounded-lg text-sm font-medium border ${
                 data.categories.includes(category)
-                  ? "bg-table-blue border-table-blue text-white"
-                  : "bg-transparent border-light-grey text-white hover:border-white"
+                  ? "bg-primary border-primary text-white"
+                  : "bg-transparent border-border text-text hover:border-text"
               }`}
             >
               {categoryDisplay[category]}
@@ -163,8 +163,8 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
                 onClick={() => toggleEquipment(equipment)}
                 className={`px-3 py-2 rounded-lg text-sm font-medium border capitalize ${
                   data.equipment.includes(equipment)
-                    ? "bg-grey border-grey text-white"
-                    : "bg-transparent border-light-grey text-white hover:border-white"
+                    ? "bg-surface border-surface text-white"
+                    : "bg-transparent border-border text-text hover:border-text"
                 }`}
               >
                 {equipment}
@@ -188,14 +188,14 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
                 onChange={(e) =>
                   updateArrayItem("objectives", index, e.target.value)
                 }
-                className="flex-1 p-3 rounded-lg bg-light-grey text-white border border-light-grey focus:border-table-blue focus:outline-none"
+                className="flex-1 p-3 rounded-lg bg-surface-light text-text border border-border focus:border-primary focus:outline-none"
                 placeholder="Enter learning objective..."
               />
               {data.objectives.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeArrayItem("objectives", index)}
-                  className="p-3 rounded-lg bg-red text-white hover:bg-red/80"
+                  className="p-3 rounded-lg bg-danger text-white hover:bg-danger-dark"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -205,7 +205,7 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
           <button
             type="button"
             onClick={() => addArrayItem("objectives")}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-table-blue text-white hover:bg-table-blue/80"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-dark"
           >
             <Plus className="w-4 h-4" />
             Add Objective
@@ -225,14 +225,14 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
                 type="text"
                 value={tip}
                 onChange={(e) => updateArrayItem("tips", index, e.target.value)}
-                className="flex-1 p-3 rounded-lg bg-light-grey text-white border border-light-grey focus:border-table-blue focus:outline-none"
+                className="flex-1 p-3 rounded-lg bg-surface-light text-text border border-border focus:border-primary focus:outline-none"
                 placeholder="Enter coaching tip..."
               />
               {data.tips.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeArrayItem("tips", index)}
-                  className="p-3 rounded-lg bg-red text-white hover:bg-red/80"
+                  className="p-3 rounded-lg bg-danger text-white hover:bg-danger-dark"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -242,7 +242,7 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
           <button
             type="button"
             onClick={() => addArrayItem("tips")}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-table-blue text-white hover:bg-table-blue/80"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-dark"
           >
             <Plus className="w-4 h-4" />
             Add Tip

@@ -11,7 +11,7 @@ export const ControlButton = ({
 }: PropsWithChildren<Props>) => {
   return (
     <button
-      className="text-white disabled:text-light-grey hover:not-disabled:text-light-grey hover:not-disabled:cursor-pointer disabled:cursor-not-allowed"
+      className="text-text disabled:text-text-subtle hover:not-disabled:text-primary hover:not-disabled:cursor-pointer disabled:cursor-not-allowed"
       {...rest}
     >
       {children}

@@ -29,10 +29,13 @@ export const DrillCard = ({ drill }: Props) => {
   } = useDrillState({ drill });
 
   return (
-    <div className="shadow-lg p-4 rounded-lg bg-grey w-[232px] flex flex-col">
+    <div className="shadow-lg p-4 rounded-lg bg-surface border border-border w-[232px] flex flex-col hover:border-primary-light transition-colors">
       <div className="mb-2 flex flex-col grow">
-        <h2 className="font-semibold text-wrap grow">
-          <Link href={`/drills/${drill.slug}`} className="hover:underline">
+        <h2 className="font-semibold text-wrap grow text-text">
+          <Link
+            href={`/drills/${drill.slug}`}
+            className="hover:text-primary-light transition-colors"
+          >
             {drill.name}
           </Link>
         </h2>
@@ -42,17 +45,17 @@ export const DrillCard = ({ drill }: Props) => {
           <div
             className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium border ${
               drill.difficulty === "beginner"
-                ? "bg-green text-white border-green"
+                ? "bg-success text-white border-success"
                 : drill.difficulty === "intermediate"
-                ? "bg-light-grey text-white border-light-grey"
-                : "bg-red text-white border-red"
+                ? "bg-warning text-white border-warning"
+                : "bg-danger text-white border-danger"
             }`}
           >
             <div className="w-1.5 h-1.5 rounded-full bg-white" />
             <span>{difficultyDisplay[drill.difficulty]}</span>
           </div>
           {drill.categories[0] && (
-            <span className="text-xs bg-table-blue text-white px-2 py-1 rounded-full font-medium border border-table-blue">
+            <span className="text-xs bg-primary text-white px-2 py-1 rounded-full font-medium border border-primary">
               {categoryDisplay[drill.categories[0]]}
             </span>
           )}

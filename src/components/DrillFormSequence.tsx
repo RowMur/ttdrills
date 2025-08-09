@@ -162,14 +162,14 @@ export const DrillFormSequence = ({ onChange }: Props) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-white/80 text-sm">
+        <p className="text-text-muted text-sm">
           Create the sequence of shots in your drill. Each node represents a
           ball hit by either the player or opponent.
         </p>
         <button
           type="button"
           onClick={addNode}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green text-white hover:bg-green/80"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-success text-white hover:bg-success-dark"
         >
           <Plus className="w-4 h-4" />
           Add Shot
@@ -178,7 +178,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
 
       {nodes.length > 0 && (
         <div>
-          <label className="block text-sm font-medium text-white mb-2">
+          <label className="block text-sm font-medium text-text mb-2">
             Starting Shot
           </label>
           <select
@@ -187,7 +187,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
               setEntryPoint(e.target.value);
               updateSequence(nodes, e.target.value);
             }}
-            className="p-2 rounded-lg bg-light-grey text-white border border-light-grey focus:border-table-blue focus:outline-none"
+            className="p-2 rounded-lg bg-surface-light text-text border border-border focus:border-primary focus:outline-none"
           >
             {nodes.map((node) => (
               <option key={node.id} value={node.id}>
@@ -203,13 +203,13 @@ export const DrillFormSequence = ({ onChange }: Props) => {
         {nodes.map((node, index) => (
           <div
             key={node.id}
-            className="bg-light-grey rounded-lg p-4 border border-light-grey"
+            className="bg-surface-light rounded-lg p-4 border border-border"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-white">
+              <h3 className="font-semibold text-text">
                 Shot {index + 1}: {node.id}
                 {node.id === entryPoint && (
-                  <span className="ml-2 px-2 py-1 bg-green text-white text-xs rounded">
+                  <span className="ml-2 px-2 py-1 bg-success text-white text-xs rounded">
                     START
                   </span>
                 )}
@@ -217,7 +217,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
               <button
                 type="button"
                 onClick={() => removeNode(index)}
-                className="p-2 rounded-lg bg-red text-white hover:bg-red/80"
+                className="p-2 rounded-lg bg-danger text-white hover:bg-danger-dark"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -226,7 +226,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
               {/* Player/Opponent */}
               <div>
-                <label className="block text-sm font-medium text-white mb-1">
+                <label className="block text-sm font-medium text-text mb-1">
                   Player
                 </label>
                 <select
@@ -238,7 +238,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
                       e.target.value === "opponent"
                     )
                   }
-                  className="w-full p-2 rounded-lg bg-grey text-white border border-grey focus:border-table-blue focus:outline-none"
+                  className="w-full p-2 rounded-lg bg-surface text-text border border-border focus:border-primary focus:outline-none"
                 >
                   <option value="player">Player</option>
                   <option value="opponent">Opponent</option>
@@ -247,7 +247,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
 
               {/* Stroke */}
               <div>
-                <label className="block text-sm font-medium text-white mb-1">
+                <label className="block text-sm font-medium text-text mb-1">
                   Stroke
                 </label>
                 <select
@@ -255,7 +255,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
                   onChange={(e) =>
                     updateNode(index, "stroke", e.target.value as ShotType)
                   }
-                  className="w-full p-2 rounded-lg bg-grey text-white border border-grey focus:border-table-blue focus:outline-none"
+                  className="w-full p-2 rounded-lg bg-surface text-text border border-border focus:border-primary focus:outline-none"
                 >
                   {(Object.keys(shotTypeDisplay) as ShotType[]).map(
                     (stroke) => (
@@ -269,7 +269,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
 
               {/* Spin */}
               <div>
-                <label className="block text-sm font-medium text-white mb-1">
+                <label className="block text-sm font-medium text-text mb-1">
                   Spin
                 </label>
                 <select
@@ -277,7 +277,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
                   onChange={(e) =>
                     updateNode(index, "spin", e.target.value as Spin)
                   }
-                  className="w-full p-2 rounded-lg bg-grey text-white border border-grey focus:border-table-blue focus:outline-none"
+                  className="w-full p-2 rounded-lg bg-surface text-text border border-border focus:border-primary focus:outline-none"
                 >
                   {(Object.keys(spinDisplay) as Spin[]).map((spin) => (
                     <option key={spin} value={spin}>
@@ -289,7 +289,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
 
               {/* Direction */}
               <div>
-                <label className="block text-sm font-medium text-white mb-1">
+                <label className="block text-sm font-medium text-text mb-1">
                   Direction
                 </label>
                 <select
@@ -301,7 +301,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
                       e.target.value as Placement["direction"]
                     )
                   }
-                  className="w-full p-2 rounded-lg bg-grey text-white border border-grey focus:border-table-blue focus:outline-none"
+                  className="w-full p-2 rounded-lg bg-surface text-text border border-border focus:border-primary focus:outline-none"
                 >
                   <option value="backhand">Backhand</option>
                   <option value="middle">Middle</option>
@@ -313,7 +313,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Depth */}
               <div>
-                <label className="block text-sm font-medium text-white mb-1">
+                <label className="block text-sm font-medium text-text mb-1">
                   Depth
                 </label>
                 <select
@@ -325,7 +325,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
                       e.target.value as Placement["depth"]
                     )
                   }
-                  className="w-full p-2 rounded-lg bg-grey text-white border border-grey focus:border-table-blue focus:outline-none"
+                  className="w-full p-2 rounded-lg bg-surface text-text border border-border focus:border-primary focus:outline-none"
                 >
                   <option value="short">Short</option>
                   <option value="halflong">Half-Long</option>
@@ -335,7 +335,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
 
               {/* Connections */}
               <div>
-                <label className="block text-sm font-medium text-white mb-1">
+                <label className="block text-sm font-medium text-text mb-1">
                   Next Shots
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -352,8 +352,8 @@ export const DrillFormSequence = ({ onChange }: Props) => {
                         }
                         className={`px-2 py-1 text-xs rounded border ${
                           node.next.includes(targetNode.id)
-                            ? "bg-table-blue border-table-blue text-white"
-                            : "bg-transparent border-light-grey text-white hover:border-white"
+                            ? "bg-primary border-primary text-white"
+                            : "bg-transparent border-border text-text hover:border-text"
                         }`}
                       >
                         {targetNode.id}
@@ -377,7 +377,7 @@ export const DrillFormSequence = ({ onChange }: Props) => {
       </div>
 
       {nodes.length === 0 && (
-        <div className="text-center py-8 text-white/60">
+        <div className="text-center py-8 text-text-subtle">
           <p>
             No shots created yet. Click &quot;Add Shot&quot; to start building
             your drill sequence.

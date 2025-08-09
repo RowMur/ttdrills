@@ -31,20 +31,25 @@ export const SearchResults = () => {
       <div className="mb-6">
         {filteredDrills.length === 0 ? (
           <div className="text-center ">
-            <p className="mb-4">
+            <p className="mb-4 text-text">
               No drills found for &quot;{searchTerm}&quot;.
             </p>
-            <p className="text-sm text-gray-600 mb-4">
-              Try searching for: <strong>strokes</strong> (forehand, backhand),{" "}
-              <strong>spins</strong> (topspin, backspin),
-              <strong>skills</strong> (attack, defense, footwork),{" "}
-              <strong>difficulty</strong> (beginner, intermediate, advanced), or{" "}
-              <strong>equipment</strong> (multiball, robot)
+            <p className="text-sm text-text-subtle mb-4">
+              Try searching for:{" "}
+              <strong className="text-text-muted">strokes</strong> (forehand,
+              backhand), <strong className="text-text-muted">spins</strong>{" "}
+              (topspin, backspin),
+              <strong className="text-text-muted">skills</strong> (attack,
+              defense, footwork),{" "}
+              <strong className="text-text-muted">difficulty</strong> (beginner,
+              intermediate, advanced), or{" "}
+              <strong className="text-text-muted">equipment</strong> (multiball,
+              robot)
             </p>
           </div>
         ) : (
           <div className="flex wrap flex-col sm:flex-row items-center justify-between">
-            <p>
+            <p className="text-text">
               Found {filteredDrills.length} drill
               {filteredDrills.length === 1 ? "" : "s"}
               {searchTerm ? ` for "${searchTerm}"` : ""}.
@@ -52,7 +57,7 @@ export const SearchResults = () => {
 
             <button
               onClick={handleRandomDrill}
-              className="bg-green-600 text-white rounded-md hover:bg-green-700 hover:cursor-pointer px-4 py-2 transition-colors flex items-center justify-center gap-2"
+              className="bg-success text-white rounded-md hover:bg-success-dark hover:cursor-pointer px-4 py-2 transition-colors flex items-center justify-center gap-2"
               title="Get a random drill from these results"
             >
               <Dice6 size={16} />

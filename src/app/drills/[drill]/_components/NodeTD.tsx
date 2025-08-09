@@ -8,7 +8,7 @@ type Props = {
 
 export const NodeTD = ({ node, isActive }: Props) => {
   if (!node) {
-    return <td className="p-2">-</td>;
+    return <td className="p-2 text-text-subtle">-</td>;
   }
 
   return (
@@ -16,13 +16,13 @@ export const NodeTD = ({ node, isActive }: Props) => {
       {node && (
         <div
           className={`flex flex-col gap-1 w-fit px-2 rounded ${
-            isActive ? "bg-light-grey" : ""
+            isActive ? "bg-surface-light" : ""
           }`}
         >
-          <span className="text-sm font-bold">
+          <span className="text-sm font-bold text-text">
             {shotTypeDisplay[node.ball.stroke]} {spinDisplay[node.ball.spin]}
           </span>
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-text-subtle">
             from {node.ball.placement.depth} {node.ball.placement.direction}
           </span>
         </div>

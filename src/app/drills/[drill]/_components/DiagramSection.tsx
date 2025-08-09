@@ -69,7 +69,7 @@ export const DiagramSection = ({ drill }: Props) => {
           goToNextNodeOption={goToNextNodeOption}
         />
       </div>
-      <div className="grow bg-grey rounded flex flex-col p-4 gap-4">
+      <div className="grow bg-surface border border-border rounded flex flex-col p-4 gap-4">
         <div className="flex justify-between items-end gap-2">
           <ControlButton onClick={reset}>
             <RotateCcw />
@@ -105,10 +105,10 @@ export const DiagramSection = ({ drill }: Props) => {
             <div className="justify-center flex mt-4 gap-2">
               {potentialNextNodes.map((node, i) => (
                 <>
-                  <span className="text-xs text-slate-500" key={node.id}>
+                  <span className="text-xs text-text-subtle" key={node.id}>
                     {node.ball.placement.depth} {node.ball.placement.direction}
                   </span>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-text-subtle">
                     {i < potentialNextNodes.length - 1 ? "or" : ""}
                   </span>
                 </>
