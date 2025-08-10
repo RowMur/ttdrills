@@ -1,4 +1,27 @@
-import { track } from "@vercel/analytics";
+import { posthog } from "./posthog";
+
+// Helper function to safely capture events
+const safeCapture = (
+  event: string,
+  properties?: Record<string, string | number | boolean>
+) => {
+  try {
+    // Only capture if PostHog is properly initialized
+    if (posthog && typeof posthog.capture === "function") {
+      posthog.capture(event, properties);
+    } else {
+      // Log events in development when PostHog isn't initialized
+      if (process.env.NODE_ENV === "development") {
+        console.log("PostHog Event:", event, properties);
+      }
+    }
+  } catch (error) {
+    // Silently fail in production, log in development
+    if (process.env.NODE_ENV === "development") {
+      console.warn("PostHog capture failed:", error);
+    }
+  }
+};
 
 // Track drill views
 export const trackDrillView = (
@@ -7,7 +30,7 @@ export const trackDrillView = (
   difficulty: string,
   categories: string[]
 ) => {
-  track("drill_view", {
+  safeCapture("drill_view", {
     drill_name: drillName,
     drill_slug: drillSlug,
     difficulty,
@@ -22,7 +45,7 @@ export const trackDrillCreation = (
   categories: string[],
   hasVideo: boolean
 ) => {
-  track("drill_created", {
+  safeCapture("drill_created", {
     drill_name: drillName,
     difficulty,
     categories: categories.join(","),
@@ -32,7 +55,7 @@ export const trackDrillCreation = (
 
 // Track drill editing
 export const trackDrillEdit = (drillName: string, drillSlug: string) => {
-  track("drill_edited", {
+  safeCapture("drill_edited", {
     drill_name: drillName,
     drill_slug: drillSlug,
   });
@@ -40,7 +63,7 @@ export const trackDrillEdit = (drillName: string, drillSlug: string) => {
 
 // Track drill deletion
 export const trackDrillDeletion = (drillName: string, drillSlug: string) => {
-  track("drill_deleted", {
+  safeCapture("drill_deleted", {
     drill_name: drillName,
     drill_slug: drillSlug,
   });
@@ -48,14 +71,14 @@ export const trackDrillDeletion = (drillName: string, drillSlug: string) => {
 
 // Track user sign in
 export const trackSignIn = (method: string) => {
-  track("user_signed_in", {
+  safeCapture("user_signed_in", {
     method,
   });
 };
 
 // Track search queries
 export const trackSearch = (query: string, resultsCount: number) => {
-  track("search_performed", {
+  safeCapture("search_performed", {
     query,
     results_count: resultsCount,
   });
@@ -63,7 +86,7 @@ export const trackSearch = (query: string, resultsCount: number) => {
 
 // Track random drill selection
 export const trackRandomDrill = (drillName: string, drillSlug: string) => {
-  track("random_drill_selected", {
+  safeCapture("random_drill_selected", {
     drill_name: drillName,
     drill_slug: drillSlug,
   });
@@ -71,14 +94,14 @@ export const trackRandomDrill = (drillName: string, drillSlug: string) => {
 
 // Track timer usage
 export const trackTimerStart = (duration: number) => {
-  track("timer_started", {
+  safeCapture("timer_started", {
     duration_seconds: duration,
   });
 };
 
 // Track timer completion
 export const trackTimerComplete = (duration: number) => {
-  track("timer_completed", {
+  safeCapture("timer_completed", {
     duration_seconds: duration,
   });
 };
@@ -89,7 +112,7 @@ export const trackVideoView = (
   drillSlug: string,
   videoUrl: string
 ) => {
-  track("video_viewed", {
+  safeCapture("video_viewed", {
     drill_name: drillName,
     drill_slug: drillSlug,
     video_url: videoUrl,
@@ -98,7 +121,7 @@ export const trackVideoView = (
 
 // Track page views (for custom pages)
 export const trackPageView = (page: string) => {
-  track("page_view", {
+  safeCapture("page_view", {
     page,
   });
 };
@@ -108,7 +131,7 @@ export const trackUserEngagement = (
   action: string,
   details?: Record<string, string | number | boolean>
 ) => {
-  track("user_engagement", {
+  safeCapture("user_engagement", {
     action,
     ...details,
   });
