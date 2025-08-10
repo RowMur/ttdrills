@@ -59,7 +59,7 @@ export type User = {
 };
 
 export type Drill = {
-  id: string;
+  id?: string;
   name: string;
   slug: string;
   description: string;

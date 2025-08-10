@@ -65,7 +65,6 @@ async function seedDatabase() {
       .from("drills")
       .insert(
         drillsToInsert.map((drill) => ({
-          id: drill.id,
           name: drill.name,
           slug: drill.slug,
           description: drill.description,

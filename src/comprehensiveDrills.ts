@@ -2,7 +2,6 @@ import { Drill } from "@/types";
 
 export const COMPREHENSIVE_DRILLS: Drill[] = [
   {
-    id: "2-backhands-2-forehands",
     name: "2 Backhands, 2 Forehands",
     slug: "2-backhands-2-forehands",
     videoUrl: "https://www.youtube.com/watch?v=P5GNNVxyhWc",
@@ -147,8 +146,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   },
 
   {
-    id: "falkenberg-drill",
-    creatorId: "system",
+    creatorId: "00000000-0000-0000-0000-000000000000",
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-01-01"),
     name: "Falkenberg Drill",
@@ -246,8 +244,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   },
 
   {
-    id: "1-backhand-1-forehand",
-    creatorId: "system",
+    creatorId: "00000000-0000-0000-0000-000000000000",
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-01-01"),
     name: "1 Backhand, 1 Forehand",
@@ -323,8 +320,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   },
 
   {
-    id: "backhand-middle-backhand-wide",
-    creatorId: "system",
+    creatorId: "00000000-0000-0000-0000-000000000000",
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-01-01"),
     name: "Backhand, Middle, Backhand, Wide",
@@ -443,8 +439,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   },
 
   {
-    id: "12-backhand-1-forehand",
-    creatorId: "system",
+    creatorId: "00000000-0000-0000-0000-000000000000",
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-01-01"),
     name: "1/2 Backhand, 1 Forehand",
@@ -558,8 +553,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   },
 
   {
-    id: "12-backhand-12-forehand",
-    creatorId: "system",
+    creatorId: "00000000-0000-0000-0000-000000000000",
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-01-01"),
     name: "1/2 Backhand, 1/2 Forehand",
@@ -703,8 +697,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   },
 
   {
-    id: "flick-and-down-the-line",
-    creatorId: "system",
+    creatorId: "00000000-0000-0000-0000-000000000000",
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-01-01"),
     name: "Flick and Down the Line",
@@ -789,8 +782,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   },
 
   {
-    id: "3rd-ball-forehand-pivot",
-    creatorId: "system",
+    creatorId: "00000000-0000-0000-0000-000000000000",
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-01-01"),
     name: "3rd Ball Forehand Pivot",
@@ -852,7 +844,6 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
     },
   },
   {
-    id: "five-forehands",
     slug: "five-forehands",
     name: "Five Forehands",
     description:
@@ -863,7 +854,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
     difficulty: "intermediate",
     objectives: [],
     tips: [],
-    creatorId: "system",
+    creatorId: "00000000-0000-0000-0000-000000000000",
     videoUrl: "https://www.youtube.com/watch?v=3EnAQWQ7CMk",
     videoStart: 50,
     graph: {
