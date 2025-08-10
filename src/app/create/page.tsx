@@ -25,6 +25,7 @@ type PreviewDrill = Omit<Drill, "id" | "creatorId" | "createdAt" | "updatedAt">;
 
 function CreateDrillContent() {
   const { data: session } = useSession();
+  const [isCreating, setIsCreating] = useState(false);
   const [drillData, setDrillData] = useState({
     name: "",
     description: "",
@@ -106,6 +107,8 @@ function CreateDrillContent() {
       return;
     }
 
+    setIsCreating(true);
+
     // Filter out empty objectives and tips
     const cleanObjectives = drillData.objectives.filter(
       (obj) => obj.trim() !== ""
@@ -144,11 +147,10 @@ function CreateDrillContent() {
 
       const createdDrill = await response.json();
 
-      alert("Drill created successfully!");
       console.log("Created Drill:", createdDrill);
 
-      // Optionally redirect to the drill page
-      // window.location.href = `/drills/${createdDrill.slug}`;
+      // Redirect to the drill details page
+      window.location.href = `/drills/${createdDrill.slug}`;
     } catch (error) {
       console.error("Error creating drill:", error);
       alert(
@@ -156,6 +158,8 @@ function CreateDrillContent() {
           error instanceof Error ? error.message : "Unknown error"
         }`
       );
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -205,14 +209,14 @@ function CreateDrillContent() {
               <div className="text-center">
                 <Button
                   onClick={handleCreateDrill}
-                  disabled={!isFormValid()}
+                  disabled={!isFormValid() || isCreating}
                   className={`px-8 py-3 rounded-lg font-semibold ${
-                    isFormValid()
+                    isFormValid() && !isCreating
                       ? "bg-success text-white hover:bg-success-dark"
                       : "bg-surface-light text-text-subtle cursor-not-allowed"
                   }`}
                 >
-                  Create Drill
+                  {isCreating ? "Creating..." : "Create Drill"}
                 </Button>
                 {!isFormValid() && (
                   <p className="text-text-subtle text-sm mt-2">
