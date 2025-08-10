@@ -157,8 +157,8 @@ export async function getDrills(
   } = {}
 ): Promise<{ drills: DatabaseDrill[]; total: number }> {
   const { search, category, difficulty, page = 1, limit = 10 } = options;
-  const offset = (page - 1) * limit;
 
+  // First, get all drills that match basic filters
   let query = supabase.from("drills").select(
     `
       *,
@@ -167,10 +167,7 @@ export async function getDrills(
     { count: "exact" }
   );
 
-  if (search) {
-    query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
-  }
-
+  // Apply basic filters
   if (category) {
     query = query.contains("categories", [category]);
   }
@@ -179,18 +176,56 @@ export async function getDrills(
     query = query.eq("difficulty", difficulty);
   }
 
-  const { data, error, count } = await query
-    .order("created_at", { ascending: false })
-    .range(offset, offset + limit - 1);
+  const { data, error } = await query;
 
   if (error) {
     console.error("Error fetching drills:", error);
     return { drills: [], total: 0 };
   }
 
+  if (!data) {
+    return { drills: [], total: 0 };
+  }
+
+  // Transform to Drill type for intelligent search
+  const drills = data.map(transformDatabaseDrill);
+
+  // Apply intelligent search if search term is provided
+  let filteredDrills = drills;
+  if (search) {
+    // Import the search function dynamically to avoid circular dependencies
+    const { searchDrillsWithScoring } = await import("@/utils/drillSearch");
+    const scoredResults = searchDrillsWithScoring(search, drills);
+    filteredDrills = scoredResults.map((result) => result.drill);
+  } else {
+    // When no search term, sort by quality score
+    const { searchDrillsWithScoring } = await import("@/utils/drillSearch");
+    const scoredResults = searchDrillsWithScoring("", drills);
+    filteredDrills = scoredResults.map((result) => result.drill);
+  }
+
+  // Apply pagination
+  const offset = (page - 1) * limit;
+  const paginatedDrills = filteredDrills.slice(offset, offset + limit);
+
+  // Transform back to DatabaseDrill format for API response
+  const resultDrills = paginatedDrills
+    .map((drill) => {
+      // Find the original database drill to get the database format
+      const originalDrill = data.find((dbDrill) => dbDrill.id === drill.id);
+      if (!originalDrill) {
+        console.warn(
+          `Could not find original drill data for drill ID: ${drill.id}`
+        );
+        return null;
+      }
+      return originalDrill;
+    })
+    .filter(Boolean) as DatabaseDrill[];
+
   return {
-    drills: data || [],
-    total: count || 0,
+    drills: resultDrills,
+    total: filteredDrills.length,
   };
 }
 

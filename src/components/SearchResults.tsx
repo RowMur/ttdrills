@@ -21,18 +21,18 @@ export const SearchResults = () => {
         setLoading(true);
         const params = new URLSearchParams();
         if (searchTerm) {
-          params.append('search', searchTerm);
+          params.append("search", searchTerm);
         }
-        
+
         const response = await fetch(`/api/drills?${params.toString()}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch drills');
+          throw new Error("Failed to fetch drills");
         }
-        
+
         const data = await response.json();
         setDrills(data.drills || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch drills');
+        setError(err instanceof Error ? err.message : "Failed to fetch drills");
       } finally {
         setLoading(false);
       }
@@ -92,6 +92,8 @@ export const SearchResults = () => {
               Found {drills.length} drill
               {drills.length === 1 ? "" : "s"}
               {searchTerm ? ` for "${searchTerm}"` : ""}.
+              {!searchTerm &&
+                " Results are sorted by quality and completeness."}
             </p>
 
             <button
