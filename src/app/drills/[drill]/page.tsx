@@ -2,6 +2,7 @@ import { DiagramSection } from "@/app/drills/[drill]/_components/DiagramSection"
 import { DrillDetails } from "@/components/DrillDetails";
 import { DeleteDrillButton } from "@/components/DeleteDrillButton";
 import { EditDrillButton } from "@/components/EditDrillButton";
+import { TimerButton } from "@/components/TimerButton";
 import { Main } from "@/components/Main";
 import { notFound } from "next/navigation";
 import { getDrillBySlug, transformDatabaseDrill } from "@/lib/database";
@@ -31,6 +32,7 @@ const Page = async (props: Props) => {
           {drill.name}
         </h2>
         <div className="flex gap-2">
+          <TimerButton />
           <EditDrillButton
             drillSlug={drill.slug}
             creatorEmail={drill.creator?.email || ""}
