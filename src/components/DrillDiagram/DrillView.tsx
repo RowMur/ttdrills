@@ -17,13 +17,6 @@ type Props = {
 
 export const DrillView = ({ drill, nodeId, height, width }: Props) => {
   const out = drill.graph.nodes[nodeId];
-  const incomingOptions = out.next
-    ? out.next.map((i) => drill.graph.nodes[i])
-    : null;
-
-  if (!out || !incomingOptions) {
-    return null;
-  }
 
   // Get where the current shot is coming from and going to
   const fromPlacement = getEffectiveFromPlacement(out, drill.graph);
