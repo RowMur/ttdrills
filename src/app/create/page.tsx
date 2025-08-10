@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useSession } from "next-auth/react";
 import { DrillFormMetadata } from "@/components/DrillFormMetadata";
 import { DrillFormSequence } from "@/components/DrillFormSequence";
 import { Button } from "@/components/Button";
@@ -23,6 +24,7 @@ import {
 type PreviewDrill = Omit<Drill, "id" | "creatorId" | "createdAt" | "updatedAt">;
 
 function CreateDrillContent() {
+  const { data: session } = useSession();
   const [drillData, setDrillData] = useState({
     name: "",
     description: "",
@@ -99,6 +101,11 @@ function CreateDrillContent() {
   };
 
   const handleCreateDrill = () => {
+    if (!session?.user?.email) {
+      alert("Please sign in to create a drill");
+      return;
+    }
+
     // Filter out empty objectives and tips
     const cleanObjectives = drillData.objectives.filter(
       (obj) => obj.trim() !== ""
@@ -114,7 +121,7 @@ function CreateDrillContent() {
       difficulty: drillData.difficulty,
       categories: drillData.categories,
       tips: cleanTips,
-      creatorId: "user-id", // This would come from the session
+      creatorId: session.user.email, // Use email as user identifier
       createdAt: new Date(),
       updatedAt: new Date(),
       ...(drillData.duration && { duration: drillData.duration }),

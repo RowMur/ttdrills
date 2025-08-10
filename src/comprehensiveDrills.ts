@@ -840,7 +840,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
         "forehand-pivot": {
           id: "forehand-pivot",
           prev: ["return"],
-          next: ["counter"],
+          next: null,
           ball: {
             spin: "top",
             stroke: "forehand",
