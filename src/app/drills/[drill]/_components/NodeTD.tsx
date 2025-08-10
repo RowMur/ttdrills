@@ -1,12 +1,17 @@
 import { shotTypeDisplay, spinDisplay } from "@/data";
-import { Node } from "@/types";
+import { Node, StepGraph } from "@/types";
+import {
+  getEffectivePlacement,
+  getEffectiveFromPlacement,
+} from "@/utils/drillUtils";
 
 type Props = {
   node: Node | null;
   isActive: boolean;
+  graph?: StepGraph; // Optional for backward compatibility
 };
 
-export const NodeTD = ({ node, isActive }: Props) => {
+export const NodeTD = ({ node, isActive, graph }: Props) => {
   if (!node) {
     return <td className="p-2 text-text-subtle">-</td>;
   }
@@ -23,7 +28,18 @@ export const NodeTD = ({ node, isActive }: Props) => {
             {shotTypeDisplay[node.ball.stroke]} {spinDisplay[node.ball.spin]}
           </span>
           <span className="text-xs text-text-subtle">
-            from {node.ball.placement.depth} {node.ball.placement.direction}
+            {(() => {
+              const toPlacement = getEffectivePlacement(node);
+              const fromPlacement = graph
+                ? getEffectiveFromPlacement(node, graph)
+                : null;
+
+              if (fromPlacement) {
+                return `from ${fromPlacement.depth} ${fromPlacement.direction} → to ${toPlacement.depth} ${toPlacement.direction}`;
+              } else {
+                return `to ${toPlacement.depth} ${toPlacement.direction}`;
+              }
+            })()}
           </span>
         </div>
       )}

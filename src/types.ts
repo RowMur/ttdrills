@@ -21,7 +21,8 @@ export type ShotType = "forehand" | "backhand" | "serve";
 export type Ball = {
   stroke: ShotType;
   spin: Spin;
-  placement: Placement;
+  placement: Placement; // Where the shot is going (user specifies)
+  // fromPlacement?: Placement; // Where the shot is coming from (derived from previous shot)
   isOpponent: boolean;
   // repetition?: Repetition;
 };

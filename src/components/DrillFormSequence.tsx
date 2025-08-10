@@ -15,8 +15,8 @@ type NodeFormData = {
   name: string;
   stroke: ShotType;
   spin: Spin;
-  depth: Placement["depth"];
-  direction: Placement["direction"];
+  toDepth: Placement["depth"];
+  toDirection: Placement["direction"];
   isOpponent: boolean;
   prev: string[];
   next: string[];
@@ -39,8 +39,8 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
         name: node.id, // Use ID as name initially
         stroke: node.ball.stroke,
         spin: node.ball.spin,
-        depth: node.ball.placement.depth,
-        direction: node.ball.placement.direction,
+        toDepth: node.ball.placement.depth,
+        toDirection: node.ball.placement.direction,
         isOpponent: node.ball.isOpponent,
         prev: node.prev || [],
         next: node.next || [],
@@ -53,8 +53,8 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
       name: "Serve",
       stroke: "forehand",
       spin: "top",
-      depth: "long",
-      direction: "forehand",
+      toDepth: "long",
+      toDirection: "backhand",
       isOpponent: false,
       prev: [],
       next: [],
@@ -145,8 +145,8 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
       name: "",
       stroke: "forehand",
       spin: "top",
-      depth: "long",
-      direction: "forehand",
+      toDepth: "long",
+      toDirection: "backhand",
       isOpponent: !currentNode.isOpponent, // Automatically alternate between player and opponent
       prev: [currentNode.id],
       next: [],
@@ -542,8 +542,8 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
           stroke: nodeData.stroke,
           spin: nodeData.spin,
           placement: {
-            depth: nodeData.depth,
-            direction: nodeData.direction,
+            depth: nodeData.toDepth,
+            direction: nodeData.toDirection,
           },
           isOpponent: nodeData.isOpponent,
         },
@@ -560,8 +560,11 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
     <div className="space-y-6">
       <div>
         <p className="text-text-muted text-sm">
-          Create the sequence of shots in your drill. Use &quot;Add Next
-          Shot&quot; to extend the sequence.
+          Create the sequence of shots in your drill. For each shot, specify
+          where it&apos;s going (To/To Depth). Where each shot comes from is
+          automatically determined based on where the previous shot is going.
+          This makes it intuitive: you specify where you&apos;re hitting the
+          ball TO. Use &quot;Add Next Shot&quot; to extend the sequence.
         </p>
       </div>
 
@@ -699,17 +702,17 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
                   </select>
                 </div>
 
-                {/* Direction */}
+                {/* To Direction */}
                 <div>
                   <label className="block text-sm font-medium text-text mb-1">
-                    From
+                    To
                   </label>
                   <select
-                    value={node.direction}
+                    value={node.toDirection}
                     onChange={(e) =>
                       updateNode(
                         index,
-                        "direction",
+                        "toDirection",
                         e.target.value as Placement["direction"]
                       )
                     }
@@ -721,17 +724,17 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
                   </select>
                 </div>
 
-                {/* Depth */}
+                {/* To Depth */}
                 <div>
                   <label className="block text-sm font-medium text-text mb-1">
-                    Depth (from)
+                    To Depth
                   </label>
                   <select
-                    value={node.depth}
+                    value={node.toDepth}
                     onChange={(e) =>
                       updateNode(
                         index,
-                        "depth",
+                        "toDepth",
                         e.target.value as Placement["depth"]
                       )
                     }

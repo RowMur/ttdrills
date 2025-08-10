@@ -31,7 +31,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
           ball: {
             spin: "top",
             stroke: "backhand",
-            placement: { depth: "long", direction: "backhand" },
+            placement: { depth: "long", direction: "forehand" },
             isOpponent: false,
           },
         },
@@ -53,7 +53,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
           ball: {
             spin: "top",
             stroke: "backhand",
-            placement: { depth: "long", direction: "backhand" },
+            placement: { depth: "long", direction: "forehand" },
             isOpponent: false,
           },
         },
@@ -75,7 +75,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
           ball: {
             spin: "top",
             stroke: "forehand",
-            placement: { depth: "long", direction: "forehand" },
+            placement: { depth: "long", direction: "backhand" },
             isOpponent: false,
           },
         },
@@ -97,7 +97,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
           ball: {
             spin: "top",
             stroke: "forehand",
-            placement: { depth: "long", direction: "forehand" },
+            placement: { depth: "long", direction: "backhand" },
             isOpponent: false,
           },
         },
@@ -146,7 +146,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
           ball: {
             spin: "top",
             stroke: "backhand",
-            placement: { depth: "long", direction: "backhand" },
+            placement: { depth: "long", direction: "forehand" },
             isOpponent: false,
           },
         },
@@ -190,7 +190,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
           ball: {
             spin: "top",
             stroke: "forehand",
-            placement: { depth: "long", direction: "forehand" },
+            placement: { depth: "long", direction: "backhand" },
             isOpponent: false,
           },
         },

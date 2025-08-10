@@ -8,6 +8,7 @@ import { DrillDiagram } from "@/components/DrillDiagram/DrillDiagram";
 import { ControlButton } from "@/components/ControlButton";
 import { useDrillState } from "@/hooks/useDrillState";
 import { Drill, DifficultyLevel, DrillCategory, StepGraph } from "@/types";
+import { getEffectivePlacement } from "@/utils/drillUtils";
 import {
   ChevronLeft,
   ChevronRight,
@@ -39,7 +40,7 @@ export default function CreateDrillPage() {
         ball: {
           stroke: "forehand",
           spin: "top",
-          placement: { depth: "long", direction: "forehand" },
+          placement: { depth: "long", direction: "backhand" },
           isOpponent: false,
         },
       },
@@ -104,7 +105,7 @@ export default function CreateDrillPage() {
             ball: {
               stroke: "forehand",
               spin: "top",
-              placement: { depth: "long", direction: "forehand" },
+              placement: { depth: "long", direction: "backhand" },
               isOpponent: false,
             },
           },
@@ -339,8 +340,8 @@ export default function CreateDrillPage() {
                             {drillState.availableNextNodes.map((node, i) => (
                               <span key={node.id} className="text-xs">
                                 <span className="bg-primary/20 text-primary px-2 py-1 rounded">
-                                  {node.ball.placement.depth}{" "}
-                                  {node.ball.placement.direction}
+                                  {getEffectivePlacement(node).depth}{" "}
+                                  {getEffectivePlacement(node).direction}
                                 </span>
                                 {i <
                                   drillState.availableNextNodes.length - 1 && (
@@ -528,14 +529,16 @@ export default function CreateDrillPage() {
                                 Placement:
                               </span>
                               <div className="text-text-subtle">
-                                {
-                                  ballSequence.nodes[drillState.nodeId]?.ball
-                                    .placement.direction
-                                }{" "}
-                                {
-                                  ballSequence.nodes[drillState.nodeId]?.ball
-                                    .placement.depth
-                                }
+                                {(() => {
+                                  const node =
+                                    ballSequence.nodes[drillState.nodeId];
+                                  if (node) {
+                                    const placement =
+                                      getEffectivePlacement(node);
+                                    return `${placement.direction} ${placement.depth}`;
+                                  }
+                                  return "final shot";
+                                })()}
                               </div>
                             </div>
                           </div>
@@ -554,8 +557,8 @@ export default function CreateDrillPage() {
                             {drillState.availableNextNodes.map((node, i) => (
                               <span key={node.id} className="text-sm">
                                 <span className="bg-primary/20 text-primary px-3 py-1 rounded-full">
-                                  {node.ball.placement.depth}{" "}
-                                  {node.ball.placement.direction}
+                                  {getEffectivePlacement(node).depth}{" "}
+                                  {getEffectivePlacement(node).direction}
                                 </span>
                                 {i <
                                   drillState.availableNextNodes.length - 1 && (

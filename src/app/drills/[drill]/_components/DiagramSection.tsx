@@ -5,9 +5,10 @@ import { ControlButton } from "@/components/ControlButton";
 import { DrillDiagram } from "@/components/DrillDiagram/DrillDiagram";
 import { useDrillState } from "@/hooks/useDrillState";
 import { Drill, Node } from "@/types";
-import { isPlaceholderPositioningNode } from "@/utils/isPlaceholderPositioningNode";
+import { getEffectivePlacement } from "@/utils/drillUtils";
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { useMemo } from "react";
+import React from "react";
 
 const DIAGRAM_HEIGHT = 360;
 const DIAGRAM_WIDTH = 200;
@@ -92,10 +93,12 @@ export const DiagramSection = ({ drill }: Props) => {
                   <NodeTD
                     node={playerNode}
                     isActive={playerNode?.id === nodeId}
+                    graph={drill.graph}
                   />
                   <NodeTD
                     node={opponentNode}
                     isActive={opponentNode?.id === nodeId}
+                    graph={drill.graph}
                   />
                 </tr>
               ))}
@@ -103,16 +106,19 @@ export const DiagramSection = ({ drill }: Props) => {
           </table>
           {potentialNextNodes && potentialNextNodes?.length > 1 && (
             <div className="justify-center flex mt-4 gap-2">
-              {potentialNextNodes.map((node, i) => (
-                <>
-                  <span className="text-xs text-text-subtle" key={node.id}>
-                    {node.ball.placement.depth} {node.ball.placement.direction}
-                  </span>
-                  <span className="text-xs text-text-subtle">
-                    {i < potentialNextNodes.length - 1 ? "or" : ""}
-                  </span>
-                </>
-              ))}
+              {potentialNextNodes.map((node, i) => {
+                const nextPlacement = getEffectivePlacement(node);
+                return (
+                  <React.Fragment key={node.id}>
+                    <span className="text-xs text-text-subtle">
+                      {nextPlacement.depth} {nextPlacement.direction}
+                    </span>
+                    <span className="text-xs text-text-subtle">
+                      {i < potentialNextNodes.length - 1 ? "or" : ""}
+                    </span>
+                  </React.Fragment>
+                );
+              })}
             </div>
           )}
         </div>
@@ -131,11 +137,6 @@ const getDrillPaths = (drill: Drill) => {
     if (!node) return;
 
     if (nodeId === exitId && path.length > 0) {
-      paths.push(path);
-      return;
-    }
-
-    if (isPlaceholderPositioningNode(node)) {
       paths.push(path);
       return;
     }

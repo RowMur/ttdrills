@@ -3,6 +3,10 @@ import { Table } from "@/components/DrillDiagram/Table";
 import { shotTypeShorthand } from "@/data";
 import { Drill } from "@/types";
 import { getCoords } from "@/utils/coords";
+import {
+  getEffectivePlacement,
+  getEffectiveFromPlacement,
+} from "@/utils/drillUtils";
 
 type Props = {
   drill: Drill;
@@ -21,37 +25,37 @@ export const DrillView = ({ drill, nodeId, height, width }: Props) => {
     return null;
   }
 
+  // Get where the current shot is coming from and going to
+  const fromPlacement = getEffectiveFromPlacement(out, drill.graph);
+  const toPlacement = getEffectivePlacement(out);
+
+  // Start position: where the current shot is coming from (same side as the player)
   const [startX, startY] = getCoords(
     height,
     width,
-    out.ball.placement,
+    fromPlacement || { depth: "long", direction: "backhand" },
     out.ball.isOpponent
   );
-  const endCoords = incomingOptions.map((i) =>
-    getCoords(
-      height,
-      width,
-      i?.ball.placement || {
-        depth: "long",
-        direction: out.ball.placement.direction,
-      },
-      i?.ball.isOpponent || false
-    )
+
+  // End position: where the current shot is going to (opposite side)
+  const [endX, endY] = getCoords(
+    height,
+    width,
+    toPlacement,
+    !out.ball.isOpponent // Opposite side
   );
 
   return (
     <svg width={width} height={height} xmlns="http://www.w3.org/2000/svg">
       <Table height={height} width={width} />
-      {incomingOptions.map((incoming) => (
-        <HighlightedSection
-          key={incoming.id}
-          tableHeight={height}
-          tableWidth={width}
-          placement={incoming.ball.placement}
-          isOpponent={incoming.ball.isOpponent}
-          spin={out.ball.spin}
-        />
-      ))}
+      {/* Highlight where the current shot is going to (opposite side) */}
+      <HighlightedSection
+        tableHeight={height}
+        tableWidth={width}
+        placement={toPlacement}
+        isOpponent={!out.ball.isOpponent} // Opposite side
+        spin={out.ball.spin}
+      />
       <text
         x={startX}
         y={out.ball.isOpponent ? startY - 10 : startY + 20}
@@ -61,20 +65,15 @@ export const DrillView = ({ drill, nodeId, height, width }: Props) => {
       >
         {shotTypeShorthand[out.ball.stroke]}
       </text>
-      {incomingOptions.map((incoming, index) => {
-        const [endX, endY] = endCoords[index];
-        return (
-          <line
-            key={incoming.id}
-            x1={startX}
-            y1={startY}
-            x2={endX}
-            y2={endY}
-            className="stroke-2 stroke-white"
-            strokeDasharray={incomingOptions.length > 1 ? "4,2" : "none"}
-          />
-        );
-      })}
+      {/* Draw the shot trajectory from where it comes from to where it goes */}
+      <line
+        x1={startX}
+        y1={startY}
+        x2={endX}
+        y2={endY}
+        className="stroke-2 stroke-white"
+        strokeDasharray="none"
+      />
     </svg>
   );
 };
