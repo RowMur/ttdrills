@@ -5,8 +5,10 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "tsx scripts/startup.ts && next start",
+    "start:no-seed": "next start",
+    "lint": "next lint",
+    "seed": "tsx scripts/seed-database.ts"
   },
   "dependencies": {
     "@auth/core": "^0.40.0",
@@ -16,7 +18,8 @@
     "next": "15.3.4",
     "next-auth": "^4.24.11",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "tsx": "^4.20.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

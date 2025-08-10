@@ -149,6 +149,31 @@ function CreateDrillContent() {
 
       console.log("Created Drill:", createdDrill);
 
+      // Console log for comprehensive drills format
+      const comprehensiveDrillFormat = {
+        id: createdDrill.slug,
+        name: createdDrill.name,
+        slug: createdDrill.slug,
+        ...(createdDrill.video_url && { videoUrl: createdDrill.video_url }),
+        ...(createdDrill.video_start && {
+          videoStart: createdDrill.video_start,
+        }),
+        creatorId: "system",
+        createdAt: new Date("2024-01-01"),
+        updatedAt: new Date("2024-01-01"),
+        description: createdDrill.description,
+        objectives: createdDrill.objectives,
+        difficulty: createdDrill.difficulty,
+        categories: createdDrill.categories,
+        tips: createdDrill.tips,
+        ...(createdDrill.duration && { duration: createdDrill.duration }),
+        graph: createdDrill.graph,
+      };
+
+      console.log("=== COMPREHENSIVE DRILLS FORMAT ===");
+      console.log(JSON.stringify(comprehensiveDrillFormat, null, 2));
+      console.log("=== COPY THE ABOVE OBJECT TO comprehensiveDrills.ts ===");
+
       // Redirect to the drill details page
       window.location.href = `/drills/${createdDrill.slug}`;
     } catch (error) {
