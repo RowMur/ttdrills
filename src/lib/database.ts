@@ -194,6 +194,42 @@ export async function getDrills(
   };
 }
 
+export async function updateDrill(
+  slug: string,
+  drillData: {
+    name: string;
+    slug: string;
+    description: string;
+    objectives: string[];
+    difficulty: string;
+    categories: string[];
+    tips: string[];
+    duration?: string;
+    video_url?: string;
+    video_start?: number;
+    graph: StepGraph;
+  }
+): Promise<DatabaseDrill | null> {
+  const { data, error } = await supabase
+    .from("drills")
+    .update(drillData)
+    .eq("slug", slug)
+    .select(
+      `
+      *,
+      creator:users(id, name, email)
+    `
+    )
+    .single();
+
+  if (error) {
+    console.error("Error updating drill:", error);
+    return null;
+  }
+
+  return data;
+}
+
 export async function deleteDrill(slug: string): Promise<boolean> {
   const { error } = await supabase.from("drills").delete().eq("slug", slug);
 
