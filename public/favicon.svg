@@ -1,0 +1,17 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="15" fill="#3B82F6" stroke="#1E40AF" stroke-width="2"/>
+  
+  <!-- Table tennis bat -->
+  <g transform="translate(4, 2)">
+    <!-- Bat handle - thin and centered -->
+    <rect x="7.5" y="14" width="1" height="12" fill="white" rx="0.5"/>
+    <!-- Bat head - wide oval that clearly extends beyond handle -->
+    <ellipse cx="8" cy="14" rx="7" ry="5" fill="white" stroke="#1E40AF" stroke-width="2"/>
+    <!-- Ball on bat - small and centered -->
+    <circle cx="8" cy="14" r="1.2" fill="#3B82F6"/>
+  </g>
+  
+  <!-- TT text -->
+  <text x="16" y="26" font-family="Arial, sans-serif" font-size="8" font-weight="bold" text-anchor="middle" fill="white">TT</text>
+</svg>

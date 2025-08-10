@@ -1,6 +1,7 @@
 "use client";
 
 import { Searchbox } from "@/components/Searchbox";
+import { LogoWithIcon } from "@/components/LogoWithIcon";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Plus, User, LogOut } from "lucide-react";
@@ -16,15 +17,9 @@ export const Navbar = () => {
         {/* Top row - Title, Create button, Search, and Auth */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 md:gap-6">
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold">
-              <Link
-                href="/"
-                className="hover:text-primary-light transition-colors"
-              >
-                <span className="hidden sm:inline">TTDrills</span>
-                <span className="sm:hidden">TTDrills</span>
-              </Link>
-            </h1>
+            <Link href="/" className="hover:opacity-80 transition-opacity">
+              <LogoWithIcon />
+            </Link>
             {session && (
               <Link
                 href="/create"
