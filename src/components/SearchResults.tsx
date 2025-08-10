@@ -104,8 +104,8 @@ export const SearchResults = () => {
             </p>
           </div>
         ) : (
-          <div className="flex wrap flex-col sm:flex-row items-center justify-between">
-            <p className="text-text">
+          <div className="flex wrap flex-col gap-2 sm:flex-row items-center justify-between">
+            <p className="text-text sm:text-center">
               Found {totalDrills} drill
               {totalDrills === 1 ? "" : "s"}
               {searchTerm ? ` for "${searchTerm}"` : ""}.
