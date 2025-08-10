@@ -3,7 +3,6 @@
 import { ControlButton } from "@/components/ControlButton";
 import { DrillView } from "@/components/DrillDiagram/DrillView";
 import { Drill, Node } from "@/types";
-import { getEffectivePlacement } from "@/utils/drillUtils";
 
 type Props = {
   drill: Drill;
@@ -30,7 +29,6 @@ export const DrillDiagram = ({
       {selectingNextNode && (
         <div className="absolute left-0 top-0 size-full bg-slate opacity-80 grid place-items-center">
           {availableNextNodes.map((nextNode) => {
-            const nextPlacement = getEffectivePlacement(nextNode);
             return (
               <ControlButton
                 key={nextNode.id}
@@ -38,7 +36,7 @@ export const DrillDiagram = ({
                   goToNextNodeOption(nextNode.id);
                 }}
               >
-                {nextPlacement.direction} {nextPlacement.depth}
+                {nextNode.id}
               </ControlButton>
             );
           })}

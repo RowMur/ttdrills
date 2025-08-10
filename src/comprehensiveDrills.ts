@@ -440,71 +440,89 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
     ],
     duration: "10-12 minutes",
     graph: {
-      entryPoint: "backhand1",
+      entryPoint: "backhand",
       nodes: {
-        backhand1: {
-          id: "backhand1",
-          prev: ["block3"],
-          next: ["block1"],
+        backhand: {
+          id: "backhand",
+          prev: ["block-back-to-backhand"],
+          next: ["block-to-backhand", "block-to-forehand"],
           ball: {
-            spin: "top",
             stroke: "backhand",
-            placement: { depth: "long", direction: "backhand" },
+            spin: "top",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
             isOpponent: false,
           },
         },
-        block1: {
-          id: "block1",
-          prev: ["backhand1"],
-          next: ["backhand2", "forehand1"],
+        "block-to-backhand": {
+          id: "block-to-backhand",
+          prev: ["backhand"],
+          next: ["backhand-1"],
           ball: {
-            spin: "block",
             stroke: "backhand",
-            placement: { depth: "long", direction: "backhand" },
+            spin: "block",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
             isOpponent: true,
           },
         },
-        backhand2: {
-          id: "backhand2",
-          prev: ["block1"],
-          next: ["block2"],
+        "backhand-1": {
+          id: "backhand-1",
+          prev: ["block-to-backhand"],
+          next: ["block-to-forehand"],
           ball: {
-            spin: "top",
             stroke: "backhand",
-            placement: { depth: "long", direction: "backhand" },
+            spin: "top",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
             isOpponent: false,
           },
         },
-        block2: {
-          id: "block2",
-          prev: ["backhand2"],
-          next: ["forehand1"],
+        "block-to-forehand": {
+          id: "block-to-forehand",
+          prev: ["backhand", "backhand-1"],
+          next: ["forehand"],
           ball: {
-            spin: "block",
             stroke: "backhand",
-            placement: { depth: "long", direction: "backhand" },
+            spin: "block",
+            placement: {
+              depth: "long",
+              direction: "forehand",
+            },
             isOpponent: true,
           },
         },
-        forehand1: {
-          id: "forehand1",
-          prev: ["block1", "block2"],
-          next: ["block3"],
+        forehand: {
+          id: "forehand",
+          prev: ["block-to-forehand"],
+          next: ["block-back-to-backhand"],
           ball: {
-            spin: "top",
             stroke: "forehand",
-            placement: { depth: "long", direction: "forehand" },
+            spin: "top",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
             isOpponent: false,
           },
         },
-        block3: {
-          id: "block3",
-          prev: ["forehand1"],
-          next: ["backhand1"],
+        "block-back-to-backhand": {
+          id: "block-back-to-backhand",
+          prev: ["forehand"],
+          next: ["backhand"],
           ball: {
-            spin: "block",
             stroke: "backhand",
-            placement: { depth: "long", direction: "backhand" },
+            spin: "block",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
             isOpponent: true,
           },
         },
@@ -533,94 +551,118 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
     ],
     duration: "12-15 minutes",
     graph: {
-      entryPoint: "backhand1",
+      entryPoint: "backhand",
       nodes: {
-        backhand1: {
-          id: "backhand1",
-          prev: ["block3", "block4"],
-          next: ["block1"],
+        backhand: {
+          id: "backhand",
+          prev: ["block-back-to-backhand"],
+          next: ["block-to-backhand", "block-to-forehand"],
           ball: {
-            spin: "top",
             stroke: "backhand",
-            placement: { depth: "long", direction: "backhand" },
+            spin: "top",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
             isOpponent: false,
           },
         },
-        block1: {
-          id: "block1",
-          prev: ["backhand1"],
-          next: ["backhand2", "forehand1"],
+        "block-to-backhand": {
+          id: "block-to-backhand",
+          prev: ["backhand"],
+          next: ["backhand-2"],
           ball: {
-            spin: "block",
             stroke: "backhand",
-            placement: { depth: "long", direction: "backhand" },
+            spin: "block",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
             isOpponent: true,
           },
         },
-        backhand2: {
-          id: "backhand2",
-          prev: ["block1"],
-          next: ["block2"],
+        "backhand-2": {
+          id: "backhand-2",
+          prev: ["block-to-backhand"],
+          next: ["block-to-forehand"],
           ball: {
-            spin: "top",
             stroke: "backhand",
-            placement: { depth: "long", direction: "backhand" },
+            spin: "top",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
             isOpponent: false,
           },
         },
-        block2: {
-          id: "block2",
-          prev: ["backhand2"],
-          next: ["forehand1"],
+        "block-to-forehand": {
+          id: "block-to-forehand",
+          prev: ["backhand", "backhand-2"],
+          next: ["forehand"],
           ball: {
-            spin: "block",
             stroke: "backhand",
-            placement: { depth: "long", direction: "backhand" },
+            spin: "block",
+            placement: {
+              depth: "long",
+              direction: "forehand",
+            },
             isOpponent: true,
           },
         },
-        forehand1: {
-          id: "forehand1",
-          prev: ["block1", "block2"],
-          next: ["block3"],
+        forehand: {
+          id: "forehand",
+          prev: ["block-to-forehand"],
+          next: ["block-back-to-backhand", "block-back-to-forehand"],
           ball: {
-            spin: "top",
             stroke: "forehand",
-            placement: { depth: "long", direction: "forehand" },
-            isOpponent: false,
-          },
-        },
-        block3: {
-          id: "block3",
-          prev: ["forehand1"],
-          next: ["forehand2", "backhand1"],
-          ball: {
-            spin: "block",
-            stroke: "backhand",
-            placement: { depth: "long", direction: "backhand" },
-            isOpponent: true,
-          },
-        },
-        forehand2: {
-          id: "forehand2",
-          prev: ["block3"],
-          next: ["block4"],
-          ball: {
             spin: "top",
-            stroke: "forehand",
-            placement: { depth: "long", direction: "forehand" },
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
             isOpponent: false,
           },
         },
-        block4: {
-          id: "block4",
-          prev: ["forehand2"],
-          next: ["backhand1"],
+        "block-back-to-backhand": {
+          id: "block-back-to-backhand",
+          prev: ["forehand", "forehand-2"],
+          next: ["backhand"],
           ball: {
-            spin: "block",
             stroke: "backhand",
-            placement: { depth: "long", direction: "backhand" },
+            spin: "block",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
             isOpponent: true,
+          },
+        },
+        "block-back-to-forehand": {
+          id: "block-back-to-forehand",
+          prev: ["forehand"],
+          next: ["forehand-2"],
+          ball: {
+            stroke: "backhand",
+            spin: "block",
+            placement: {
+              depth: "long",
+              direction: "forehand",
+            },
+            isOpponent: true,
+          },
+        },
+        "forehand-2": {
+          id: "forehand-2",
+          prev: ["block-back-to-forehand"],
+          next: ["block-back-to-backhand"],
+          ball: {
+            stroke: "forehand",
+            spin: "top",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: false,
           },
         },
       },
