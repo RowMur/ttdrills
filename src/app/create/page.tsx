@@ -16,6 +16,7 @@ import {
   Eye,
   X,
 } from "lucide-react";
+import { Main } from "@/components/Main";
 
 export default function CreateDrillPage() {
   const [drillData, setDrillData] = useState({
@@ -162,8 +163,8 @@ export default function CreateDrillPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <Main>
+      <div className="container">
         <h1 className="text-3xl font-bold text-center mb-8 text-text">
           Create New Drill
         </h1>
@@ -591,6 +592,6 @@ export default function CreateDrillPage() {
           </div>
         )}
       </div>
-    </div>
+    </Main>
   );
 }
