@@ -6,12 +6,56 @@ import { TimerButton } from "@/components/TimerButton";
 import { Main } from "@/components/Main";
 import { notFound } from "next/navigation";
 import { getDrillBySlug, transformDatabaseDrill } from "@/lib/database";
+import type { Metadata } from "next";
 
 type Props = {
   params: Promise<{
     drill: string;
   }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { drill: slug } = await params;
+  const dbDrill = await getDrillBySlug(slug);
+
+  if (!dbDrill) {
+    return {
+      title: "Drill Not Found - TTDrills",
+      description: "The requested table tennis drill could not be found.",
+    };
+  }
+
+  const drill = transformDatabaseDrill(dbDrill);
+
+  return {
+    title: `${drill.name} - TTDrills`,
+    description:
+      drill.description ||
+      `Practice the ${drill.name} table tennis drill with interactive diagrams and step-by-step instructions.`,
+    keywords: `${drill.name}, table tennis drill, ${
+      drill.difficulty
+    } level, ${drill.categories.join(", ")}`,
+    openGraph: {
+      title: `${drill.name} - TTDrills`,
+      description:
+        drill.description || `Practice the ${drill.name} table tennis drill.`,
+      type: "website",
+      url: `https://ttdrills.com/drills/${drill.slug}`,
+      ...(drill.videoUrl && {
+        images: [
+          {
+            url: `https://img.youtube.com/vi/${
+              drill.videoUrl.split("v=")[1]
+            }/maxresdefault.jpg`,
+            width: 1200,
+            height: 630,
+            alt: `${drill.name} drill demonstration`,
+          },
+        ],
+      }),
+    },
+  };
+}
 
 const Page = async (props: Props) => {
   const params = await props.params;

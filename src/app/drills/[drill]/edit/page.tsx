@@ -3,12 +3,38 @@ import { getDrillBySlug, transformDatabaseDrill } from "@/lib/database";
 import { getServerSession } from "next-auth";
 import { getUserByEmail } from "@/lib/database";
 import { EditDrillForm } from "@/components/EditDrillForm";
+import type { Metadata } from "next";
 
 type Props = {
   params: Promise<{
     drill: string;
   }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { drill: slug } = await params;
+  const dbDrill = await getDrillBySlug(slug);
+
+  if (!dbDrill) {
+    return {
+      title: "Drill Not Found - TTDrills",
+      description: "The requested table tennis drill could not be found.",
+    };
+  }
+
+  const drill = transformDatabaseDrill(dbDrill);
+
+  return {
+    title: `Edit ${drill.name} - TTDrills`,
+    description: `Edit the ${drill.name} table tennis drill. Update description, objectives, tips, and video information.`,
+    keywords: `edit ${drill.name}, table tennis drill editor, drill management`,
+    openGraph: {
+      title: `Edit ${drill.name} - TTDrills`,
+      description: `Edit the ${drill.name} table tennis drill.`,
+      type: "website",
+    },
+  };
+}
 
 const Page = async (props: Props) => {
   const params = await props.params;
