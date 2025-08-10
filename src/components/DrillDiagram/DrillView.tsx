@@ -1,7 +1,7 @@
 import { HighlightedSection } from "@/components/DrillDiagram/HighlightedSection";
 import { Table } from "@/components/DrillDiagram/Table";
 import { shotTypeShorthand } from "@/data";
-import { Drill } from "@/types";
+import { StepGraph } from "@/types";
 import { getCoords } from "@/utils/coords";
 import {
   getEffectivePlacement,
@@ -9,7 +9,7 @@ import {
 } from "@/utils/drillUtils";
 
 type Props = {
-  drill: Drill;
+  drill: { graph: StepGraph };
   nodeId: string;
   height: number;
   width: number;

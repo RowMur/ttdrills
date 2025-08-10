@@ -51,7 +51,15 @@ export type DrillCategory =
   | "technique"
   | "consistency";
 
+export type User = {
+  id: string;
+  email: string;
+  name: string;
+  image?: string;
+};
+
 export type Drill = {
+  id: string;
   name: string;
   slug: string;
   description: string;
@@ -62,5 +70,8 @@ export type Drill = {
   duration?: string; // e.g., "5-10 minutes"
   videoUrl?: string; // YouTube video URL
   videoStart?: number; // Start time in seconds
+  creatorId: string; // Reference to the user who created the drill
+  createdAt: Date;
+  updatedAt: Date;
   graph: StepGraph;
 };

@@ -2,10 +2,14 @@ import { Drill } from "@/types";
 
 export const COMPREHENSIVE_DRILLS: Drill[] = [
   {
+    id: "2-backhands-2-forehands",
     name: "2 Backhands, 2 Forehands",
     slug: "2-backhands-2-forehands",
     videoUrl: "https://www.youtube.com/watch?v=P5GNNVxyhWc",
     videoStart: 22,
+    creatorId: "system",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
     description:
       "A classic consistency drill alternating between backhand and forehand strokes to develop rhythm and footwork.",
     objectives: [
@@ -143,6 +147,10 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   },
 
   {
+    id: "falkenberg-drill",
+    creatorId: "system",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
     name: "Falkenberg Drill",
     slug: "falkenberg",
     videoUrl: "https://www.youtube.com/watch?v=Ebl0ZRBfJt0",
@@ -238,6 +246,10 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   },
 
   {
+    id: "1-backhand-1-forehand",
+    creatorId: "system",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
     name: "1 Backhand, 1 Forehand",
     slug: "1-backhand-1-forehand",
     videoUrl: "https://www.youtube.com/watch?v=EnrbMBqabGE", // Example video URL
@@ -311,6 +323,10 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   },
 
   {
+    id: "backhand-middle-backhand-wide",
+    creatorId: "system",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
     name: "Backhand, Middle, Backhand, Wide",
     slug: "backhand-middle-backhand-wide",
     videoUrl: "https://www.youtube.com/watch?v=LajBrVdLehM",
@@ -427,6 +443,10 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   },
 
   {
+    id: "12-backhand-1-forehand",
+    creatorId: "system",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
     name: "1/2 Backhand, 1 Forehand",
     slug: "1-2-backhand-1-forehand",
     description:
@@ -538,6 +558,10 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   },
 
   {
+    id: "12-backhand-12-forehand",
+    creatorId: "system",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
     name: "1/2 Backhand, 1/2 Forehand",
     slug: "1-2-backhand-1-2-forehand",
     videoUrl: "https://www.youtube.com/watch?v=XsZp8nTjZ2c",
@@ -679,6 +703,10 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   },
 
   {
+    id: "flick-and-down-the-line",
+    creatorId: "system",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
     name: "Flick and Down the Line",
     slug: "flick-and-down-the-line",
     description:
@@ -761,6 +789,10 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   },
 
   {
+    id: "3rd-ball-forehand-pivot",
+    creatorId: "system",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
     name: "3rd Ball Forehand Pivot",
     slug: "3rd-ball-forehand-pivot",
     description:

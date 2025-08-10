@@ -2,10 +2,10 @@
 
 import { ControlButton } from "@/components/ControlButton";
 import { DrillView } from "@/components/DrillDiagram/DrillView";
-import { Drill, Node } from "@/types";
+import { Node, StepGraph } from "@/types";
 
 type Props = {
-  drill: Drill;
+  drill: { graph: StepGraph };
   nodeId: string;
   selectingNextNode: boolean;
   availableNextNodes: Node[];

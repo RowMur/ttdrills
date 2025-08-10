@@ -1,8 +1,8 @@
-import { Drill, Node } from "@/types";
+import { Node, StepGraph } from "@/types";
 import { useCallback, useMemo, useState } from "react";
 
 type Input = {
-  drill: Drill;
+  drill: { graph: StepGraph };
 };
 
 export const useDrillState = (input: Input) => {
