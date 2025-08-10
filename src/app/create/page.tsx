@@ -83,8 +83,6 @@ export default function CreateDrillPage() {
     };
   }, [drillData, ballSequence]);
 
-  console.log("previewDrill", previewDrill);
-
   // Use drill state for interactive stepping (always call hook)
   const drillState = useDrillState({ drill: previewDrill });
 
