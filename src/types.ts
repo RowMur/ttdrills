@@ -61,5 +61,6 @@ export type Drill = {
   tips: string[];
   duration?: string; // e.g., "5-10 minutes"
   videoUrl?: string; // YouTube video URL
+  videoStart?: number; // Start time in seconds
   graph: StepGraph;
 };

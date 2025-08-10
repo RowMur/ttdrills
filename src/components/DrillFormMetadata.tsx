@@ -14,6 +14,7 @@ type Props = {
     tips: string[];
     duration: string;
     videoUrl: string;
+    videoStart: string;
   };
   onChange: (
     field: string,
@@ -92,6 +93,26 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
           Paste a YouTube video URL to show a demonstration of this drill
         </p>
       </div>
+
+      {/* Video Start Time */}
+      {data.videoUrl && (
+        <div>
+          <label className="block text-sm font-medium text-text mb-2">
+            Video Start Time (optional)
+          </label>
+          <input
+            type="number"
+            min="0"
+            value={data.videoStart}
+            onChange={(e) => onChange("videoStart", e.target.value)}
+            className="w-full p-3 rounded-lg bg-surface-light text-text border border-border focus:border-primary focus:outline-none"
+            placeholder="0"
+          />
+          <p className="text-xs text-text-muted mt-1">
+            Start time in seconds (e.g., 30 for 30 seconds into the video)
+          </p>
+        </div>
+      )}
 
       {/* Description */}
       <div>

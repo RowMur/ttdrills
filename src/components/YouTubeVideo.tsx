@@ -5,9 +5,10 @@ import { useState } from "react";
 type Props = {
   videoUrl: string;
   title?: string;
+  startTime?: number;
 };
 
-export const YouTubeVideo = ({ videoUrl, title }: Props) => {
+export const YouTubeVideo = ({ videoUrl, title, startTime }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Extract video ID from various YouTube URL formats
@@ -39,7 +40,9 @@ export const YouTubeVideo = ({ videoUrl, title }: Props) => {
     );
   }
 
-  const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+  const embedUrl = `https://www.youtube.com/embed/${videoId}${
+    startTime ? `?start=${startTime}` : ""
+  }`;
 
   return (
     <div className="bg-surface-light rounded-lg p-4">

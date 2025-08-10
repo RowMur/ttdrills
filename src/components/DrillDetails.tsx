@@ -27,7 +27,10 @@ export const DrillDetails = ({ drill }: Props) => {
               <Play className="w-5 h-5 text-danger" />
               Video Demonstration
             </h3>
-            <YouTubeVideo videoUrl={drill.videoUrl} />
+            <YouTubeVideo
+              videoUrl={drill.videoUrl}
+              startTime={drill.videoStart}
+            />
           </div>
         )}
 

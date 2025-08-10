@@ -4,6 +4,8 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   {
     name: "2 Backhands, 2 Forehands",
     slug: "2-backhands-2-forehands",
+    videoUrl: "https://www.youtube.com/watch?v=P5GNNVxyhWc",
+    videoStart: 22,
     description:
       "A classic consistency drill alternating between backhand and forehand strokes to develop rhythm and footwork.",
     objectives: [
@@ -143,6 +145,8 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   {
     name: "Falkenberg Drill",
     slug: "falkenberg",
+    videoUrl: "https://www.youtube.com/watch?v=Ebl0ZRBfJt0",
+    videoStart: 35,
     description:
       "Named after the Swedish training center, this drill focuses on backhand-forehand combinations with crosscourt patterns.",
     objectives: [
@@ -237,6 +241,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
     name: "1 Backhand, 1 Forehand",
     slug: "1-backhand-1-forehand",
     videoUrl: "https://www.youtube.com/watch?v=EnrbMBqabGE", // Example video URL
+    videoStart: 12,
     description:
       "Simple alternating pattern between backhand and forehand strokes for basic consistency.",
     objectives: [
@@ -308,6 +313,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   {
     name: "Backhand, Middle, Backhand, Wide",
     slug: "backhand-middle-backhand-wide",
+    videoUrl: "https://www.youtube.com/watch?v=LajBrVdLehM",
     description:
       "A challenging footwork drill that combines placement variety with consistent backhand and forehand execution.",
     objectives: [
@@ -534,6 +540,8 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   {
     name: "1/2 Backhand, 1/2 Forehand",
     slug: "1-2-backhand-1-2-forehand",
+    videoUrl: "https://www.youtube.com/watch?v=XsZp8nTjZ2c",
+    videoStart: 60,
     description:
       "An advanced pattern drill with multiple decision points that develops tactical flexibility and adaptability.",
     objectives: [
