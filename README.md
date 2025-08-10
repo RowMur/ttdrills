@@ -1,4 +1,4 @@
-# Table Tennis Drills
+# TTDrills
 
 A web application for creating, sharing, and learning table tennis drills with interactive diagrams and video demonstrations.
 

@@ -15,7 +15,7 @@ async function main() {
     .upsert(
       {
         id: "00000000-0000-0000-0000-000000000000",
-        email: "system@tabletennisdrills.com",
+        email: "system@ttdrills.com",
         name: "System",
         image: null,
         created_at: new Date().toISOString(),

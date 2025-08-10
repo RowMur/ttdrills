@@ -21,8 +21,8 @@ export const Navbar = () => {
                 href="/"
                 className="hover:text-primary-light transition-colors"
               >
-                <span className="hidden sm:inline">Table Tennis Drills</span>
-                <span className="sm:hidden">TT Drills</span>
+                <span className="hidden sm:inline">TTDrills</span>
+                <span className="sm:hidden">TTDrills</span>
               </Link>
             </h1>
             {session && (

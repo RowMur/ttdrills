@@ -33,7 +33,7 @@ export default function SignInPage() {
       <div className="container max-w-md mx-auto">
         <div className="bg-surface border border-border rounded-lg p-8 mt-16">
           <h1 className="text-2xl font-bold text-center mb-6 text-text">
-            Sign In to Table Tennis Drills
+            Sign In to TTDrills
           </h1>
 
           <p className="text-text-muted text-center mb-8">

@@ -12,8 +12,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Table Tennis Drills",
-  description: "A collection of table tennis drills",
+  title: "TTDrills",
+  description:
+    "A collection of table tennis drills with interactive diagrams and video demonstrations",
 };
 
 export default function RootLayout({
