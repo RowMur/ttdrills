@@ -28,6 +28,7 @@ export default function CreateDrillPage() {
     categories: [] as DrillCategory[],
     tips: [""],
     duration: "",
+    videoUrl: "",
   });
 
   const [ballSequence, setBallSequence] = useState<StepGraph>({
@@ -73,6 +74,7 @@ export default function CreateDrillPage() {
       difficulty: drillData.difficulty,
       categories: drillData.categories,
       tips: drillData.tips.filter((tip) => tip.trim() !== ""),
+      ...(drillData.videoUrl && { videoUrl: drillData.videoUrl }),
       graph: ballSequence,
     };
   }, [drillData, ballSequence]);
@@ -107,6 +109,7 @@ export default function CreateDrillPage() {
       categories: drillData.categories,
       tips: cleanTips,
       ...(drillData.duration && { duration: drillData.duration }),
+      ...(drillData.videoUrl && { videoUrl: drillData.videoUrl }),
       graph: ballSequence,
     };
 

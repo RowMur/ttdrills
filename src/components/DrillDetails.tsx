@@ -1,6 +1,7 @@
 import { difficultyDisplay, categoryDisplay } from "@/data";
 import { Drill } from "@/types";
-import { Clock, Target, Lightbulb, Award } from "lucide-react";
+import { Clock, Target, Lightbulb, Award, Play } from "lucide-react";
+import { YouTubeVideo } from "@/components/YouTubeVideo";
 
 type Props = {
   drill: Drill;
@@ -18,6 +19,17 @@ export const DrillDetails = ({ drill }: Props) => {
           </h3>
           <p className="text-text-muted leading-relaxed">{drill.description}</p>
         </div>
+
+        {/* Video */}
+        {drill.videoUrl && (
+          <div>
+            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2 text-text">
+              <Play className="w-5 h-5 text-danger" />
+              Video Demonstration
+            </h3>
+            <YouTubeVideo videoUrl={drill.videoUrl} />
+          </div>
+        )}
 
         {/* Metadata Row */}
         <div className="flex flex-wrap gap-4 items-center text-sm">

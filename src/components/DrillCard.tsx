@@ -12,6 +12,7 @@ import {
   Clock,
   Target,
   Lightbulb,
+  Play,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -39,14 +40,22 @@ export const DrillCard = ({ drill }: Props) => {
     <div className="shadow-lg p-6 rounded-lg bg-surface border border-border w-full flex flex-col hover:border-primary-light transition-colors">
       {/* Header with title and metadata */}
       <div className="flex-shrink-0">
-        <h2 className="font-semibold text-lg text-text mb-3">
-          <Link
-            href={`/drills/${drill.slug}`}
-            className="hover:text-primary-light transition-colors"
-          >
-            {drill.name}
-          </Link>
-        </h2>
+        <div className="flex items-center gap-2 mb-3">
+          <h2 className="font-semibold text-lg text-text">
+            <Link
+              href={`/drills/${drill.slug}`}
+              className="hover:text-primary-light transition-colors"
+            >
+              {drill.name}
+            </Link>
+          </h2>
+          {drill.videoUrl && (
+            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-danger text-white text-xs font-medium">
+              <Play className="w-3 h-3" />
+              <span>Video</span>
+            </div>
+          )}
+        </div>
 
         {/* Difficulty and categories */}
         <div className="flex items-center gap-2 mb-3 flex-wrap">

@@ -236,6 +236,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
   {
     name: "1 Backhand, 1 Forehand",
     slug: "1-backhand-1-forehand",
+    videoUrl: "https://www.youtube.com/watch?v=EnrbMBqabGE", // Example video URL
     description:
       "Simple alternating pattern between backhand and forehand strokes for basic consistency.",
     objectives: [
