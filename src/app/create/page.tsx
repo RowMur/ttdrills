@@ -212,7 +212,7 @@ function CreateDrillContent() {
                       : "bg-surface-light text-text-subtle cursor-not-allowed"
                   }`}
                 >
-                  Create Drill (Console Log)
+                  Create Drill
                 </Button>
                 {!isFormValid() && (
                   <p className="text-text-subtle text-sm mt-2">

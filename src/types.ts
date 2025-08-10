@@ -71,6 +71,7 @@ export type Drill = {
   videoUrl?: string; // YouTube video URL
   videoStart?: number; // Start time in seconds
   creatorId: string; // Reference to the user who created the drill
+  creator?: User; // Creator information (populated when fetched from database)
   createdAt: Date;
   updatedAt: Date;
   graph: StepGraph;

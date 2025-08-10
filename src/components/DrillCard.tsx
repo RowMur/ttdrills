@@ -5,6 +5,7 @@ import { DrillDiagram } from "@/components/DrillDiagram/DrillDiagram";
 import { difficultyDisplay, categoryDisplay } from "@/data";
 import { useDrillState } from "@/hooks/useDrillState";
 import { Drill } from "@/types";
+import { useSession } from "next-auth/react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -13,6 +14,8 @@ import {
   Target,
   Lightbulb,
   Play,
+  User,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -24,6 +27,7 @@ type Props = {
 };
 
 export const DrillCard = ({ drill }: Props) => {
+  const { data: session } = useSession();
   const {
     nodeId,
     availableNextNodes,
@@ -36,24 +40,38 @@ export const DrillCard = ({ drill }: Props) => {
     goToNextNodeOption,
   } = useDrillState({ drill });
 
+  const isCreator =
+    session?.user?.email && drill.creator?.email === session.user.email;
+
   return (
     <div className="shadow-lg p-6 rounded-lg bg-surface border border-border w-full flex flex-col hover:border-primary-light transition-colors">
       {/* Header with title and metadata */}
       <div className="flex-shrink-0">
-        <div className="flex items-center gap-2 mb-3">
-          <h2 className="font-semibold text-lg text-text">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <h2 className="font-semibold text-lg text-text">
+              <Link
+                href={`/drills/${drill.slug}`}
+                className="hover:text-primary-light transition-colors"
+              >
+                {drill.name}
+              </Link>
+            </h2>
+            {drill.videoUrl && (
+              <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-danger text-white text-xs font-medium">
+                <Play className="w-3 h-3" />
+                <span>Video</span>
+              </div>
+            )}
+          </div>
+          {isCreator && (
             <Link
               href={`/drills/${drill.slug}`}
-              className="hover:text-primary-light transition-colors"
+              className="text-danger hover:text-danger-dark transition-colors p-1"
+              title="Delete drill"
             >
-              {drill.name}
+              <Trash2 className="w-4 h-4" />
             </Link>
-          </h2>
-          {drill.videoUrl && (
-            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-danger text-white text-xs font-medium">
-              <Play className="w-3 h-3" />
-              <span>Video</span>
-            </div>
           )}
         </div>
 
@@ -86,13 +104,21 @@ export const DrillCard = ({ drill }: Props) => {
           )}
         </div>
 
-        {/* Duration */}
-        {drill.duration && (
-          <div className="flex items-center gap-2 text-sm text-text-muted mb-2">
-            <Clock className="w-4 h-4" />
-            <span>{drill.duration}</span>
-          </div>
-        )}
+        {/* Duration and Creator */}
+        <div className="flex items-center justify-between text-sm text-text-muted mb-2">
+          {drill.duration && (
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              <span>{drill.duration}</span>
+            </div>
+          )}
+          {drill.creator && (
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4" />
+              <span>by {drill.creator.name || drill.creator.email}</span>
+            </div>
+          )}
+        </div>
 
         {/* Description */}
         {drill.description && (

@@ -194,6 +194,17 @@ export async function getDrills(
   };
 }
 
+export async function deleteDrill(slug: string): Promise<boolean> {
+  const { error } = await supabase.from("drills").delete().eq("slug", slug);
+
+  if (error) {
+    console.error("Error deleting drill:", error);
+    return false;
+  }
+
+  return true;
+}
+
 // Transform database drill to app drill type
 export function transformDatabaseDrill(dbDrill: DatabaseDrill): Drill {
   return {
@@ -209,6 +220,14 @@ export function transformDatabaseDrill(dbDrill: DatabaseDrill): Drill {
     videoUrl: dbDrill.video_url || undefined,
     videoStart: dbDrill.video_start || undefined,
     creatorId: dbDrill.creator_id,
+    creator: dbDrill.creator
+      ? {
+          id: dbDrill.creator.id,
+          email: dbDrill.creator.email,
+          name: dbDrill.creator.name || "",
+          image: dbDrill.creator.image || undefined,
+        }
+      : undefined,
     createdAt: new Date(dbDrill.created_at),
     updatedAt: new Date(dbDrill.updated_at),
     graph: dbDrill.graph,

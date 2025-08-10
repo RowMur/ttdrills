@@ -1,5 +1,6 @@
 import { DiagramSection } from "@/app/drills/[drill]/_components/DiagramSection";
 import { DrillDetails } from "@/components/DrillDetails";
+import { DeleteDrillButton } from "@/components/DeleteDrillButton";
 import { Main } from "@/components/Main";
 import { notFound } from "next/navigation";
 import { getDrillBySlug, transformDatabaseDrill } from "@/lib/database";
@@ -24,9 +25,16 @@ const Page = async (props: Props) => {
 
   return (
     <Main>
-      <h2 className="text-2xl font-bold text-center sm:text-left mb-4">
-        {drill.name}
-      </h2>
+      <div className="flex justify-between items-start mb-4">
+        <h2 className="text-2xl font-bold text-center sm:text-left">
+          {drill.name}
+        </h2>
+        <DeleteDrillButton
+          drillSlug={drill.slug}
+          drillName={drill.name}
+          creatorEmail={drill.creator?.email || ""}
+        />
+      </div>
       <DrillDetails drill={drill} />
       <DiagramSection drill={drill} />
     </Main>

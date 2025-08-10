@@ -1,6 +1,6 @@
 import { difficultyDisplay, categoryDisplay } from "@/data";
 import { Drill } from "@/types";
-import { Clock, Target, Lightbulb, Award, Play } from "lucide-react";
+import { Clock, Target, Lightbulb, Award, Play, User } from "lucide-react";
 import { YouTubeVideo } from "@/components/YouTubeVideo";
 
 type Props = {
@@ -77,6 +77,16 @@ export const DrillDetails = ({ drill }: Props) => {
                   </span>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Creator */}
+          {drill.creator && (
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-primary" />
+              <span className="text-text-muted">
+                Created by {drill.creator.name || drill.creator.email}
+              </span>
             </div>
           )}
         </div>
