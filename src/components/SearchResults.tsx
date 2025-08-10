@@ -3,6 +3,7 @@
 import { DrillCard } from "@/components/DrillCard";
 import { Pagination } from "@/components/Pagination";
 import { useSearchTerm } from "@/hooks/useSearchTerm";
+import { trackSearch, trackRandomDrill } from "@/lib/analytics";
 import { Dice6 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -44,6 +45,11 @@ export const SearchResults = () => {
         setDrills(data.drills || []);
         setTotalPages(data.pagination?.pages || 1);
         setTotalDrills(data.pagination?.total || 0);
+
+        // Track search
+        if (searchTerm) {
+          trackSearch(searchTerm, data.drills?.length || 0);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch drills");
       } finally {
@@ -58,6 +64,10 @@ export const SearchResults = () => {
     if (drills.length > 0) {
       const randomIndex = Math.floor(Math.random() * drills.length);
       const randomDrill = drills[randomIndex];
+
+      // Track random drill selection
+      trackRandomDrill(randomDrill.name, randomDrill.slug);
+
       router.push(`/drills/${randomDrill.slug}`);
     }
   };

@@ -3,6 +3,7 @@ import { DrillDetails } from "@/components/DrillDetails";
 import { DeleteDrillButton } from "@/components/DeleteDrillButton";
 import { EditDrillButton } from "@/components/EditDrillButton";
 import { TimerButton } from "@/components/TimerButton";
+import { DrillViewTracker } from "@/components/DrillViewTracker";
 import { Main } from "@/components/Main";
 import { notFound } from "next/navigation";
 import { getDrillBySlug, transformDatabaseDrill } from "@/lib/database";
@@ -71,6 +72,7 @@ const Page = async (props: Props) => {
 
   return (
     <Main>
+      <DrillViewTracker drill={drill} />
       <div className="flex justify-between items-start mb-4">
         <h2 className="text-2xl font-bold text-center sm:text-left">
           {drill.name}

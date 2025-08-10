@@ -9,6 +9,7 @@ import { ControlButton } from "@/components/ControlButton";
 import { useDrillState } from "@/hooks/useDrillState";
 import { Drill } from "@/types";
 import { Main } from "@/components/Main";
+import { trackDrillEdit } from "@/lib/analytics";
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 
 type Props = {
@@ -98,6 +99,9 @@ export const EditDrillForm = ({ drill }: Props) => {
       }
 
       const updatedDrill = await response.json();
+
+      // Track drill edit
+      trackDrillEdit(drill.name, drill.slug);
       console.log("Updated Drill:", updatedDrill);
 
       // Redirect to the updated drill details page

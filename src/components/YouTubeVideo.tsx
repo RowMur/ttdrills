@@ -1,15 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { trackVideoView } from "@/lib/analytics";
 
 type Props = {
   videoUrl: string;
   title?: string;
   startTime?: number;
+  drillName?: string;
+  drillSlug?: string;
 };
 
-export const YouTubeVideo = ({ videoUrl, title, startTime }: Props) => {
+export const YouTubeVideo = ({
+  videoUrl,
+  title,
+  startTime,
+  drillName,
+  drillSlug,
+}: Props) => {
   const [isLoading, setIsLoading] = useState(true);
+
+  // Track video view when component mounts
+  useEffect(() => {
+    if (drillName && drillSlug) {
+      trackVideoView(drillName, drillSlug, videoUrl);
+    }
+  }, [drillName, drillSlug, videoUrl]);
 
   // Extract video ID from various YouTube URL formats
   const getVideoId = (url: string): string | null => {

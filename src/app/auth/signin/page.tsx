@@ -4,6 +4,7 @@ import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Main } from "@/components/Main";
+import { trackSignIn } from "@/lib/analytics";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -21,6 +22,9 @@ export default function SignInPage() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
+      // Track sign in attempt
+      trackSignIn("google");
+
       await signIn("google", { callbackUrl: "/" });
     } catch (error) {
       console.error("Sign in error:", error);

@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
 import { Modal } from "@/components/Modal";
+import { trackDrillDeletion } from "@/lib/analytics";
 import { Trash2, AlertTriangle } from "lucide-react";
 
 type Props = {
@@ -41,6 +42,9 @@ export const DeleteDrillButton = ({
         const error = await response.json();
         throw new Error(error.error || "Failed to delete drill");
       }
+
+      // Track drill deletion
+      trackDrillDeletion(drillName, drillSlug);
 
       // Redirect to home page after successful deletion
       router.push("/");

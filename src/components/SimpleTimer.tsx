@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/Button";
+import { trackTimerStart, trackTimerComplete } from "@/lib/analytics";
 import { Play, Pause, RotateCcw } from "lucide-react";
 
 export const SimpleTimer = () => {
@@ -20,6 +21,10 @@ export const SimpleTimer = () => {
           if (prev <= 1) {
             setIsRunning(false);
             setIsCompleted(true);
+
+            // Track timer completion
+            trackTimerComplete(parseInt(inputSeconds) || 60);
+
             return 0;
           }
           return prev - 1;
@@ -36,6 +41,9 @@ export const SimpleTimer = () => {
     const seconds = parseInt(inputSeconds) || 60;
     setTimeLeft(seconds);
     setIsRunning(true);
+
+    // Track timer start
+    trackTimerStart(seconds);
   };
 
   const pauseTimer = () => {

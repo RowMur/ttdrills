@@ -11,6 +11,7 @@ import { useDrillState } from "@/hooks/useDrillState";
 import { Drill, DifficultyLevel, DrillCategory, StepGraph } from "@/types";
 import { Main } from "@/components/Main";
 import { AuthGuard } from "@/components/AuthGuard";
+import { trackDrillCreation } from "@/lib/analytics";
 import {
   Play,
   X,
@@ -173,6 +174,14 @@ function CreateDrillContent() {
       console.log("=== COMPREHENSIVE DRILLS FORMAT ===");
       console.log(JSON.stringify(comprehensiveDrillFormat, null, 2));
       console.log("=== COPY THE ABOVE OBJECT TO comprehensiveDrills.ts ===");
+
+      // Track drill creation
+      trackDrillCreation(
+        createdDrill.name,
+        createdDrill.difficulty,
+        createdDrill.categories,
+        !!createdDrill.video_url
+      );
 
       // Redirect to the drill details page
       window.location.href = `/drills/${createdDrill.slug}`;
