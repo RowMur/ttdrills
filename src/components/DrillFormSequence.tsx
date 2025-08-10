@@ -67,6 +67,7 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
     cascadeNodes: string[];
   } | null>(null);
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   // Initialize the sequence with the default shot
   useEffect(() => {
@@ -421,6 +422,19 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
     // Use provided name or generate placeholder
     const finalName = name.trim() || generatePlaceholderName();
 
+    // Check for duplicate names (case-insensitive)
+    const existingNames = nodes
+      .filter((n) => n.id !== nodeId) // Exclude current node
+      .map((n) => n.name.toLowerCase());
+
+    if (existingNames.includes(finalName.toLowerCase())) {
+      // Don't allow duplicate names - show error and keep editing
+      setValidationError(
+        `A shot named "${finalName}" already exists. Please use a unique name.`
+      );
+      return;
+    }
+
     // Generate new ID from name
     const newId = generateUniqueId(finalName);
     if (!newId) return setEditingNodeId(null);
@@ -453,6 +467,7 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
       updateSequence(updatedNodes, entryPoint);
     }
 
+    setValidationError(null);
     setEditingNodeId(null);
   };
 
@@ -492,6 +507,18 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
     if (field === "name" && typeof value === "string") {
       if (!value.trim()) {
         return; // Don't allow empty names
+      }
+
+      // Check for duplicate names (case-insensitive)
+      const existingNames = nodes
+        .filter((n) => n.id !== currentNode.id) // Exclude current node
+        .map((n) => n.name.toLowerCase());
+
+      if (existingNames.includes(value.trim().toLowerCase())) {
+        setValidationError(
+          `A shot named "${value.trim()}" already exists. Please use a unique name.`
+        );
+        return; // Don't allow duplicate names
       }
 
       const oldId = currentNode.id;
@@ -567,6 +594,10 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
           automatically determined based on where the previous shot is going.
           This makes it intuitive: you specify where you&apos;re hitting the
           ball TO. Use &quot;Add Next Shot&quot; to extend the sequence.
+          <br />
+          <span className="text-primary font-medium">
+            Note: Each shot must have a unique name.
+          </span>
         </p>
       </div>
 
@@ -587,29 +618,40 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2">
                     {editingNodeId === node.id ? (
-                      <input
-                        type="text"
-                        defaultValue={node.name}
-                        autoFocus
-                        className="font-semibold text-text bg-transparent border-b-2 border-primary focus:outline-none"
-                        onBlur={(e) =>
-                          finalizeShotName(node.id, e.target.value)
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            finalizeShotName(node.id, e.currentTarget.value);
+                      <div className="flex flex-col">
+                        <input
+                          type="text"
+                          defaultValue={node.name}
+                          autoFocus
+                          className={`font-semibold text-text bg-transparent border-b-2 focus:outline-none ${
+                            validationError ? "border-danger" : "border-primary"
+                          }`}
+                          onBlur={(e) =>
+                            finalizeShotName(node.id, e.target.value)
                           }
-                          if (e.key === "Escape") {
-                            if (node.isPlaceholder) {
-                              // For placeholders, finalize with empty name (will get placeholder name)
-                              finalizeShotName(node.id, "");
-                            } else {
-                              setEditingNodeId(null);
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              finalizeShotName(node.id, e.currentTarget.value);
                             }
-                          }
-                        }}
-                        placeholder="Enter shot name..."
-                      />
+                            if (e.key === "Escape") {
+                              setValidationError(null);
+                              if (node.isPlaceholder) {
+                                // For placeholders, finalize with empty name (will get placeholder name)
+                                finalizeShotName(node.id, "");
+                              } else {
+                                setEditingNodeId(null);
+                              }
+                            }
+                          }}
+                          onChange={() => setValidationError(null)}
+                          placeholder="Enter shot name..."
+                        />
+                        {validationError && (
+                          <div className="text-danger text-xs mt-1">
+                            {validationError}
+                          </div>
+                        )}
+                      </div>
                     ) : (
                       <h3
                         className={`font-semibold cursor-pointer hover:text-primary transition-colors ${
@@ -617,7 +659,10 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
                             ? "text-text-muted italic"
                             : "text-text"
                         }`}
-                        onClick={() => setEditingNodeId(node.id)}
+                        onClick={() => {
+                          setValidationError(null);
+                          setEditingNodeId(node.id);
+                        }}
                       >
                         {node.name || "Click to name shot"}
                       </h3>
