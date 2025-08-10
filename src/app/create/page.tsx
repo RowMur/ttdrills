@@ -143,15 +143,19 @@ function CreateDrillContent() {
       }
 
       const createdDrill = await response.json();
-      
+
       alert("Drill created successfully!");
       console.log("Created Drill:", createdDrill);
-      
+
       // Optionally redirect to the drill page
       // window.location.href = `/drills/${createdDrill.slug}`;
     } catch (error) {
       console.error("Error creating drill:", error);
-      alert(`Error creating drill: ${error instanceof Error ? error.message : "Unknown error"}`);
+      alert(
+        `Error creating drill: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   };
 
