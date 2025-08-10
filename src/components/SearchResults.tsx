@@ -1,6 +1,7 @@
 "use client";
 
 import { DrillCard } from "@/components/DrillCard";
+import { Pagination } from "@/components/Pagination";
 import { useSearchTerm } from "@/hooks/useSearchTerm";
 import { Dice6 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -13,6 +14,14 @@ export const SearchResults = () => {
   const [drills, setDrills] = useState<Drill[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalDrills, setTotalDrills] = useState(0);
+
+  // Reset to page 1 when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   // Fetch drills from API
   useEffect(() => {
@@ -23,6 +32,8 @@ export const SearchResults = () => {
         if (searchTerm) {
           params.append("search", searchTerm);
         }
+        params.append("page", currentPage.toString());
+        params.append("limit", "12");
 
         const response = await fetch(`/api/drills?${params.toString()}`);
         if (!response.ok) {
@@ -31,6 +42,8 @@ export const SearchResults = () => {
 
         const data = await response.json();
         setDrills(data.drills || []);
+        setTotalPages(data.pagination?.pages || 1);
+        setTotalDrills(data.pagination?.total || 0);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch drills");
       } finally {
@@ -39,7 +52,7 @@ export const SearchResults = () => {
     };
 
     fetchDrills();
-  }, [searchTerm]);
+  }, [searchTerm, currentPage]);
 
   const handleRandomDrill = () => {
     if (drills.length > 0) {
@@ -47,6 +60,10 @@ export const SearchResults = () => {
       const randomDrill = drills[randomIndex];
       router.push(`/drills/${randomDrill.slug}`);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   if (loading) {
@@ -89,11 +106,12 @@ export const SearchResults = () => {
         ) : (
           <div className="flex wrap flex-col sm:flex-row items-center justify-between">
             <p className="text-text">
-              Found {drills.length} drill
-              {drills.length === 1 ? "" : "s"}
+              Found {totalDrills} drill
+              {totalDrills === 1 ? "" : "s"}
               {searchTerm ? ` for "${searchTerm}"` : ""}.
               {!searchTerm &&
                 " Results are sorted by quality and completeness."}
+              {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
             </p>
 
             <button
@@ -117,6 +135,12 @@ export const SearchResults = () => {
           <DrillCard key={drill.id} drill={drill} />
         ))}
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </>
   );
 };
