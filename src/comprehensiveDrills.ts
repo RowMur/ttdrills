@@ -7,7 +7,7 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
     slug: "2-backhands-2-forehands",
     videoUrl: "https://www.youtube.com/watch?v=P5GNNVxyhWc",
     videoStart: 22,
-    creatorId: "system",
+    creatorId: "00000000-0000-0000-0000-000000000000",
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-01-01"),
     description:

@@ -16,10 +16,10 @@ async function seedDatabase() {
     console.log("Starting database seeding...");
 
     // First, ensure the system user exists
-    const { data: systemUser, error: userError } = await supabase
+    const { error: userError } = await supabase
       .from("users")
       .upsert({
-        id: "system",
+        id: "00000000-0000-0000-0000-000000000000",
         email: "system@tabletennisdrills.com",
         name: "System",
         image: null,
@@ -40,7 +40,7 @@ async function seedDatabase() {
     const { data: existingDrills, error: checkError } = await supabase
       .from("drills")
       .select("slug")
-      .eq("creator_id", "system");
+      .eq("creator_id", "00000000-0000-0000-0000-000000000000");
 
     if (checkError) {
       console.error("Error checking existing drills:", checkError);
@@ -77,7 +77,7 @@ async function seedDatabase() {
           video_url: drill.videoUrl,
           video_start: drill.videoStart,
           graph: drill.graph,
-          creator_id: "system",
+          creator_id: "00000000-0000-0000-0000-000000000000",
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }))
