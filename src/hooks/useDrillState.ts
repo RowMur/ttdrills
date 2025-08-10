@@ -9,12 +9,19 @@ export const useDrillState = (input: Input) => {
   const { drill } = input;
 
   const [path, setPath] = useState([drill.graph.entryPoint]);
-  console.log("path", path);
   const nodeId = path[path.length - 1];
   const [selectingNextNode, setSelectingNextNode] = useState(false);
 
+  for (const pathNode of path) {
+    if (!drill.graph.nodes[pathNode]) {
+      setPath([drill.graph.entryPoint]);
+      setSelectingNextNode(false);
+      break;
+    }
+  }
+
   const availableNextNodes: Node[] = useMemo(() => {
-    const nextNodeIds = drill.graph.nodes[nodeId].next;
+    const nextNodeIds = drill.graph.nodes[nodeId]?.next;
     if (!nextNodeIds || nextNodeIds.length === 0) {
       return [];
     }

@@ -64,15 +64,7 @@ export default function CreateDrillPage() {
   };
 
   // Create a preview drill object for the diagram
-  const previewDrill: Drill | null = useMemo(() => {
-    if (
-      !ballSequence.entryPoint ||
-      Object.keys(ballSequence.nodes).length === 0 ||
-      !ballSequence.nodes[ballSequence.entryPoint]
-    ) {
-      return null;
-    }
-
+  const previewDrill: Drill = useMemo(() => {
     return {
       name: drillData.name || "Preview Drill",
       slug: "preview",
@@ -85,38 +77,10 @@ export default function CreateDrillPage() {
     };
   }, [drillData, ballSequence]);
 
-  // Create a default drill for useDrillState (hooks can't be called conditionally)
-  const defaultDrill: Drill = useMemo(
-    () => ({
-      name: "Default",
-      slug: "default",
-      description: "",
-      objectives: [],
-      difficulty: "beginner" as DifficultyLevel,
-      categories: [],
-      tips: [],
-      graph: {
-        entryPoint: "default",
-        nodes: {
-          default: {
-            id: "default",
-            prev: [],
-            next: [],
-            ball: {
-              stroke: "forehand",
-              spin: "top",
-              placement: { depth: "long", direction: "backhand" },
-              isOpponent: false,
-            },
-          },
-        },
-      },
-    }),
-    []
-  );
+  console.log("previewDrill", previewDrill);
 
   // Use drill state for interactive stepping (always call hook)
-  const drillState = useDrillState({ drill: previewDrill || defaultDrill });
+  const drillState = useDrillState({ drill: previewDrill });
 
   const generateSlug = (name: string): string => {
     return name

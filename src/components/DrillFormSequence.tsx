@@ -444,8 +444,10 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
         }
       });
 
+      const newEntryPoint = entryPoint === node.id ? newId : entryPoint;
+
       setNodes(updatedNodes);
-      updateSequence(updatedNodes, entryPoint);
+      updateSequence(updatedNodes, newEntryPoint);
     } else {
       setNodes(updatedNodes);
       updateSequence(updatedNodes, entryPoint);
