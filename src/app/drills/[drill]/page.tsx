@@ -1,8 +1,8 @@
 import { DiagramSection } from "@/app/drills/[drill]/_components/DiagramSection";
 import { DrillDetails } from "@/components/DrillDetails";
 import { Main } from "@/components/Main";
-import { DRILLS } from "@/data";
 import { notFound } from "next/navigation";
+import { getDrillBySlug, transformDatabaseDrill } from "@/lib/database";
 
 type Props = {
   params: Promise<{
@@ -12,11 +12,15 @@ type Props = {
 
 const Page = async (props: Props) => {
   const params = await props.params;
-  const drill = DRILLS.find((d) => d.slug === params.drill);
 
-  if (!drill) {
+  const dbDrill = await getDrillBySlug(params.drill);
+
+  if (!dbDrill) {
     notFound();
   }
+
+  // Transform database result to match Drill type
+  const drill = transformDatabaseDrill(dbDrill);
 
   return (
     <Main>

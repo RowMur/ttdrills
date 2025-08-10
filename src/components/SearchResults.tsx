@@ -2,34 +2,73 @@
 
 import { DrillCard } from "@/components/DrillCard";
 import { useSearchTerm } from "@/hooks/useSearchTerm";
-import { filterDrills, getRandomDrill } from "@/utils/drillSearch";
 import { Dice6 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Drill } from "@/types";
 
 export const SearchResults = () => {
   const searchTerm = useSearchTerm();
   const router = useRouter();
+  const [drills, setDrills] = useState<Drill[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredDrills = filterDrills(searchTerm);
+  // Fetch drills from API
+  useEffect(() => {
+    const fetchDrills = async () => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams();
+        if (searchTerm) {
+          params.append('search', searchTerm);
+        }
+        
+        const response = await fetch(`/api/drills?${params.toString()}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch drills');
+        }
+        
+        const data = await response.json();
+        setDrills(data.drills || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch drills');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDrills();
+  }, [searchTerm]);
 
   const handleRandomDrill = () => {
-    const randomDrill = getRandomDrill(searchTerm);
-    if (randomDrill) {
+    if (drills.length > 0) {
+      const randomIndex = Math.floor(Math.random() * drills.length);
+      const randomDrill = drills[randomIndex];
       router.push(`/drills/${randomDrill.slug}`);
-    } else {
-      // This shouldn't happen since the button only shows when there are results,
-      // but as a fallback, pick any random drill
-      const anyRandomDrill = getRandomDrill("");
-      if (anyRandomDrill) {
-        router.push(`/drills/${anyRandomDrill.slug}`);
-      }
     }
   };
+
+  if (loading) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-text">Loading drills...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-text text-red-500">Error: {error}</p>
+      </div>
+    );
+  }
 
   return (
     <>
       <div className="mb-6">
-        {filteredDrills.length === 0 ? (
+        {drills.length === 0 ? (
           <div className="text-center ">
             <p className="mb-4 text-text">
               No drills found for &quot;{searchTerm}&quot;.
@@ -50,8 +89,8 @@ export const SearchResults = () => {
         ) : (
           <div className="flex wrap flex-col sm:flex-row items-center justify-between">
             <p className="text-text">
-              Found {filteredDrills.length} drill
-              {filteredDrills.length === 1 ? "" : "s"}
+              Found {drills.length} drill
+              {drills.length === 1 ? "" : "s"}
               {searchTerm ? ` for "${searchTerm}"` : ""}.
             </p>
 
@@ -72,8 +111,8 @@ export const SearchResults = () => {
           gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
         }}
       >
-        {filteredDrills.map((drill) => (
-          <DrillCard key={drill.name} drill={drill} />
+        {drills.map((drill: Drill) => (
+          <DrillCard key={drill.id} drill={drill} />
         ))}
       </div>
     </>

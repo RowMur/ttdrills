@@ -37,6 +37,10 @@ pnpm install
    Create a `.env.local` file with the following variables:
 
 ```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
 # Google OAuth Credentials
 # Get these from https://console.cloud.google.com/apis/credentials
 GOOGLE_CLIENT_ID=your_google_client_id_here
@@ -47,13 +51,29 @@ NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your_nextauth_secret_here
 ```
 
-4. Run the development server:
+4. Set up the database:
+
+```bash
+# Run the SQL migration in your Supabase dashboard
+# Copy the contents of supabase/migrations/001_initial_schema.sql
+# and run it in the Supabase SQL editor
+```
+
+5. Run the development server:
 
 ```bash
 pnpm dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Setting up Supabase
+
+1. Create a new project at [Supabase](https://supabase.com)
+2. Go to your project's SQL Editor
+3. Copy and run the SQL from `supabase/migrations/001_initial_schema.sql`
+4. Get your project URL and anon key from Settings > API
+5. Add them to your `.env.local` file
 
 ### Setting up Google OAuth
 

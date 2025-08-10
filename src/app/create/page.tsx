@@ -100,7 +100,7 @@ function CreateDrillContent() {
       .trim();
   };
 
-  const handleCreateDrill = () => {
+  const handleCreateDrill = async () => {
     if (!session?.user?.email) {
       alert("Please sign in to create a drill");
       return;
@@ -112,8 +112,7 @@ function CreateDrillContent() {
     );
     const cleanTips = drillData.tips.filter((tip) => tip.trim() !== "");
 
-    const drill: Drill = {
-      id: `drill-${Date.now()}`, // Temporary ID for demo
+    const drillPayload = {
       name: drillData.name,
       slug: generateSlug(drillData.name),
       description: drillData.description,
@@ -121,9 +120,6 @@ function CreateDrillContent() {
       difficulty: drillData.difficulty,
       categories: drillData.categories,
       tips: cleanTips,
-      creatorId: session.user.email, // Use email as user identifier
-      createdAt: new Date(),
-      updatedAt: new Date(),
       ...(drillData.duration && { duration: drillData.duration }),
       ...(drillData.videoUrl && { videoUrl: drillData.videoUrl }),
       ...(drillData.videoStart && {
@@ -132,12 +128,31 @@ function CreateDrillContent() {
       graph: ballSequence,
     };
 
-    console.log("Generated Drill Object:");
-    console.log(JSON.stringify(drill, null, 2));
+    try {
+      const response = await fetch("/api/drills", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(drillPayload),
+      });
 
-    alert(
-      "Drill object has been logged to console! Check the browser developer tools."
-    );
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create drill");
+      }
+
+      const createdDrill = await response.json();
+      
+      alert("Drill created successfully!");
+      console.log("Created Drill:", createdDrill);
+      
+      // Optionally redirect to the drill page
+      // window.location.href = `/drills/${createdDrill.slug}`;
+    } catch (error) {
+      console.error("Error creating drill:", error);
+      alert(`Error creating drill: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
   };
 
   const isFormValid = () => {
