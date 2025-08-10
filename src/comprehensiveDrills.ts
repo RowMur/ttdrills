@@ -984,4 +984,430 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
       entryPoint: "serve-1",
     },
   },
+  {
+    name: "Irregular Middle Control",
+    slug: "irregular-middle-control",
+    creatorId: "00000000-0000-0000-0000-000000000000",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
+    description:
+      "Passive blocker in middle alternates between blocking to middle and either one of forehand or backhand.",
+    objectives: [],
+    difficulty: "intermediate",
+    categories: ["footwork", "match-play"],
+    tips: [],
+    graph: {
+      nodes: {
+        serve: {
+          id: "serve",
+          ball: {
+            spin: "top",
+            stroke: "forehand",
+            placement: {
+              depth: "long",
+              direction: "middle",
+            },
+            isOpponent: false,
+          },
+          next: ["block-to-backhand", "block-to-forehand"],
+          prev: ["block-to-middle"],
+        },
+        backhand: {
+          id: "backhand",
+          ball: {
+            spin: "top",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "middle",
+            },
+            isOpponent: false,
+          },
+          next: ["block-to-middle"],
+          prev: ["block-to-backhand"],
+        },
+        forehand: {
+          id: "forehand",
+          ball: {
+            spin: "top",
+            stroke: "forehand",
+            placement: {
+              depth: "long",
+              direction: "middle",
+            },
+            isOpponent: false,
+          },
+          next: ["block-to-middle"],
+          prev: ["block-to-forehand"],
+        },
+        "block-to-middle": {
+          id: "block-to-middle",
+          ball: {
+            spin: "block",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "middle",
+            },
+            isOpponent: true,
+          },
+          next: ["serve"],
+          prev: ["backhand", "forehand"],
+        },
+        "block-to-backhand": {
+          id: "block-to-backhand",
+          ball: {
+            spin: "block",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: true,
+          },
+          next: ["backhand"],
+          prev: ["serve"],
+        },
+        "block-to-forehand": {
+          id: "block-to-forehand",
+          ball: {
+            spin: "block",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "forehand",
+            },
+            isOpponent: true,
+          },
+          next: ["forehand"],
+          prev: ["serve"],
+        },
+      },
+      entryPoint: "serve",
+    },
+  },
+  {
+    name: "Backhand Open Up",
+    slug: "backhand-open-up",
+    creatorId: "00000000-0000-0000-0000-000000000000",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
+    description:
+      "A common 3rd ball attack routine. You serve half-long backspin to your opponent’s elbow, really trying to hit their their crossover point to force a weak return. You then topspin to anywhere on the table to try and win the point on the 3rd ball.",
+    objectives: [],
+    difficulty: "beginner",
+    categories: ["attack", "match-play", "serve-receive"],
+    tips: [],
+    graph: {
+      nodes: {
+        push: {
+          id: "push",
+          ball: {
+            spin: "back",
+            stroke: "forehand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: true,
+          },
+          next: ["open-up"],
+          prev: ["serve-1"],
+        },
+        "open-up": {
+          id: "open-up",
+          ball: {
+            spin: "top",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: false,
+          },
+          next: [],
+          prev: ["push"],
+        },
+        "serve-1": {
+          id: "serve-1",
+          ball: {
+            spin: "back",
+            stroke: "serve",
+            placement: {
+              depth: "halflong",
+              direction: "middle",
+            },
+            isOpponent: false,
+          },
+          next: ["push"],
+          prev: null,
+        },
+      },
+      entryPoint: "serve-1",
+    },
+  },
+  {
+    name: "Fast push and counter",
+    slug: "fast-push-and-counter",
+    creatorId: "00000000-0000-0000-0000-000000000000",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
+    description:
+      "In this drill you will practice playing an aggressive push to try and force a weak attack from your opponent and then following up with a fast topspin for the 4th ball. Many players struggle to attack heavy backspin pushes, so it’s a very useful tactic to use. This is also a useful drill to practice switching between a push stroke and a topspin stroke.",
+    objectives: [],
+    difficulty: "intermediate",
+    categories: ["attack", "match-play", "serve-receive"],
+    tips: [],
+    graph: {
+      nodes: {
+        touch: {
+          id: "touch",
+          ball: {
+            spin: "back",
+            stroke: "backhand",
+            placement: {
+              depth: "short",
+              direction: "middle",
+            },
+            isOpponent: true,
+          },
+          next: ["fast-push"],
+          prev: ["serve-1"],
+        },
+        counter: {
+          id: "counter",
+          ball: {
+            spin: "top",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: false,
+          },
+          next: [],
+          prev: ["open-up"],
+        },
+        "open-up": {
+          id: "open-up",
+          ball: {
+            spin: "top",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: true,
+          },
+          next: ["counter"],
+          prev: ["fast-push"],
+        },
+        "serve-1": {
+          id: "serve-1",
+          ball: {
+            spin: "back",
+            stroke: "serve",
+            placement: {
+              depth: "short",
+              direction: "middle",
+            },
+            isOpponent: false,
+          },
+          next: ["touch"],
+          prev: null,
+        },
+        "fast-push": {
+          id: "fast-push",
+          ball: {
+            spin: "back",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: false,
+          },
+          next: ["open-up"],
+          prev: ["touch"],
+        },
+      },
+      entryPoint: "serve-1",
+    },
+  },
+  {
+    name: "Two forehand topspins",
+    slug: "two-forehand-topspins",
+    creatorId: "00000000-0000-0000-0000-000000000000",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
+    description:
+      "In this drill you will practice switching between attacking a backspin return and then attacking a topspin return, both with your forehand. This is a very common combination in table tennis and requires an important change of bat angle between the two topspins. You also get to practice playing attacking topspins crosscourt and down the line.",
+    objectives: [],
+    difficulty: "intermediate",
+    categories: ["footwork", "attack", "match-play", "serve-receive"],
+    tips: [],
+    graph: {
+      nodes: {
+        kill: {
+          id: "kill",
+          ball: {
+            spin: "top",
+            stroke: "forehand",
+            placement: {
+              depth: "long",
+              direction: "forehand",
+            },
+            isOpponent: false,
+          },
+          next: [],
+          prev: ["block"],
+        },
+        push: {
+          id: "push",
+          ball: {
+            spin: "back",
+            stroke: "forehand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: true,
+          },
+          next: ["open-up"],
+          prev: ["serve-1"],
+        },
+        block: {
+          id: "block",
+          ball: {
+            spin: "block",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: true,
+          },
+          next: ["kill"],
+          prev: ["open-up"],
+        },
+        "open-up": {
+          id: "open-up",
+          ball: {
+            spin: "top",
+            stroke: "forehand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: false,
+          },
+          next: ["block"],
+          prev: ["push"],
+        },
+        "serve-1": {
+          id: "serve-1",
+          ball: {
+            spin: "back",
+            stroke: "serve",
+            placement: {
+              depth: "halflong",
+              direction: "middle",
+            },
+            isOpponent: false,
+          },
+          next: ["push"],
+          prev: null,
+        },
+      },
+      entryPoint: "serve-1",
+    },
+  },
+  {
+    name: "Backhand and forehand topspins",
+    slug: "backhand-and-forehand-topspins",
+    creatorId: "00000000-0000-0000-0000-000000000000",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
+    description:
+      "In this drill you will practise attacking a topspin return of serve and switching between backhand and forehand attacks. This is a fast five ball training drill, as the pace is added on the serve and maintained or increased with the return of serve. This is a good drill if you want to improve playing quick topspin rallies.",
+    objectives: [],
+    difficulty: "intermediate",
+    categories: ["attack", "serve-receive", "match-play"],
+    tips: [],
+    graph: {
+      nodes: {
+        return: {
+          id: "return",
+          ball: {
+            spin: "top",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: true,
+          },
+          next: ["backhand-attack"],
+          prev: ["long-serve"],
+        },
+        "long-serve": {
+          id: "long-serve",
+          ball: {
+            spin: "top",
+            stroke: "serve",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: false,
+          },
+          next: ["return"],
+          prev: null,
+        },
+        "backhand-attack": {
+          id: "backhand-attack",
+          ball: {
+            spin: "top",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: false,
+          },
+          next: ["block-to-forehand"],
+          prev: ["return"],
+        },
+        "forehand-attack": {
+          id: "forehand-attack",
+          ball: {
+            spin: "top",
+            stroke: "forehand",
+            placement: {
+              depth: "long",
+              direction: "forehand",
+            },
+            isOpponent: false,
+          },
+          next: [],
+          prev: ["block-to-forehand"],
+        },
+        "block-to-forehand": {
+          id: "block-to-forehand",
+          ball: {
+            spin: "block",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "forehand",
+            },
+            isOpponent: true,
+          },
+          next: ["forehand-attack"],
+          prev: ["backhand-attack"],
+        },
+      },
+      entryPoint: "long-serve",
+    },
+  },
 ];
