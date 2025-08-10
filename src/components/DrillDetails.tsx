@@ -66,45 +66,56 @@ export const DrillDetails = ({ drill }: Props) => {
           )}
         </div>
 
-        {/* Objectives */}
-        {drill.objectives.length > 0 && (
-          <div>
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2 text-text">
-              <Award className="w-5 h-5 text-success" />
-              Objectives
-            </h3>
-            <ul className="space-y-1">
-              {drill.objectives.map((objective, index) => (
-                <li
-                  key={index}
-                  className="text-text-muted flex items-start gap-2"
-                >
-                  <span className="text-success">•</span>
-                  {objective}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {/* Objectives and Tips - Side by side on larger screens */}
+        {(drill.objectives.length > 0 || drill.tips.length > 0) && (
+          <div
+            className={`grid gap-6 ${
+              drill.objectives.length > 0 && drill.tips.length > 0
+                ? "grid-cols-1 lg:grid-cols-2"
+                : "grid-cols-1"
+            }`}
+          >
+            {/* Objectives */}
+            {drill.objectives.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2 text-text">
+                  <Award className="w-5 h-5 text-success" />
+                  Objectives
+                </h3>
+                <ul className="space-y-1">
+                  {drill.objectives.map((objective, index) => (
+                    <li
+                      key={index}
+                      className="text-text-muted flex items-start gap-2"
+                    >
+                      <span className="text-success">•</span>
+                      {objective}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-        {/* Tips */}
-        {drill.tips.length > 0 && (
-          <div>
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2 text-text">
-              <Lightbulb className="w-5 h-5 text-warning" />
-              Coaching Tips
-            </h3>
-            <ul className="space-y-1">
-              {drill.tips.map((tip, index) => (
-                <li
-                  key={index}
-                  className="text-text-muted flex items-start gap-2"
-                >
-                  <span className="text-warning">•</span>
-                  {tip}
-                </li>
-              ))}
-            </ul>
+            {/* Tips */}
+            {drill.tips.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2 text-text">
+                  <Lightbulb className="w-5 h-5 text-warning" />
+                  Coaching Tips
+                </h3>
+                <ul className="space-y-1">
+                  {drill.tips.map((tip, index) => (
+                    <li
+                      key={index}
+                      className="text-text-muted flex items-start gap-2"
+                    >
+                      <span className="text-warning">•</span>
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
       </div>
