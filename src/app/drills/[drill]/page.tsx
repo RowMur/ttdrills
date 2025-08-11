@@ -99,10 +99,8 @@ const Page = async (props: Props) => {
     <Main>
       <DrillViewTracker drill={drill} />
       <div className="flex justify-between flex-wrap gap-2 items-start mb-4">
-        <h2 className="text-2xl font-bold text-center sm:text-left">
-          {drill.name}
-        </h2>
-        <div className="flex gap-2">
+        <h2 className="text-2xl font-bold text-left">{drill.name}</h2>
+        <div className="flex justify-center sm:justify-start gap-2 sm:grow-0">
           <TimerButton />
           <ShareButton drillSlug={drill.slug} />
           <EditDrillButton

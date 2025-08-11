@@ -40,7 +40,7 @@ export const ShareButton = ({ drillSlug }: Props) => {
   return (
     <Button
       onClick={handleShare}
-      className="flex items-center gap-2 px-3 py-2 bg-info text-white rounded-lg hover:bg-info-dark transition-colors text-xs font-medium"
+      className="flex items-center gap-2 px-3 py-2 bg-info text-white rounded-lg hover:bg-info-dark transition-colors font-medium"
     >
       {copied ? (
         <>

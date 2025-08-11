@@ -22,9 +22,8 @@ export const EditDrillButton = ({ drillSlug, creatorEmail }: Props) => {
 
   return (
     <Link href={`/drills/${drillSlug}/edit`}>
-      <Button className="bg-primary text-white hover:bg-primary-dark px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+      <Button className="bg-primary text-white h-full hover:bg-primary-dark px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
         <Edit className="w-4 h-4" />
-        Edit Drill
       </Button>
     </Link>
   );

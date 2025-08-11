@@ -37,8 +37,8 @@ export default function Home() {
         </p>
 
         {/* Search Section */}
-        <div className="max-w-2xl mx-auto mb-12">
-          <div className="bg-surface-light border border-border rounded-lg p-6">
+        <div className="max-w-2xl mx-auto mb-12 px-4">
+          <div className="bg-surface-light border border-border rounded-lg p-4 sm:p-6">
             <h2 className="text-lg font-semibold text-text mb-4">
               Find Your Perfect Drill
             </h2>

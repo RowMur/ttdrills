@@ -16,7 +16,7 @@ export const TimerButton = () => {
         className="bg-primary text-white hover:bg-primary-dark px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
       >
         <Timer className="w-4 h-4" />
-        Timer
+        <span className="hidden md:inline">Timer</span>
       </Button>
 
       <Modal

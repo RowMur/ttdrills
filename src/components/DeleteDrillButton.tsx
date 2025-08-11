@@ -68,7 +68,6 @@ export const DeleteDrillButton = ({
         className="bg-danger text-white hover:bg-danger-dark px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
       >
         <Trash2 className="w-4 h-4" />
-        Delete Drill
       </Button>
 
       <Modal
