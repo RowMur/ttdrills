@@ -3,6 +3,7 @@ import { Searchbox } from "@/components/Searchbox";
 import { Button } from "@/components/Button";
 import { Search, Play, BookOpen, Target, Users, Zap } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -41,7 +42,15 @@ export default function Home() {
             <h2 className="text-lg font-semibold text-text mb-4">
               Find Your Perfect Drill
             </h2>
-            <Searchbox />
+            <Suspense
+              fallback={
+                <div className="text-sm text-text-subtle">
+                  Loading search...
+                </div>
+              }
+            >
+              <Searchbox />
+            </Suspense>
             <div className="mt-4 text-sm text-text-subtle">
               Try searching for:{" "}
               <strong className="text-text-muted">forehand</strong>,{" "}
