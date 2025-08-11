@@ -57,14 +57,14 @@ export const Searchbox = () => {
       />
       <button
         onClick={() => handleSearch(searchInput)}
-        className="bg-primary text-white rounded-md hover:bg-primary-dark hover:cursor-pointer px-3 transition-colors"
+        className="bg-primary text-white rounded-md hover:bg-primary-dark px-3 transition-colors hover:cursor-pointer"
         title="Search drills"
       >
         <Search size={16} />
       </button>
       <button
         onClick={handleRandomDrill}
-        className="bg-success text-white rounded-md hover:bg-success-dark hover:cursor-pointer px-3 transition-colors"
+        className="bg-success text-white rounded-md hover:bg-success-dark px-3 transition-colors hover:cursor-pointer"
         title="Get a random drill based on your search"
       >
         <Dice6 size={16} />

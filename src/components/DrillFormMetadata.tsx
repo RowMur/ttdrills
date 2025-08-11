@@ -140,7 +140,7 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
                 key={level}
                 type="button"
                 onClick={() => onChange("difficulty", level)}
-                className={`px-4 py-2 rounded-lg border font-medium ${
+                className={`px-4 py-2 rounded-lg border font-medium hover:cursor-pointer ${
                   data.difficulty === level
                     ? level === "beginner"
                       ? "bg-success border-success text-white"

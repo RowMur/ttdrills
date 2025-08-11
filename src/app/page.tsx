@@ -54,7 +54,7 @@ export default function Home() {
         </div>
 
         {/* Quick Actions */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 w-fit mx-auto">
           <Link href="/search">
             <Button className="flex items-center gap-2 px-8 py-3 text-lg">
               <Search size={20} />

@@ -47,7 +47,7 @@ export default function SignInPage() {
           <button
             onClick={handleGoogleSignIn}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white hover:bg-gray-100 border border-gray-300 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white hover:bg-gray-100 border border-gray-300 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
             style={{ color: "#000000" }}
           >
             {isLoading ? "Signing in..." : "Continue with Google"}

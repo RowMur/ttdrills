@@ -20,7 +20,7 @@ export const Button = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={className}
+      className={`cursor-pointer transition-colors ${className}`}
     >
       {children}
     </button>
