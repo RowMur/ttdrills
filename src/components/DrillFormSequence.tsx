@@ -55,7 +55,7 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
       spin: "top",
       toDepth: "long",
       toDirection: "backhand",
-      isOpponent: false,
+      isOpponent: false, // This will be updated by recalculatePlayerAssignments
       prev: [],
       next: [],
     };
@@ -68,12 +68,30 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
   } | null>(null);
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [startsWithOpponent, setStartsWithOpponent] = useState<boolean>(() => {
+    // Detect starting player from existing sequence
+    if (entryPoint && Object.keys(sequence.nodes).length > 0) {
+      const entryNode = sequence.nodes[entryPoint];
+      return entryNode?.ball.isOpponent || false;
+    }
+    return false;
+  });
 
   // Initialize the sequence with the default shot
   useEffect(() => {
     updateSequence(nodes, entryPoint);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Recalculate player assignments when toggle changes
+  useEffect(() => {
+    if (nodes.length > 0) {
+      const updatedNodes = recalculatePlayerAssignments(nodes);
+      setNodes(updatedNodes);
+      updateSequence(updatedNodes, entryPoint);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startsWithOpponent]);
 
   // Generate unique ID from name
   const generateUniqueId = (name: string): string => {
@@ -106,8 +124,8 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
     const entryNode = updatedNodes.find((node) => node.id === entryPoint);
     if (!entryNode) return updatedNodes;
 
-    // Start with entry point as player
-    entryNode.isOpponent = false;
+    // Start with entry point based on the toggle setting
+    entryNode.isOpponent = startsWithOpponent;
 
     // Use BFS to assign players based on sequence depth
     const visited = new Set<string>();
@@ -119,8 +137,8 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
     while (queue.length > 0) {
       const { node, depth } = queue.shift()!;
 
-      // Assign player based on depth: even depth = player, odd depth = opponent
-      node.isOpponent = depth % 2 === 1;
+      // Assign player based on depth: even depth = same as entry, odd depth = opposite
+      node.isOpponent = (depth % 2 === 1) !== startsWithOpponent;
 
       // Add next nodes to queue
       node.next.forEach((nextId) => {
@@ -148,7 +166,7 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
       spin: "top",
       toDepth: "long",
       toDirection: "backhand",
-      isOpponent: !currentNode.isOpponent, // Automatically alternate between player and opponent
+      isOpponent: !currentNode.isOpponent, // This will be corrected by recalculatePlayerAssignments
       prev: [currentNode.id],
       next: [],
       isPlaceholder: true,
@@ -599,6 +617,40 @@ export const DrillFormSequence = ({ sequence, onChange }: Props) => {
             Note: Each shot must have a unique name.
           </span>
         </p>
+      </div>
+
+      {/* Starting Player Toggle */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 bg-surface-light border border-border rounded-lg">
+        <span className="text-text font-medium text-base sm:text-sm">
+          Drill starts with:
+        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setStartsWithOpponent(false)}
+            className={`px-4 py-2 sm:px-3 sm:py-1 rounded-md text-base sm:text-sm font-medium transition-colors min-w-[80px] sm:min-w-0 ${
+              !startsWithOpponent
+                ? "bg-primary text-white"
+                : "bg-surface text-text-muted hover:text-text"
+            }`}
+          >
+            Player
+          </button>
+          <button
+            type="button"
+            onClick={() => setStartsWithOpponent(true)}
+            className={`px-4 py-2 sm:px-3 sm:py-1 rounded-md text-base sm:text-sm font-medium transition-colors min-w-[80px] sm:min-w-0 ${
+              startsWithOpponent
+                ? "bg-warning text-white"
+                : "bg-surface text-text-muted hover:text-text"
+            }`}
+          >
+            Opponent
+          </button>
+        </div>
+        <span className="text-text-subtle text-sm sm:ml-auto">
+          {startsWithOpponent ? "Opponent serves first" : "Player serves first"}
+        </span>
       </div>
 
       <div className="space-y-4">
