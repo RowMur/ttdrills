@@ -16,9 +16,9 @@ export const Searchbox = () => {
   const handleSearch = useCallback(
     (query: string) => {
       if (query) {
-        router.push(`/?${SEARCH_KEY}=${encodeURIComponent(query)}`);
+        router.push(`/search?${SEARCH_KEY}=${encodeURIComponent(query)}`);
       } else {
-        router.push("/");
+        router.push("/search");
       }
     },
     [router]

@@ -7,9 +7,12 @@ import { Suspense } from "react";
 import { Plus, User, LogOut } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/Button";
+import { usePathname } from "next/navigation";
 
 export const Navbar = () => {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
 
   return (
     <nav className="max-w-6xl mx-auto mb-4 px-4 text-text">
@@ -31,12 +34,14 @@ export const Navbar = () => {
             )}
           </div>
 
-          {/* Search - hidden on small screens */}
-          <div className="hidden lg:block flex-1 max-w-md mx-4">
-            <Suspense fallback={<div className="text-xs">Loading...</div>}>
-              <Searchbox />
-            </Suspense>
-          </div>
+          {/* Search - hidden on small screens and homepage */}
+          {!isHomePage && (
+            <div className="hidden lg:block flex-1 max-w-md mx-4">
+              <Suspense fallback={<div className="text-xs">Loading...</div>}>
+                <Searchbox />
+              </Suspense>
+            </div>
+          )}
 
           {/* Auth section */}
           {status === "loading" ? (
@@ -69,12 +74,14 @@ export const Navbar = () => {
           )}
         </div>
 
-        {/* Bottom row - Search (only on smaller screens) */}
-        <div className="lg:hidden">
-          <Suspense fallback={<div className="text-xs">Loading...</div>}>
-            <Searchbox />
-          </Suspense>
-        </div>
+        {/* Bottom row - Search (only on smaller screens and not homepage) */}
+        {!isHomePage && (
+          <div className="lg:hidden">
+            <Suspense fallback={<div className="text-xs">Loading...</div>}>
+              <Searchbox />
+            </Suspense>
+          </div>
+        )}
       </div>
     </nav>
   );
