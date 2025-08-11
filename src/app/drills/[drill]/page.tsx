@@ -30,17 +30,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const drill = transformDatabaseDrill(dbDrill);
 
   return {
-    title: `${drill.name} - TTDrills`,
+    title: drill.name,
     description:
       drill.description ||
-      `Practice the ${drill.name} table tennis drill with interactive diagrams and step-by-step instructions.`,
-    keywords: `${drill.name}, table tennis drill, ${
-      drill.difficulty
-    } level, ${drill.categories.join(", ")}`,
+      `Practice the ${drill.name} table tennis drill with interactive diagrams and step-by-step instructions. Perfect for ${drill.difficulty} level players.`,
+    keywords: [
+      drill.name,
+      "table tennis drill",
+      `${drill.difficulty} level`,
+      ...drill.categories,
+      "ping pong training",
+      "table tennis practice",
+      "interactive drill",
+    ],
     openGraph: {
       title: `${drill.name} - TTDrills`,
       description:
-        drill.description || `Practice the ${drill.name} table tennis drill.`,
+        drill.description ||
+        `Practice the ${drill.name} table tennis drill with interactive diagrams and step-by-step instructions.`,
       type: "website",
       url: `https://ttdrills.com/drills/${drill.slug}`,
       ...(drill.videoUrl && {
@@ -55,6 +62,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           },
         ],
       }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${drill.name} - TTDrills`,
+      description:
+        drill.description ||
+        `Practice the ${drill.name} table tennis drill with interactive diagrams and step-by-step instructions.`,
+      ...(drill.videoUrl && {
+        images: [
+          `https://img.youtube.com/vi/${
+            drill.videoUrl.split("v=")[1]
+          }/maxresdefault.jpg`,
+        ],
+      }),
+    },
+    alternates: {
+      canonical: `/drills/${drill.slug}`,
     },
   };
 }

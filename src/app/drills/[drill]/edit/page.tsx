@@ -25,13 +25,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const drill = transformDatabaseDrill(dbDrill);
 
   return {
-    title: `Edit ${drill.name} - TTDrills`,
+    title: `Edit ${drill.name}`,
     description: `Edit the ${drill.name} table tennis drill. Update description, objectives, tips, and video information.`,
-    keywords: `edit ${drill.name}, table tennis drill editor, drill management`,
+    keywords: [
+      `edit ${drill.name}`,
+      "table tennis drill editor",
+      "drill management",
+      "update drill",
+      "modify table tennis drill",
+    ],
     openGraph: {
       title: `Edit ${drill.name} - TTDrills`,
-      description: `Edit the ${drill.name} table tennis drill.`,
+      description: `Edit the ${drill.name} table tennis drill. Update description, objectives, tips, and video information.`,
       type: "website",
+      url: `https://ttdrills.com/drills/${drill.slug}/edit`,
+    },
+    twitter: {
+      card: "summary",
+      title: `Edit ${drill.name} - TTDrills`,
+      description: `Edit the ${drill.name} table tennis drill.`,
     },
   };
 }
