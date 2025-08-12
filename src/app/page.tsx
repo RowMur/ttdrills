@@ -65,7 +65,7 @@ export default function Home() {
         {/* Quick Actions */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 w-fit mx-auto">
           <Link href="/search">
-            <Button className="flex items-center gap-2 px-8 py-3 text-lg">
+            <Button className="flex items-center gap-2 px-8 py-3 text-lg border border-transparent hover:border-border">
               <Search size={20} />
               Browse All Drills
             </Button>
@@ -168,7 +168,9 @@ export default function Home() {
           search or explore our comprehensive drill library.
         </p>
         <Link href="/search">
-          <Button className="px-8 py-3 text-lg">Start Practicing Now</Button>
+          <Button className="px-8 py-3 text-lg border border-border hover:bg-background">
+            Start Practicing Now
+          </Button>
         </Link>
       </div>
     </Main>
