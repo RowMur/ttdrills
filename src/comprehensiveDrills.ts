@@ -1410,4 +1410,470 @@ export const COMPREHENSIVE_DRILLS: Drill[] = [
       entryPoint: "long-serve",
     },
   },
+  {
+    name: "Full Table Topspin to Backhand",
+    slug: "full-table-topspin-to-backhand",
+    creatorId: "00000000-0000-0000-0000-000000000000",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
+    description:
+      "The active player plays topspin into passive player's backhand. Passive player blocks anywhere on the table.",
+    objectives: [],
+    difficulty: "intermediate",
+    categories: ["attack", "serve-receive", "match-play"],
+    tips: [
+      "Focus on keeping the bat high for quick forehand to backhand transitions",
+    ],
+    graph: {
+      nodes: {
+        serve: {
+          id: "serve",
+          ball: {
+            spin: "top",
+            stroke: "forehand",
+            placement: { depth: "long", direction: "backhand" },
+            isOpponent: false,
+          },
+          next: ["block-to-forehand", "block-to-middle", "block-to-backhand"],
+          prev: ["block-to-forehand", "block-to-middle", "block-to-backhand"],
+        },
+        "block-to-middle": {
+          id: "block-to-middle",
+          ball: {
+            spin: "block",
+            stroke: "backhand",
+            placement: { depth: "long", direction: "middle" },
+            isOpponent: true,
+          },
+          next: ["serve"],
+          prev: ["serve"],
+        },
+        "block-to-backhand": {
+          id: "block-to-backhand",
+          ball: {
+            spin: "block",
+            stroke: "backhand",
+            placement: { depth: "long", direction: "backhand" },
+            isOpponent: true,
+          },
+          next: ["serve"],
+          prev: ["serve"],
+        },
+        "block-to-forehand": {
+          id: "block-to-forehand",
+          ball: {
+            spin: "block",
+            stroke: "backhand",
+            placement: { depth: "long", direction: "forehand" },
+            isOpponent: true,
+          },
+          next: ["serve"],
+          prev: ["serve"],
+        },
+      },
+      entryPoint: "serve",
+    },
+  },
+  {
+    name: "Push, Loop, Counter",
+    slug: "push-loop-counter",
+    creatorId: "00000000-0000-0000-0000-000000000000",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
+    description:
+      "Passive player serves and the active player pushes the first ball, loops the next and finally counters the final ball. Can easily be modified to focus on forehand or backhand.",
+    categories: ["serve-receive", "attack", "match-play"],
+    objectives: [],
+    difficulty: "intermediate",
+    tips: [],
+    graph: {
+      nodes: {
+        loop: {
+          id: "loop",
+          ball: {
+            spin: "top",
+            stroke: "backhand",
+            placement: { depth: "long", direction: "backhand" },
+            isOpponent: false,
+          },
+          next: ["control"],
+          prev: ["counter-push"],
+        },
+        push: {
+          id: "push",
+          ball: {
+            spin: "back",
+            stroke: "backhand",
+            placement: { depth: "halflong", direction: "backhand" },
+            isOpponent: false,
+          },
+          next: ["counter-push"],
+          prev: ["serve-1"],
+        },
+        control: {
+          id: "control",
+          ball: {
+            spin: "block",
+            stroke: "backhand",
+            placement: { depth: "long", direction: "backhand" },
+            isOpponent: true,
+          },
+          next: ["counter"],
+          prev: ["loop"],
+        },
+        counter: {
+          id: "counter",
+          ball: {
+            spin: "top",
+            stroke: "backhand",
+            placement: { depth: "long", direction: "backhand" },
+            isOpponent: false,
+          },
+          next: [],
+          prev: ["control"],
+        },
+        "serve-1": {
+          id: "serve-1",
+          ball: {
+            spin: "back",
+            stroke: "serve",
+            placement: { depth: "halflong", direction: "middle" },
+            isOpponent: true,
+          },
+          next: ["push"],
+          prev: null,
+        },
+        "counter-push": {
+          id: "counter-push",
+          ball: {
+            spin: "back",
+            stroke: "backhand",
+            placement: { depth: "long", direction: "backhand" },
+            isOpponent: true,
+          },
+          next: ["loop"],
+          prev: ["push"],
+        },
+      },
+      entryPoint: "serve-1",
+    },
+  },
+  {
+    name: "Push and Loop",
+    slug: "push-and-loop",
+    creatorId: "00000000-0000-0000-0000-000000000000",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
+    description:
+      "Push to push backhand rally. Passive player can push to forehand at any time, active player loops and then goes into free play.",
+    objectives: [],
+    difficulty: "beginner",
+    categories: ["serve-receive", "attack", "match-play"],
+    tips: [
+      "As the active player, actively watch the passive player for when they push to forehand.",
+    ],
+    graph: {
+      nodes: {
+        loop: {
+          id: "loop",
+          ball: {
+            spin: "top",
+            stroke: "forehand",
+            placement: {
+              depth: "long",
+              direction: "forehand",
+            },
+            isOpponent: false,
+          },
+          next: [],
+          prev: ["push-to-forehand"],
+        },
+        push: {
+          id: "push",
+          ball: {
+            spin: "back",
+            stroke: "backhand",
+            placement: {
+              depth: "halflong",
+              direction: "backhand",
+            },
+            isOpponent: false,
+          },
+          next: ["push-back", "push-to-forehand"],
+          prev: ["push-back"],
+        },
+        "push-back": {
+          id: "push-back",
+          ball: {
+            spin: "back",
+            stroke: "backhand",
+            placement: {
+              depth: "halflong",
+              direction: "backhand",
+            },
+            isOpponent: true,
+          },
+          next: ["push"],
+          prev: ["push"],
+        },
+        "push-to-forehand": {
+          id: "push-to-forehand",
+          ball: {
+            spin: "back",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "forehand",
+            },
+            isOpponent: true,
+          },
+          next: ["loop"],
+          prev: ["push"],
+        },
+      },
+      entryPoint: "push",
+    },
+  },
+  {
+    name: "3 Point Forehand",
+    slug: "3-point-forehand",
+    creatorId: "00000000-0000-0000-0000-000000000000",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
+    description:
+      "Active player plays forehand from forehand, middle and backhand continuously.",
+    objectives: [],
+    difficulty: "advanced",
+    categories: ["attack", "consistency", "technique"],
+    tips: [
+      "Focus on forehand placement and consistency",
+      "Use proper footwork and balance",
+      "Practice with varying speeds to challenge yourself",
+    ],
+    graph: {
+      nodes: {
+        "block-to-middle": {
+          id: "block-to-middle",
+          ball: {
+            spin: "block",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "middle",
+            },
+            isOpponent: true,
+          },
+          next: ["forehand-from-middle"],
+          prev: ["forehand-from-forehand"],
+        },
+        "block-to-backhand": {
+          id: "block-to-backhand",
+          ball: {
+            spin: "block",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: true,
+          },
+          next: ["forehand-from-backhand"],
+          prev: ["forehand-from-middle"],
+        },
+        "block-to-forehand": {
+          id: "block-to-forehand",
+          ball: {
+            spin: "block",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "forehand",
+            },
+            isOpponent: true,
+          },
+          next: ["forehand-from-forehand"],
+          prev: ["forehand-from-backhand"],
+        },
+        "forehand-from-middle": {
+          id: "forehand-from-middle",
+          ball: {
+            spin: "top",
+            stroke: "forehand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: false,
+          },
+          next: ["block-to-backhand"],
+          prev: ["block-to-middle"],
+        },
+        "forehand-from-backhand": {
+          id: "forehand-from-backhand",
+          ball: {
+            spin: "top",
+            stroke: "forehand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: false,
+          },
+          next: ["block-to-forehand"],
+          prev: ["block-to-backhand"],
+        },
+        "forehand-from-forehand": {
+          id: "forehand-from-forehand",
+          ball: {
+            spin: "top",
+            stroke: "forehand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: false,
+          },
+          next: ["block-to-middle"],
+          prev: ["block-to-forehand"],
+        },
+      },
+      entryPoint: "forehand-from-forehand",
+    },
+  },
+  {
+    name: "Touch, Push or Flick",
+    slug: "touch-push-or-flick",
+    creatorId: "00000000-0000-0000-0000-000000000000",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
+    description:
+      "One player serves short backspin, the other player can touch it short or push or flick it into the server's crossover point. The point then goes free.",
+    objectives: [],
+    difficulty: "intermediate",
+    categories: ["serve-receive", "attack", "match-play"],
+    tips: [],
+    graph: {
+      nodes: {
+        push: {
+          id: "push",
+          ball: {
+            spin: "back",
+            stroke: "forehand",
+            placement: {
+              depth: "long",
+              direction: "middle",
+            },
+            isOpponent: true,
+          },
+          next: [],
+          prev: ["serve"],
+        },
+        flick: {
+          id: "flick",
+          ball: {
+            spin: "top",
+            stroke: "backhand",
+            placement: {
+              depth: "long",
+              direction: "middle",
+            },
+            isOpponent: true,
+          },
+          next: [],
+          prev: ["serve"],
+        },
+        serve: {
+          id: "serve",
+          ball: {
+            spin: "back",
+            stroke: "serve",
+            placement: {
+              depth: "short",
+              direction: "middle",
+            },
+            isOpponent: false,
+          },
+          next: ["touch", "push", "flick"],
+          prev: null,
+        },
+        touch: {
+          id: "touch",
+          ball: {
+            spin: "back",
+            stroke: "forehand",
+            placement: {
+              depth: "short",
+              direction: "middle",
+            },
+            isOpponent: true,
+          },
+          next: [],
+          prev: ["serve"],
+        },
+      },
+      entryPoint: "serve",
+    },
+  },
+  {
+    name: "Serve and loop down the line",
+    slug: "serve-and-loop-down-the-line",
+    creatorId: "00000000-0000-0000-0000-000000000000",
+    createdAt: new Date("2024-01-01"),
+    updatedAt: new Date("2024-01-01"),
+    description:
+      "Serve short backspin to forehand, opponent pushes long to forehand, play a loop down the line to the opponent's backhand.",
+    objectives: ["Play a loop down the line to the opponent's backhand."],
+    difficulty: "beginner",
+    categories: ["serve-receive", "attack", "match-play"],
+    tips: [
+      "Don't wait too long to loop. Playing this shot quickly will catch the opponent out recovering from the short forehand.",
+    ],
+    graph: {
+      nodes: {
+        loop: {
+          id: "loop",
+          ball: {
+            spin: "top",
+            stroke: "forehand",
+            placement: {
+              depth: "long",
+              direction: "backhand",
+            },
+            isOpponent: false,
+          },
+          next: [],
+          prev: ["push"],
+        },
+        push: {
+          id: "push",
+          ball: {
+            spin: "back",
+            stroke: "forehand",
+            placement: {
+              depth: "long",
+              direction: "forehand",
+            },
+            isOpponent: true,
+          },
+          next: ["loop"],
+          prev: ["serve-1"],
+        },
+        "serve-1": {
+          id: "serve-1",
+          ball: {
+            spin: "back",
+            stroke: "serve",
+            placement: {
+              depth: "short",
+              direction: "forehand",
+            },
+            isOpponent: false,
+          },
+          next: ["push"],
+          prev: null,
+        },
+      },
+      entryPoint: "serve-1",
+    },
+  },
 ];

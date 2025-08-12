@@ -8,7 +8,7 @@
     "start": "tsx scripts/startup.ts && next start",
     "start:no-seed": "next start",
     "lint": "next lint",
-    "seed": "tsx scripts/seed-database.ts"
+    "seed": "export $(cat .env | xargs) && tsx scripts/seed-database.ts"
   },
   "dependencies": {
     "@auth/core": "^0.40.0",
