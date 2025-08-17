@@ -19,22 +19,32 @@ export default function SessionsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalSessions, setTotalSessions] = useState(0);
+  const [sortBy, setSortBy] = useState<
+    "date" | "name" | "duration" | "created_at"
+  >("date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   useEffect(() => {
     if (status === "authenticated") {
       fetchSessions();
     }
-  }, [status, currentPage]);
+  }, [status, currentPage, sortBy, sortOrder]);
 
   const fetchSessions = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `/api/sessions?page=${currentPage}&limit=10`
-      );
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: "10",
+        sortBy: sortBy,
+        sortOrder: sortOrder,
+      });
+
+      const response = await fetch(`/api/sessions?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
         setSessions(data.sessions);
+        console.log(data.sessions);
         setTotalPages(data.pagination.totalPages);
         setTotalSessions(data.pagination.total);
       } else {
@@ -101,6 +111,38 @@ export default function SessionsPage() {
         </Button>
       </div>
 
+      {/* Sorting Controls */}
+      {sessions.length > 0 && (
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center space-x-4">
+            <label className="text-sm font-medium text-text">Sort by:</label>
+            <select
+              value={sortBy}
+              onChange={(e) =>
+                setSortBy(
+                  e.target.value as "date" | "name" | "duration" | "created_at"
+                )
+              }
+              className="px-3 py-1 text-sm border border-border rounded bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="date">Date</option>
+              <option value="name">Name</option>
+              <option value="duration">Duration</option>
+              <option value="created_at">Created</option>
+            </select>
+            <button
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              className="p-1 text-text-muted hover:text-text transition-colors"
+            >
+              {sortOrder === "asc" ? "↑" : "↓"}
+            </button>
+          </div>
+          <div className="text-sm text-text-muted">
+            {totalSessions} session{totalSessions !== 1 ? "s" : ""} total
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex justify-center py-12">
           <div className="text-lg text-text">Loading sessions...</div>
@@ -134,7 +176,66 @@ export default function SessionsPage() {
         </div>
       ) : (
         <>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* Sessions Summary */}
+          <div className="bg-surface rounded-lg border border-border p-6 mb-6">
+            <h2 className="text-lg font-semibold text-text mb-4">
+              Sessions Overview
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {totalSessions}
+                </div>
+                <div className="text-sm text-text-muted">Total Sessions</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {sessions.reduce((total, session) => {
+                    const sessionDuration =
+                      session.durationMinutes ||
+                      session.sessionDrills?.reduce(
+                        (sum, sd) => sum + (sd.durationMinutes || 0),
+                        0
+                      ) ||
+                      0;
+                    return total + sessionDuration;
+                  }, 0)}
+                </div>
+                <div className="text-sm text-text-muted">Total Minutes</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {sessions.reduce(
+                    (total, session) =>
+                      total + (session.sessionDrills?.length || 0),
+                    0
+                  )}
+                </div>
+                <div className="text-sm text-text-muted">Total Drills</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {(() => {
+                    const allRatings = sessions.flatMap(
+                      (session) =>
+                        session.sessionDrills
+                          ?.map((sd) => sd.rating)
+                          .filter((r) => r !== undefined && r !== null) || []
+                    );
+                    if (allRatings.length === 0) return "N/A";
+                    const avg =
+                      allRatings.reduce((sum, rating) => sum + rating, 0) /
+                      allRatings.length;
+                    return Math.round(avg * 10) / 10;
+                  })()}
+                </div>
+                <div className="text-sm text-text-muted">Avg Rating</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Sessions List */}
+          <div className="space-y-4">
             {sessions.map((session) => (
               <SessionCard
                 key={session.id}
@@ -145,7 +246,10 @@ export default function SessionsPage() {
           </div>
 
           {totalPages > 1 && (
-            <div className="mt-8">
+            <div className="mt-8 flex justify-between items-center">
+              <div className="text-sm text-text-muted">
+                Showing page {currentPage} of {totalPages}
+              </div>
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}

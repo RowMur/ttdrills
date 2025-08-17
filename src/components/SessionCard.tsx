@@ -10,12 +10,19 @@ interface SessionCardProps {
 }
 
 export function SessionCard({ session, onDelete }: SessionCardProps) {
-  const [showDetails, setShowDetails] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   // Debug logging
-  console.log("Session data:", session);
-  console.log("Session drills:", session.sessionDrills);
+  console.log("SessionCard render:", {
+    sessionName: session.name,
+    sessionDrillsCount: session.sessionDrills?.length,
+    firstSessionDrill: session.sessionDrills?.[0],
+    drillData: session.sessionDrills?.[0]?.drill,
+    drillName: session.sessionDrills?.[0]?.drill?.name,
+    drillSlug: session.sessionDrills?.[0]?.drill?.slug,
+  });
+
+  console.log(session);
 
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this session?")) {
@@ -83,8 +90,8 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
 
   return (
     <div className="bg-surface rounded-lg shadow-md border border-border overflow-hidden">
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-4">
+      <div className="p-4">
+        <div className="flex justify-between items-start mb-3">
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-text mb-1">
               {session.name}
@@ -105,7 +112,8 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
           </div>
         </div>
 
-        <div className="flex items-center space-x-4 text-sm text-text-muted mb-4">
+        {/* Quick Stats Row */}
+        <div className="flex items-center space-x-6 text-sm text-text-muted mb-3">
           {totalDuration > 0 && (
             <div className="flex items-center">
               <svg
@@ -142,12 +150,6 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
               </svg>
               {session.sessionDrills.length} drill
               {session.sessionDrills.length !== 1 ? "s" : ""}
-              {session.sessionDrills.some((sd) => sd.drill?.name) && (
-                <span className="ml-2 text-xs">
-                  ({session.sessionDrills.filter((sd) => sd.drill?.name).length}{" "}
-                  with names)
-                </span>
-              )}
             </div>
           )}
 
@@ -165,66 +167,93 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
           )}
         </div>
 
-        {session.notes && (
-          <p className="text-sm text-text-muted mb-4">{session.notes}</p>
-        )}
-
+        {/* Enhanced Drill Details Preview */}
         {session.sessionDrills && session.sessionDrills.length > 0 && (
-          <div className="border-t border-border pt-4">
-            <div className="flex justify-between items-center mb-3">
+          <div className="mb-3">
+            <div className="flex items-center justify-between mb-3">
               <h4 className="font-medium text-text">
                 Drills in this session ({session.sessionDrills.length}):
               </h4>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setShowDetails(!showDetails)}
-              >
-                {showDetails ? "Hide Details" : "Show Details"}
-              </Button>
             </div>
-
-            {showDetails && (
-              <div className="space-y-3">
-                {session.sessionDrills.map((sessionDrill, index) => (
-                  <div key={index} className="bg-surface-light rounded-md p-3">
-                    <div className="flex justify-between items-start mb-2">
-                      <h5 className="font-medium text-text">
-                        {sessionDrill.drill?.name || `Drill ${index + 1}`}
-                      </h5>
-                      <div className="flex items-center space-x-2 text-sm text-text-muted">
-                        {sessionDrill.durationMinutes && (
-                          <span>{sessionDrill.durationMinutes} min</span>
-                        )}
-                        {sessionDrill.repetitions &&
-                          sessionDrill.repetitions > 1 && (
-                            <span>{sessionDrill.repetitions}x</span>
-                          )}
-                        {sessionDrill.rating && (
-                          <div className="flex items-center">
-                            <span className="text-yellow-500">★</span>
-                            <span>{sessionDrill.rating}</span>
-                          </div>
-                        )}
-                      </div>
+            <div className="space-y-3">
+              {session.sessionDrills.map((sessionDrill, index) => (
+                <div
+                  key={index}
+                  className="bg-surface-light rounded-md p-3 border border-border"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      {sessionDrill.drill?.slug ? (
+                        <a
+                          href={`/drills/${sessionDrill.drill.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary border border-primary/20 font-medium hover:bg-primary/20 transition-colors cursor-pointer"
+                        >
+                          {sessionDrill.drill.name || `Drill ${index + 1}`}
+                        </a>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary border border-primary/20 font-medium">
+                          {sessionDrill.drill?.name || `Drill ${index + 1}`}
+                        </span>
+                      )}
+                      {sessionDrill.durationMinutes && (
+                        <span className="text-sm text-text-muted bg-surface px-2 py-1 rounded">
+                          {sessionDrill.durationMinutes} min
+                        </span>
+                      )}
+                      {sessionDrill.rating && (
+                        <div className="flex items-center text-yellow-500 bg-surface px-2 py-1 rounded">
+                          <span className="text-xs">★</span>
+                          <span className="text-xs ml-1 font-medium">
+                            {sessionDrill.rating}/5
+                          </span>
+                        </div>
+                      )}
                     </div>
+                  </div>
 
-                    {sessionDrill.drill?.description && (
-                      <p className="text-sm text-text-muted mb-2">
-                        {sessionDrill.drill.description}
-                      </p>
-                    )}
+                  {sessionDrill.drill?.description && (
+                    <p
+                      className="text-sm text-text-muted mb-2 overflow-hidden"
+                      style={{
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      {sessionDrill.drill.description}
+                    </p>
+                  )}
 
-                    {sessionDrill.notes && (
-                      <p className="text-sm text-text-muted italic">
+                  {sessionDrill.drill?.id && !sessionDrill.drill?.slug && (
+                    <div className="mt-2">
+                      <a
+                        href={`/drills/${sessionDrill.drill.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-2 py-1 text-xs bg-surface border border-border rounded hover:bg-surface-light transition-colors text-text-muted hover:text-text"
+                      >
+                        View Drill Details →
+                      </a>
+                    </div>
+                  )}
+
+                  {sessionDrill.notes && (
+                    <div className="bg-primary/5 border-l-2 border-primary pl-3 py-1">
+                      <p className="text-sm text-text italic">
                         &ldquo;{sessionDrill.notes}&rdquo;
                       </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
+        )}
+
+        {session.notes && (
+          <p className="text-sm text-text-muted mb-4">{session.notes}</p>
         )}
       </div>
     </div>

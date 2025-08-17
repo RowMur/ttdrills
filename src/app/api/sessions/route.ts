@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { getUserByEmail } from "@/lib/database";
 import { supabase } from "@/lib/supabase";
-import { CreateSessionRequest } from "@/types";
+import { CreateSessionRequest, Session } from "@/types";
 
 export async function POST(request: NextRequest) {
   try {
@@ -133,30 +133,37 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
+    const sortBy = searchParams.get("sortBy") || "date";
+    const sortOrder = searchParams.get("sortOrder") || "desc";
     const offset = (page - 1) * limit;
 
-    // Get sessions with session drills and drill details
-    const { data: sessions, error: sessionsError } = await supabase
-      .from("sessions")
-      .select(
-        `
-        *,
-        session_drills (
-          *,
-          drill:drills (
-            id,
-            name,
-            slug,
-            description,
-            difficulty,
-            categories
-          )
-        )
-      `
-      )
-      .eq("user_id", user.id)
-      .order("date", { ascending: false })
-      .range(offset, offset + limit - 1);
+    // Build the query - first get sessions
+    let query = supabase.from("sessions").select("*").eq("user_id", user.id);
+
+    // Apply sorting with fallback to created_at for consistent ordering
+    if (sortBy === "duration") {
+      // For duration, we need to sort by duration_minutes
+      query = query.order("duration_minutes", {
+        ascending: sortOrder === "asc",
+      });
+    } else if (sortBy === "created_at") {
+      // For created_at, no secondary sort needed
+      query = query.order("created_at", { ascending: sortOrder === "asc" });
+    } else {
+      // For other fields, add created_at as secondary sort
+      query = query.order(sortBy, { ascending: sortOrder === "asc" });
+    }
+
+    // Always add created_at as a secondary sort for consistent ordering (except when already sorting by created_at)
+    if (sortBy !== "created_at") {
+      query = query.order("created_at", { ascending: false });
+    }
+
+    // Apply pagination
+    const { data: sessions, error: sessionsError } = await query.range(
+      offset,
+      offset + limit - 1
+    );
 
     if (sessionsError) {
       console.error("Error fetching sessions:", sessionsError);
@@ -164,6 +171,115 @@ export async function GET(request: NextRequest) {
         { error: "Failed to fetch sessions" },
         { status: 500 }
       );
+    }
+
+    console.log("API: Fetched sessions:", sessions?.length);
+    console.log("API: First session:", sessions?.[0]);
+
+    // Get session drills for each session
+    if (sessions && sessions.length > 0) {
+      const sessionIds = sessions.map((s) => s.id);
+
+      // First, let's just get the session drills without the drill data
+      const { data: sessionDrills, error: sessionDrillsError } = await supabase
+        .from("session_drills")
+        .select("*")
+        .in("session_id", sessionIds);
+
+      console.log("API: Session drills query result:", {
+        sessionDrills: sessionDrills?.length,
+        sessionDrillsError,
+      });
+      console.log("API: Session IDs being queried:", sessionIds);
+
+      if (sessionDrillsError) {
+        console.error("Error fetching session drills:", sessionDrillsError);
+      } else if (sessionDrills && sessionDrills.length > 0) {
+        console.log("API: Fetched session drills:", sessionDrills.length);
+        console.log("API: First session drill:", sessionDrills[0]);
+
+        // Get drill IDs from session drills
+        const drillIds = sessionDrills
+          .map((sd) => sd.drill_id)
+          .filter((id) => id) as string[];
+
+        console.log("API: Drill IDs found:", drillIds);
+
+        // Get drill data for these IDs
+        const { data: drills, error: drillsError } = await supabase
+          .from("drills")
+          .select("id, name, slug, description, difficulty, categories")
+          .in("id", drillIds);
+
+        console.log("API: Drills query result:", {
+          drills: drills?.length,
+          drillsError,
+        });
+        console.log("API: Found drills:", drills);
+        console.log(
+          "API: Drill IDs that were found:",
+          drills?.map((d) => d.id)
+        );
+
+        // Let's also check what drills exist in the database
+        const { data: allDrills } = await supabase
+          .from("drills")
+          .select("id, name, slug")
+          .limit(10);
+
+        console.log("API: Sample drills in database:", allDrills);
+        console.log(
+          "API: Sample drill slugs in database:",
+          allDrills?.map((d) => d.slug)
+        );
+
+        if (drillsError) {
+          console.error("Error fetching drills:", drillsError);
+        } else {
+          // Create a map of ID to drill data
+          const drillMap =
+            drills?.reduce((acc, drill) => {
+              acc[drill.id] = drill;
+              return acc;
+            }, {} as Record<string, (typeof drills)[0]>) || {};
+
+          // Group session drills by session_id and add drill data
+          const drillsBySession = sessionDrills.reduce((acc, sessionDrill) => {
+            if (!acc[sessionDrill.session_id]) {
+              acc[sessionDrill.session_id] = [];
+            }
+            // Add drill data to the session drill
+            const drillData = drillMap[sessionDrill.drill_id];
+            acc[sessionDrill.session_id].push({
+              ...sessionDrill,
+              drill: drillData,
+            });
+            return acc;
+          }, {} as Record<string, ((typeof sessionDrills)[0] & { drill: (typeof drills)[0] })[]>);
+
+          // Add sessionDrills to each session (camelCase for TypeScript)
+          sessions.forEach((session) => {
+            (
+              session as Session & {
+                sessionDrills: (typeof drillsBySession)[string];
+              }
+            ).sessionDrills = drillsBySession[session.id] || [];
+          });
+
+          console.log("API: Final session with drills:", sessions[0]);
+          console.log("API: First session drills:", sessions[0]?.sessionDrills);
+          console.log(
+            "API: First session drill data:",
+            sessions[0]?.sessionDrills?.[0]?.drill
+          );
+        }
+      } else {
+        console.log("API: No session drills found");
+        // Add empty sessionDrills to each session (camelCase for TypeScript)
+        sessions.forEach((session) => {
+          (session as Session & { sessionDrills: [] }).sessionDrills = [];
+        });
+      }
     }
 
     // Get total count for pagination
