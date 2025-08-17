@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { BetaBanner } from "@/components/BetaBanner";
 import { Analytics } from "@vercel/analytics/next";
 import { SessionProvider } from "@/components/SessionProvider";
 import { StartupSeeder } from "@/components/StartupSeeder";
@@ -94,6 +95,7 @@ export default function RootLayout({
         <PostHogProvider>
           <SessionProvider>
             <StartupSeeder />
+            <BetaBanner />
             <Navbar />
             <main className="min-h-screen">{children}</main>
             <Footer />
