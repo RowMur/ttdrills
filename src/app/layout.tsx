@@ -14,20 +14,20 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "TTDrills - Table Tennis Drills with Interactive Diagrams",
+    default: "TTDrills - Track Your Table Tennis Training Progress",
     template: "%s - TTDrills",
   },
   description:
-    "Discover and practice table tennis drills with interactive diagrams, video demonstrations, and step-by-step instructions. Perfect for players of all levels.",
+    "Log your table tennis training sessions, track your progress, and discover drills to improve your game. The ultimate training journal for table tennis players.",
   keywords: [
+    "table tennis training journal",
+    "ping pong practice log",
+    "table tennis progress tracking",
+    "training sessions",
     "table tennis drills",
     "ping pong training",
     "table tennis practice",
-    "interactive drills",
-    "table tennis exercises",
-    "ping pong drills",
     "table tennis coaching",
-    "table tennis training",
   ],
   authors: [{ name: "TTDrills Team" }],
   creator: "TTDrills",
@@ -45,9 +45,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://ttdrills.com",
-    title: "TTDrills - Table Tennis Drills with Interactive Diagrams",
+    title: "TTDrills - Track Your Table Tennis Training Progress",
     description:
-      "Discover and practice table tennis drills with interactive diagrams, video demonstrations, and step-by-step instructions.",
+      "Log your table tennis training sessions, track your progress, and discover drills to improve your game.",
     siteName: "TTDrills",
     images: [
       {
@@ -60,9 +60,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "TTDrills - Table Tennis Drills with Interactive Diagrams",
+    title: "TTDrills - Track Your Table Tennis Training Progress",
     description:
-      "Discover and practice table tennis drills with interactive diagrams, video demonstrations, and step-by-step instructions.",
+      "Log your table tennis training sessions, track your progress, and discover drills to improve your game.",
     images: ["/logo.png"],
   },
   robots: {

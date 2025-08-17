@@ -1,21 +1,32 @@
 import { Main } from "@/components/Main";
 import { Searchbox } from "@/components/Searchbox";
 import { Button } from "@/components/Button";
-import { Search, Play, BookOpen, Target, Users, Zap } from "lucide-react";
+import {
+  Search,
+  Play,
+  BookOpen,
+  Target,
+  Users,
+  Zap,
+  Calendar,
+  BarChart3,
+  TrendingUp,
+  Clock,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "TTDrills - Table Tennis Drills with Interactive Diagrams",
+  title: "TTDrills - Track Your Table Tennis Training Progress",
   description:
-    "Discover and practice table tennis drills with interactive diagrams, video demonstrations, and step-by-step instructions. Perfect for players of all levels.",
+    "Log your table tennis training sessions, track your progress, and discover drills to improve your game. The ultimate training journal for table tennis players.",
   keywords:
-    "table tennis drills, ping pong training, table tennis practice, interactive drills, table tennis exercises",
+    "table tennis training journal, ping pong practice log, table tennis progress tracking, training sessions, table tennis drills",
   openGraph: {
-    title: "TTDrills - Table Tennis Drills with Interactive Diagrams",
+    title: "TTDrills - Track Your Table Tennis Training Progress",
     description:
-      "Discover and practice table tennis drills with interactive diagrams, video demonstrations, and step-by-step instructions.",
+      "Log your table tennis training sessions, track your progress, and discover drills to improve your game.",
     type: "website",
     url: "https://ttdrills.com",
   },
@@ -27,70 +38,52 @@ export default function Home() {
       {/* Hero Section */}
       <div className="text-center py-12 px-4">
         <h1 className="text-4xl md:text-6xl font-bold text-text mb-6">
-          Master Table Tennis with
-          <span className="text-primary block">Interactive Drills</span>
+          Track Your Table Tennis
+          <span className="text-primary block">Training Journey</span>
         </h1>
         <p className="text-xl text-text-subtle mb-8 max-w-3xl mx-auto">
-          Discover table tennis drills with step-by-step diagrams, video
-          demonstrations, and detailed instructions. Perfect for players of all
-          levels.
+          Log your training sessions, track your progress over time, and
+          discover drills to improve your game. The ultimate training journal
+          for serious table tennis players.
         </p>
 
-        {/* Search Section */}
-        <div className="max-w-2xl mx-auto mb-12 px-4">
-          <div className="bg-surface-light border border-border rounded-lg p-4 sm:p-6">
-            <h2 className="text-lg font-semibold text-text mb-4">
-              Find Your Perfect Drill
-            </h2>
-            <Suspense
-              fallback={
-                <div className="text-sm text-text-subtle">
-                  Loading search...
-                </div>
-              }
-            >
-              <Searchbox />
-            </Suspense>
-            <div className="mt-4 text-sm text-text-subtle">
-              Try searching for:{" "}
-              <strong className="text-text-muted">forehand</strong>,{" "}
-              <strong className="text-text-muted">backhand</strong>,{" "}
-              <strong className="text-text-muted">footwork</strong>,{" "}
-              <strong className="text-text-muted">beginner</strong>,{" "}
-              <strong className="text-text-muted">advanced</strong>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
+        {/* Primary CTA */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 w-fit mx-auto">
-          <Link href="/search">
-            <Button className="flex items-center gap-2 px-8 py-3 text-lg border border-transparent hover:border-border">
-              <Search size={20} />
-              Browse All Drills
+          <Link href="/sessions">
+            <Button
+              variant="primary"
+              size="lg"
+              className="flex items-center gap-2 px-8 py-3 text-lg"
+            >
+              <Calendar size={20} />
+              Log Training Session
             </Button>
           </Link>
-          <Link href="/create">
-            <Button className="flex items-center gap-2 px-8 py-3 text-lg border border-border bg-transparent text-text hover:bg-surface-light">
-              <BookOpen size={20} />
-              Create Your Own
+          <Link href="/search">
+            <Button
+              variant="outline"
+              size="lg"
+              className="flex items-center gap-2 px-8 py-3 text-lg"
+            >
+              <Search size={20} />
+              Browse Drills
             </Button>
           </Link>
         </div>
       </div>
 
-      {/* Features Section */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+      {/* Features Section - Training Journal Focus */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
         <div className="text-center p-6">
           <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Play className="text-primary" size={24} />
+            <Calendar className="text-primary" size={24} />
           </div>
           <h3 className="text-xl font-semibold text-text mb-2">
-            Interactive Diagrams
+            Session Logging
           </h3>
           <p className="text-text-subtle">
-            Visualize every shot with our interactive diagrams that show ball
-            trajectory, player movement, and timing.
+            Easily log your training sessions with date, duration, and detailed
+            notes about your practice.
           </p>
         </div>
 
@@ -99,77 +92,79 @@ export default function Home() {
             <Target className="text-success" size={24} />
           </div>
           <h3 className="text-xl font-semibold text-text mb-2">
-            Skill-Based Training
+            Drill Tracking
           </h3>
           <p className="text-text-subtle">
-            Drills organized by skill level, technique, and difficulty to help
-            you progress systematically.
+            Record which drills you practiced, how long you spent on each, and
+            rate your performance.
           </p>
         </div>
 
         <div className="text-center p-6">
           <div className="bg-warning/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Users className="text-warning" size={24} />
+            <BarChart3 className="text-warning" size={24} />
           </div>
           <h3 className="text-xl font-semibold text-text mb-2">
-            For All Levels
+            Progress Analytics
           </h3>
           <p className="text-text-subtle">
-            From beginners learning basic strokes to advanced players perfecting
-            complex combinations.
+            View your training history, total practice time, and track
+            improvement over weeks and months.
           </p>
         </div>
 
         <div className="text-center p-6">
           <div className="bg-info/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <BookOpen className="text-info" size={24} />
+            <Search className="text-info" size={24} />
           </div>
           <h3 className="text-xl font-semibold text-text mb-2">
-            Detailed Instructions
+            Drill Library
           </h3>
           <p className="text-text-subtle">
-            Step-by-step guidance with tips, common mistakes to avoid, and
-            progression suggestions.
+            Access hundreds of drills with interactive diagrams, video
+            demonstrations, and detailed instructions.
           </p>
         </div>
 
         <div className="text-center p-6">
           <div className="bg-secondary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Zap className="text-secondary" size={24} />
+            <Clock className="text-secondary" size={24} />
           </div>
           <h3 className="text-xl font-semibold text-text mb-2">
-            Video Demonstrations
+            Time Tracking
           </h3>
           <p className="text-text-subtle">
-            Watch professional players demonstrate techniques with clear
-            explanations and slow-motion analysis.
+            Monitor how much time you spend on different aspects of your game
+            and specific drills.
           </p>
         </div>
 
         <div className="text-center p-6">
           <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Search className="text-primary" size={24} />
+            <BookOpen className="text-primary" size={24} />
           </div>
-          <h3 className="text-xl font-semibold text-text mb-2">Smart Search</h3>
+          <h3 className="text-xl font-semibold text-text mb-2">
+            Training Notes
+          </h3>
           <p className="text-text-subtle">
-            Find exactly what you need with our intelligent search that
-            understands table tennis terminology.
+            Add personal notes to each session and drill to remember what worked
+            and what needs improvement.
           </p>
         </div>
       </div>
 
-      {/* CTA Section */}
-      <div className="text-center bg-surface-light border border-border rounded-lg p-8 mb-8">
+      {/* Final CTA - Back to Session Logging */}
+      <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-text mb-4">
-          Ready to Improve Your Game?
+          Ready to Start Tracking Your Progress?
         </h2>
         <p className="text-text-subtle mb-6 max-w-2xl mx-auto">
-          Start improving your table tennis skills today. Begin with a simple
-          search or explore our comprehensive drill library.
+          Begin your table tennis training journal today. Log your first session
+          and start building a comprehensive record of your improvement journey.
         </p>
-        <Link href="/search">
-          <Button className="px-8 py-3 text-lg border border-border hover:bg-background">
-            Start Practicing Now
+        <Link href="/sessions">
+          <Button variant="primary" size="lg" className="px-8 py-3 text-lg">
+            Log Your First Session
           </Button>
         </Link>
       </div>

@@ -26,13 +26,6 @@ export const Navbar = () => {
             {session && (
               <>
                 <Link
-                  href="/create"
-                  className="flex items-center gap-1 px-2 py-2 bg-success text-white rounded-lg hover:bg-success-dark transition-colors text-xs font-medium"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span className="hidden md:inline">Create Drill</span>
-                </Link>
-                <Link
                   href="/sessions"
                   className="flex items-center gap-1 px-2 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-xs font-medium"
                 >
@@ -50,6 +43,13 @@ export const Navbar = () => {
                     />
                   </svg>
                   <span className="hidden md:inline">Sessions</span>
+                </Link>
+                <Link
+                  href="/create"
+                  className="flex items-center gap-1 px-2 py-2 bg-success text-white rounded-lg hover:bg-success-dark transition-colors text-xs font-medium"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden md:inline">Create Drill</span>
                 </Link>
               </>
             )}
@@ -78,6 +78,8 @@ export const Navbar = () => {
               )}
               <Button
                 onClick={() => signOut()}
+                variant="outline"
+                size="sm"
                 className="flex items-center gap-1 px-2 py-2 bg-surface-light text-text hover:bg-surface-dark transition-colors text-xs"
               >
                 <LogOut className="w-4 h-4" />
