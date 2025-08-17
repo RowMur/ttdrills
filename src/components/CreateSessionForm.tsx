@@ -84,8 +84,6 @@ export function CreateSessionForm({
         sessionDrills: selectedDrills.map((d) => d.sessionData),
       };
 
-      console.log("Submitting session data:", sessionData);
-
       const response = await fetch("/api/sessions", {
         method: "POST",
         headers: {

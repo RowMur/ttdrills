@@ -13,8 +13,6 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 async function seedDatabase() {
   try {
-    console.log("Starting database seeding...");
-
     // First, ensure the system user exists
     const { error: userError } = await supabase
       .from("users")
@@ -33,8 +31,6 @@ async function seedDatabase() {
       console.error("Error creating system user:", userError);
       return { success: false, error: "Failed to create system user" };
     }
-
-    console.log("System user ready");
 
     // Check if drills already exist
     const { data: existingDrills, error: checkError } = await supabase
@@ -55,11 +51,8 @@ async function seedDatabase() {
     );
 
     if (drillsToInsert.length === 0) {
-      console.log("All system drills already exist in database");
       return { success: true, message: "All drills already exist", count: 0 };
     }
-
-    console.log(`Inserting ${drillsToInsert.length} new system drills...`);
 
     const { data: insertedDrills, error: insertError } = await supabase
       .from("drills")
@@ -88,7 +81,6 @@ async function seedDatabase() {
       return { success: false, error: "Failed to insert drills" };
     }
 
-    console.log(`Successfully seeded ${insertedDrills?.length || 0} drills`);
     return {
       success: true,
       message: `Successfully seeded ${insertedDrills?.length || 0} drills`,

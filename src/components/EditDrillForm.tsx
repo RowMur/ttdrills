@@ -102,7 +102,6 @@ export const EditDrillForm = ({ drill }: Props) => {
 
       // Track drill edit
       trackDrillEdit(drill.name, drill.slug);
-      console.log("Updated Drill:", updatedDrill);
 
       // Redirect to the updated drill details page
       router.push(`/drills/${updatedDrill.slug}`);

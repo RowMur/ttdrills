@@ -33,8 +33,6 @@ export type DatabaseDrill = {
 export async function getUserByEmail(
   email: string
 ): Promise<DatabaseUser | null> {
-  console.log("Looking up user by email:", email);
-
   const { data, error } = await supabase
     .from("users")
     .select("*")
@@ -46,7 +44,6 @@ export async function getUserByEmail(
     return null;
   }
 
-  console.log("Found user:", data?.email);
   return data;
 }
 
@@ -74,8 +71,6 @@ export async function upsertUser(userData: {
   name: string;
   image?: string;
 }): Promise<DatabaseUser | null> {
-  console.log("Upserting user:", userData.email);
-
   const { data, error } = await supabase
     .from("users")
     .upsert([userData], { onConflict: "email" })
@@ -87,7 +82,6 @@ export async function upsertUser(userData: {
     return null;
   }
 
-  console.log("Successfully upserted user:", data?.email);
   return data;
 }
 

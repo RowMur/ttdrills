@@ -8,12 +8,11 @@ export const StartupSeeder = () => {
     if (process.env.NODE_ENV === "production") {
       const seedDatabase = async () => {
         try {
-          console.log("Triggering database seeding...");
           const response = await fetch("/api/startup");
           const result = await response.json();
 
           if (result.success) {
-            console.log("Database seeding result:", result.message);
+            // Seeding completed successfully
           } else {
             console.error("Database seeding failed:", result.error);
           }

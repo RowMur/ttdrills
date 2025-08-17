@@ -44,7 +44,7 @@ export default function SessionsPage() {
       if (response.ok) {
         const data = await response.json();
         setSessions(data.sessions);
-        console.log(data.sessions);
+
         setTotalPages(data.pagination.totalPages);
         setTotalSessions(data.pagination.total);
       } else {

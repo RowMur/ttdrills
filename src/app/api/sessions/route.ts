@@ -73,8 +73,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("Created session with ID:", sessionData.id);
-
     // Create session drills
     const sessionDrillsData = sessionDrills.map((sd) => ({
       session_id: sessionData.id,
@@ -84,8 +82,6 @@ export async function POST(request: NextRequest) {
       rating: sd.rating,
       repetitions: sd.repetitions || 1,
     }));
-
-    console.log("Session drills data:", sessionDrillsData);
 
     const { error: sessionDrillsError } = await supabase
       .from("session_drills")
@@ -173,9 +169,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log("API: Fetched sessions:", sessions?.length);
-    console.log("API: First session:", sessions?.[0]);
-
     // Get session drills for each session
     if (sessions && sessions.length > 0) {
       const sessionIds = sessions.map((s) => s.id);
@@ -186,52 +179,19 @@ export async function GET(request: NextRequest) {
         .select("*")
         .in("session_id", sessionIds);
 
-      console.log("API: Session drills query result:", {
-        sessionDrills: sessionDrills?.length,
-        sessionDrillsError,
-      });
-      console.log("API: Session IDs being queried:", sessionIds);
-
       if (sessionDrillsError) {
         console.error("Error fetching session drills:", sessionDrillsError);
       } else if (sessionDrills && sessionDrills.length > 0) {
-        console.log("API: Fetched session drills:", sessionDrills.length);
-        console.log("API: First session drill:", sessionDrills[0]);
-
         // Get drill IDs from session drills
         const drillIds = sessionDrills
           .map((sd) => sd.drill_id)
           .filter((id) => id) as string[];
-
-        console.log("API: Drill IDs found:", drillIds);
 
         // Get drill data for these IDs
         const { data: drills, error: drillsError } = await supabase
           .from("drills")
           .select("id, name, slug, description, difficulty, categories")
           .in("id", drillIds);
-
-        console.log("API: Drills query result:", {
-          drills: drills?.length,
-          drillsError,
-        });
-        console.log("API: Found drills:", drills);
-        console.log(
-          "API: Drill IDs that were found:",
-          drills?.map((d) => d.id)
-        );
-
-        // Let's also check what drills exist in the database
-        const { data: allDrills } = await supabase
-          .from("drills")
-          .select("id, name, slug")
-          .limit(10);
-
-        console.log("API: Sample drills in database:", allDrills);
-        console.log(
-          "API: Sample drill slugs in database:",
-          allDrills?.map((d) => d.slug)
-        );
 
         if (drillsError) {
           console.error("Error fetching drills:", drillsError);
@@ -265,16 +225,8 @@ export async function GET(request: NextRequest) {
               }
             ).sessionDrills = drillsBySession[session.id] || [];
           });
-
-          console.log("API: Final session with drills:", sessions[0]);
-          console.log("API: First session drills:", sessions[0]?.sessionDrills);
-          console.log(
-            "API: First session drill data:",
-            sessions[0]?.sessionDrills?.[0]?.drill
-          );
         }
       } else {
-        console.log("API: No session drills found");
         // Add empty sessionDrills to each session (camelCase for TypeScript)
         sessions.forEach((session) => {
           (session as Session & { sessionDrills: [] }).sessionDrills = [];

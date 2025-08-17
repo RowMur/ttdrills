@@ -12,18 +12,6 @@ interface SessionCardProps {
 export function SessionCard({ session, onDelete }: SessionCardProps) {
   const [deleting, setDeleting] = useState(false);
 
-  // Debug logging
-  console.log("SessionCard render:", {
-    sessionName: session.name,
-    sessionDrillsCount: session.sessionDrills?.length,
-    firstSessionDrill: session.sessionDrills?.[0],
-    drillData: session.sessionDrills?.[0]?.drill,
-    drillName: session.sessionDrills?.[0]?.drill?.name,
-    drillSlug: session.sessionDrills?.[0]?.drill?.slug,
-  });
-
-  console.log(session);
-
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this session?")) {
       return;
