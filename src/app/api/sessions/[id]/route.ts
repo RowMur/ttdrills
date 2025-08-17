@@ -6,7 +6,7 @@ import { UpdateSessionRequest } from "@/types";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get the authenticated user session
@@ -26,7 +26,7 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Get session with session drills and drill details
     const { data: sessionData, error: sessionError } = await supabase
@@ -77,7 +77,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get the authenticated user session
@@ -97,7 +97,7 @@ export async function PUT(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body: UpdateSessionRequest = await request.json();
     const { name, notes, durationMinutes, date, sessionDrills } = body;
 
@@ -175,7 +175,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get the authenticated user session
@@ -195,7 +195,7 @@ export async function DELETE(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Delete session (session_drills will be deleted automatically due to CASCADE)
     const { error: deleteError } = await supabase

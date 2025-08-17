@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Drill,
   CreateSessionRequest,
@@ -52,7 +52,7 @@ export function CreateSessionForm({
   const handleUpdateDrillData = (
     index: number,
     field: keyof CreateSessionDrillRequest,
-    value: any
+    value: CreateSessionDrillRequest[keyof CreateSessionDrillRequest]
   ) => {
     const updatedDrills = [...selectedDrills];
     updatedDrills[index] = {

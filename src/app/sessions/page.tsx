@@ -12,7 +12,7 @@ import { Main } from "@/components/Main";
 import Link from "next/link";
 
 export default function SessionsPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
