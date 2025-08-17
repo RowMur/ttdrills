@@ -24,13 +24,34 @@ export const Navbar = () => {
               <LogoWithIcon />
             </Link>
             {session && (
-              <Link
-                href="/create"
-                className="flex items-center gap-1 px-2 py-2 bg-success text-white rounded-lg hover:bg-success-dark transition-colors text-xs font-medium"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="hidden md:inline">Create Drill</span>
-              </Link>
+              <>
+                <Link
+                  href="/create"
+                  className="flex items-center gap-1 px-2 py-2 bg-success text-white rounded-lg hover:bg-success-dark transition-colors text-xs font-medium"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden md:inline">Create Drill</span>
+                </Link>
+                <Link
+                  href="/sessions"
+                  className="flex items-center gap-1 px-2 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-xs font-medium"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
+                  </svg>
+                  <span className="hidden md:inline">Sessions</span>
+                </Link>
+              </>
             )}
           </div>
 

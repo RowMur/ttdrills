@@ -76,3 +76,47 @@ export type Drill = {
   updatedAt: Date;
   graph: StepGraph;
 };
+
+export type Session = {
+  id?: string;
+  userId: string;
+  name: string;
+  notes?: string;
+  durationMinutes?: number;
+  date: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  sessionDrills?: SessionDrill[];
+};
+
+export type SessionDrill = {
+  id?: string;
+  sessionId: string;
+  drillId: string;
+  durationMinutes?: number;
+  notes?: string;
+  rating?: number; // 1-5 star rating
+  repetitions?: number;
+  createdAt: Date;
+  drill?: Drill; // Populated when fetched from database
+};
+
+export type CreateSessionRequest = {
+  name: string;
+  notes?: string;
+  durationMinutes?: number;
+  date?: Date;
+  sessionDrills: CreateSessionDrillRequest[];
+};
+
+export type CreateSessionDrillRequest = {
+  drillId: string;
+  durationMinutes?: number;
+  notes?: string;
+  rating?: number;
+  repetitions?: number;
+};
+
+export type UpdateSessionRequest = Partial<CreateSessionRequest> & {
+  id: string;
+};
