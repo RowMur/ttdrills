@@ -1,20 +1,14 @@
 import { Main } from "@/components/Main";
-import { Searchbox } from "@/components/Searchbox";
 import { Button } from "@/components/Button";
 import {
   Search,
-  Play,
   BookOpen,
   Target,
-  Users,
-  Zap,
   Calendar,
   BarChart3,
-  TrendingUp,
   Clock,
 } from "lucide-react";
 import Link from "next/link";
-import { Suspense } from "react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
