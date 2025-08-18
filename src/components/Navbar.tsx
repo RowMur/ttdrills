@@ -15,91 +15,82 @@ export const Navbar = () => {
   const isHomePage = pathname === "/";
 
   return (
-    <nav className="max-w-6xl mx-auto mb-4 px-4 text-text">
-      <div className="flex flex-col gap-3 min-h-20 bg-surface rounded-b-3xl p-4 border border-border">
-        {/* Top row - Title, Create button, Search, and Auth */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 md:gap-6">
+    <nav className="bg-surface border-b border-border sticky top-0 z-50">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Top row - Logo, Navigation, and Auth */}
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center gap-8">
             <Link href="/" className="hover:opacity-80 transition-opacity">
               <LogoWithIcon />
             </Link>
-            {session && (
-              <>
+
+            {/* Navigation links - hidden on mobile */}
+            <div className="hidden lg:flex items-center gap-6">
+              <Link
+                href="/search"
+                className="text-text-muted hover:text-text transition-colors"
+              >
+                Browse Drills
+              </Link>
+              {session && (
                 <Link
                   href="/sessions"
-                  className="flex items-center gap-1 px-2 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-xs font-medium"
+                  className="text-text-muted hover:text-text transition-colors"
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                    />
-                  </svg>
-                  <span className="hidden md:inline">Sessions</span>
+                  Sessions
                 </Link>
-                <Link
-                  href="/create"
-                  className="flex items-center gap-1 px-2 py-2 bg-success text-white rounded-lg hover:bg-success-dark transition-colors text-xs font-medium"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span className="hidden md:inline">Create Drill</span>
-                </Link>
-              </>
-            )}
+              )}
+            </div>
           </div>
 
-          {/* Search - hidden on small screens and homepage */}
-          {!isHomePage && (
-            <div className="hidden lg:block flex-1 max-w-md mx-4">
-              <Suspense fallback={<div className="text-xs">Loading...</div>}>
-                <Searchbox />
-              </Suspense>
-            </div>
-          )}
+          {/* Right side - Search and Auth */}
+          <div className="flex items-center gap-4">
+            {/* Search - hidden on small screens and homepage */}
+            {!isHomePage && (
+              <div className="hidden lg:block">
+                <Suspense fallback={<div className="text-xs">Loading...</div>}>
+                  <Searchbox />
+                </Suspense>
+              </div>
+            )}
 
-          {/* Auth section */}
-          {status === "loading" ? (
-            <div className="text-text-muted text-xs">Loading...</div>
-          ) : session ? (
-            <div className="flex items-center gap-2">
-              {session.user?.image && (
-                <img
-                  src={session.user.image}
-                  alt={session.user.name || "User"}
-                  className="w-6 h-6 rounded-full"
-                />
-              )}
-              <Button
-                onClick={() => signOut()}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1 px-2 py-2 bg-surface-light text-text hover:bg-surface-dark transition-colors text-xs"
+            {/* Auth section */}
+            {status === "loading" ? (
+              <div className="text-text-muted text-xs">Loading...</div>
+            ) : session ? (
+              <div className="flex items-center gap-2">
+                {session.user?.image && (
+                  <img
+                    src={session.user.image}
+                    alt={session.user.name || "User"}
+                    className="w-6 h-6 rounded-full"
+                  />
+                )}
+                <Button
+                  onClick={() => signOut()}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1 px-2 py-2 bg-surface-light text-text hover:bg-surface-dark transition-colors text-xs"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden md:inline">Sign Out</span>
+                </Button>
+              </div>
+            ) : (
+              <Link
+                href="/auth/signin"
+                className="flex items-center gap-1 px-2 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-xs font-medium"
               >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden md:inline">Sign Out</span>
-              </Button>
-            </div>
-          ) : (
-            <Link
-              href="/auth/signin"
-              className="flex items-center gap-1 px-2 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-xs font-medium"
-            >
-              <User className="w-4 h-4" />
-              <span className="hidden md:inline">Sign In</span>
-            </Link>
-          )}
+                <User className="w-4 h-4" />
+                <span className="hidden md:inline">Sign In</span>
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Bottom row - Search (only on smaller screens and not homepage) */}
         {!isHomePage && (
-          <div className="lg:hidden">
+          <div className="lg:hidden pb-4">
             <Suspense fallback={<div className="text-xs">Loading...</div>}>
               <Searchbox />
             </Suspense>
