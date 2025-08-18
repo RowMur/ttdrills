@@ -11,6 +11,7 @@ import { Drill } from "@/types";
 import { Main } from "@/components/Main";
 import { trackDrillEdit } from "@/lib/analytics";
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { useToast } from "@/components/Toast";
 
 type Props = {
   drill: Drill;
@@ -18,6 +19,7 @@ type Props = {
 
 export const EditDrillForm = ({ drill }: Props) => {
   const router = useRouter();
+  const { showToast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [drillData, setDrillData] = useState({
     description: drill.description,
@@ -64,7 +66,7 @@ export const EditDrillForm = ({ drill }: Props) => {
 
   const handleSaveDrill = async () => {
     if (!drillData.description.trim()) {
-      alert("Please fill in the description field");
+      showToast("Please fill in the description field", "error");
       return;
     }
 
@@ -103,14 +105,17 @@ export const EditDrillForm = ({ drill }: Props) => {
       // Track drill edit
       trackDrillEdit(drill.name, drill.slug);
 
+      showToast("Drill updated successfully!", "success");
+
       // Redirect to the updated drill details page
       router.push(`/drills/${updatedDrill.slug}`);
     } catch (error) {
       console.error("Error updating drill:", error);
-      alert(
+      showToast(
         `Error updating drill: ${
           error instanceof Error ? error.message : "Unknown error"
-        }`
+        }`,
+        "error"
       );
     } finally {
       setIsSaving(false);

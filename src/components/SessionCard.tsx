@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Session } from "@/types";
 import { Button } from "./Button";
+import { useToast } from "@/components/Toast";
 
 interface SessionCardProps {
   session: Session;
@@ -10,6 +11,7 @@ interface SessionCardProps {
 }
 
 export function SessionCard({ session, onDelete }: SessionCardProps) {
+  const { showToast } = useToast();
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -24,13 +26,14 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
       });
 
       if (response.ok) {
+        showToast("Session deleted successfully!", "success");
         onDelete(session.id!);
       } else {
-        alert("Failed to delete session");
+        showToast("Failed to delete session", "error");
       }
     } catch (error) {
       console.error("Error deleting session:", error);
-      alert("Failed to delete session");
+      showToast("Failed to delete session", "error");
     } finally {
       setDeleting(false);
     }

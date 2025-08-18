@@ -12,6 +12,7 @@ import { Drill, DifficultyLevel, DrillCategory, StepGraph } from "@/types";
 import { Main } from "@/components/Main";
 import { AuthGuard } from "@/components/AuthGuard";
 import { trackDrillCreation } from "@/lib/analytics";
+import { useToast } from "@/components/Toast";
 import {
   Play,
   X,
@@ -35,6 +36,7 @@ type PreviewDrill = Omit<Drill, "id" | "creatorId" | "createdAt" | "updatedAt">;
 
 function CreateDrillContent() {
   const { data: session } = useSession();
+  const { showToast } = useToast();
   const [isCreating, setIsCreating] = useState(false);
   const [drillData, setDrillData] = useState({
     name: "",
@@ -167,14 +169,15 @@ function CreateDrillContent() {
 
   const handleCreateDrill = async () => {
     if (!session?.user?.email) {
-      alert("Please sign in to create a drill");
+      showToast("Please sign in to create a drill", "error");
       return;
     }
 
     // Check if a duplicate drill exists
     if (nameCheckResult?.exists) {
-      alert(
-        "A drill with this name already exists. Please choose a different name."
+      showToast(
+        "A drill with this name already exists. Please choose a different name.",
+        "error"
       );
       return;
     }
@@ -219,6 +222,8 @@ function CreateDrillContent() {
 
       const createdDrill = await response.json();
 
+      showToast("Drill created successfully!", "success");
+
       // Console log for comprehensive drills format (development only)
       if (process.env.NODE_ENV === "development") {
         const comprehensiveDrillFormat = {
@@ -258,10 +263,11 @@ function CreateDrillContent() {
       window.location.href = `/drills/${createdDrill.slug}`;
     } catch (error) {
       console.error("Error creating drill:", error);
-      alert(
+      showToast(
         `Error creating drill: ${
           error instanceof Error ? error.message : "Unknown error"
-        }`
+        }`,
+        "error"
       );
     } finally {
       setIsCreating(false);

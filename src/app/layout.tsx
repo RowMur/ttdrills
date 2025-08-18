@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SessionProvider } from "@/components/SessionProvider";
 import { StartupSeeder } from "@/components/StartupSeeder";
 import { PostHogProvider } from "@/components/PostHogProvider";
+import { ToastProvider } from "@/components/Toast";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -118,11 +119,13 @@ export default function RootLayout({
       <body className={`${inter.variable} antialiased`}>
         <PostHogProvider>
           <SessionProvider>
-            <StartupSeeder />
-            <BetaBanner />
-            <Navbar />
-            <main className="min-h-screen">{children}</main>
-            <Footer />
+            <ToastProvider>
+              <StartupSeeder />
+              <BetaBanner />
+              <Navbar />
+              <main className="min-h-screen">{children}</main>
+              <Footer />
+            </ToastProvider>
           </SessionProvider>
         </PostHogProvider>
       </body>

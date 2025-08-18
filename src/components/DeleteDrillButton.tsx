@@ -7,6 +7,7 @@ import { Button } from "@/components/Button";
 import { Modal } from "@/components/Modal";
 import { trackDrillDeletion } from "@/lib/analytics";
 import { Trash2, AlertTriangle } from "lucide-react";
+import { useToast } from "@/components/Toast";
 
 type Props = {
   drillSlug: string;
@@ -21,6 +22,7 @@ export const DeleteDrillButton = ({
 }: Props) => {
   const { data: session } = useSession();
   const router = useRouter();
+  const { showToast } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -46,14 +48,17 @@ export const DeleteDrillButton = ({
       // Track drill deletion
       trackDrillDeletion(drillName, drillSlug);
 
+      showToast("Drill deleted successfully!", "success");
+
       // Redirect to home page after successful deletion
       router.push("/");
     } catch (error) {
       console.error("Error deleting drill:", error);
-      alert(
+      showToast(
         `Error deleting drill: ${
           error instanceof Error ? error.message : "Unknown error"
-        }`
+        }`,
+        "error"
       );
     } finally {
       setIsDeleting(false);

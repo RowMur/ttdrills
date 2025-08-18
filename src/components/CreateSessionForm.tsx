@@ -9,6 +9,7 @@ import {
 import { Button } from "./Button";
 import { DrillSelectionModal } from "./DrillSelectionModal";
 import { Plus } from "lucide-react";
+import { useToast } from "@/components/Toast";
 
 interface CreateSessionFormProps {
   onSessionCreated: () => void;
@@ -17,6 +18,7 @@ interface CreateSessionFormProps {
 export function CreateSessionForm({
   onSessionCreated,
 }: CreateSessionFormProps) {
+  const { showToast } = useToast();
   const [name, setName] = useState("");
   const [notes, setNotes] = useState("");
   const [durationMinutes, setDurationMinutes] = useState<number | undefined>();
@@ -30,7 +32,7 @@ export function CreateSessionForm({
   const handleAddDrill = (drill: Drill) => {
     if (!drill.id) {
       console.error("Drill has no ID:", drill);
-      alert("Cannot add drill - missing ID");
+      showToast("Cannot add drill - missing ID", "error");
       return;
     }
 
@@ -69,7 +71,10 @@ export function CreateSessionForm({
     e.preventDefault();
 
     if (!name.trim() || selectedDrills.length === 0) {
-      alert("Please provide a session name and select at least one drill");
+      showToast(
+        "Please provide a session name and select at least one drill",
+        "error"
+      );
       return;
     }
 
@@ -93,14 +98,15 @@ export function CreateSessionForm({
       });
 
       if (response.ok) {
+        showToast("Session logged successfully!", "success");
         onSessionCreated();
       } else {
         const error = await response.json();
-        alert(`Failed to create session: ${error.error}`);
+        showToast(`Failed to create session: ${error.error}`, "error");
       }
     } catch (error) {
       console.error("Error creating session:", error);
-      alert("Failed to create session");
+      showToast("Failed to create session. Please try again.", "error");
     } finally {
       setLoading(false);
     }
