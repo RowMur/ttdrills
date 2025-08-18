@@ -4,7 +4,7 @@ import { Searchbox } from "@/components/Searchbox";
 import { LogoWithIcon } from "@/components/LogoWithIcon";
 import Link from "next/link";
 import { Suspense, useState } from "react";
-import { Plus, User, LogOut, Menu, X } from "lucide-react";
+import { User, LogOut, Menu, X } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/Button";
 import { usePathname } from "next/navigation";
