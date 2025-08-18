@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { DrillFormMetadata } from "@/components/DrillFormMetadata";
 import { DrillFormSequence } from "@/components/DrillFormSequence";
@@ -21,6 +21,15 @@ import {
   Eye,
 } from "lucide-react";
 
+// Debounce utility function
+function debounce(func: (...args: unknown[]) => void, wait: number) {
+  let timeout: NodeJS.Timeout;
+  return (...args: unknown[]) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
+
 // Type for preview drill (without required auth fields)
 type PreviewDrill = Omit<Drill, "id" | "creatorId" | "createdAt" | "updatedAt">;
 
@@ -38,6 +47,20 @@ function CreateDrillContent() {
     videoUrl: "",
     videoStart: "",
   });
+
+  // Duplicate detection state
+  const [nameCheckResult, setNameCheckResult] = useState<{
+    exists: boolean;
+    drill?: { id: string; name: string; slug: string; description: string };
+    similarDrills?: Array<{
+      id: string;
+      name: string;
+      slug: string;
+      description: string;
+    }>;
+    slug?: string;
+  } | null>(null);
+  const [isCheckingName, setIsCheckingName] = useState(false);
 
   const [ballSequence, setBallSequence] = useState<StepGraph>({
     entryPoint: "serve",
@@ -58,6 +81,41 @@ function CreateDrillContent() {
 
   const [showPreviewModal, setShowPreviewModal] = useState(false);
 
+  // Debounced function to check drill name
+  const checkDrillName = useCallback(
+    debounce(async (name: unknown) => {
+      if (typeof name !== "string" || !name.trim() || name.trim().length < 3) {
+        setNameCheckResult(null);
+        return;
+      }
+
+      setIsCheckingName(true);
+      try {
+        const response = await fetch("/api/drills/check-name", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name }),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          setNameCheckResult(result);
+        } else {
+          console.error("Error checking drill name");
+          setNameCheckResult(null);
+        }
+      } catch (error) {
+        console.error("Error checking drill name:", error);
+        setNameCheckResult(null);
+      } finally {
+        setIsCheckingName(false);
+      }
+    }, 500),
+    []
+  );
+
   const handleMetadataChange = (
     field: string,
     value: string | string[] | DifficultyLevel | DrillCategory[]
@@ -66,6 +124,11 @@ function CreateDrillContent() {
       ...prev,
       [field]: value,
     }));
+
+    // Check for duplicates when name changes
+    if (field === "name" && typeof value === "string") {
+      checkDrillName(value);
+    }
   };
 
   const handleSequenceChange = (sequence: StepGraph) => {
@@ -105,6 +168,14 @@ function CreateDrillContent() {
   const handleCreateDrill = async () => {
     if (!session?.user?.email) {
       alert("Please sign in to create a drill");
+      return;
+    }
+
+    // Check if a duplicate drill exists
+    if (nameCheckResult?.exists) {
+      alert(
+        "A drill with this name already exists. Please choose a different name."
+      );
       return;
     }
 
@@ -222,6 +293,8 @@ function CreateDrillContent() {
             <DrillFormMetadata
               data={drillData}
               onChange={handleMetadataChange}
+              nameCheckResult={nameCheckResult}
+              isCheckingName={isCheckingName}
             />
           </div>
 

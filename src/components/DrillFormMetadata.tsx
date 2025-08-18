@@ -20,9 +20,26 @@ type Props = {
     field: string,
     value: string | string[] | DifficultyLevel | DrillCategory[]
   ) => void;
+  nameCheckResult?: {
+    exists: boolean;
+    drill?: { id: string; name: string; slug: string; description: string };
+    similarDrills?: Array<{
+      id: string;
+      name: string;
+      slug: string;
+      description: string;
+    }>;
+    slug?: string;
+  } | null;
+  isCheckingName?: boolean;
 };
 
-export const DrillFormMetadata = ({ data, onChange }: Props) => {
+export const DrillFormMetadata = ({
+  data,
+  onChange,
+  nameCheckResult,
+  isCheckingName,
+}: Props) => {
   const addArrayItem = (field: string) => {
     onChange(field, [...(data[field as keyof typeof data] as string[]), ""]);
   };
@@ -54,13 +71,74 @@ export const DrillFormMetadata = ({ data, onChange }: Props) => {
           <label className="block text-sm font-medium text-text mb-2">
             Drill Name *
           </label>
-          <input
-            type="text"
-            value={data.name}
-            onChange={(e) => onChange("name", e.target.value)}
-            className="w-full p-3 rounded-lg bg-surface-light text-text border border-border focus:border-primary focus:outline-none"
-            placeholder="Enter drill name..."
-          />
+          <div className="relative">
+            <input
+              type="text"
+              value={data.name}
+              onChange={(e) => onChange("name", e.target.value)}
+              className={`w-full p-3 pr-10 rounded-lg bg-surface-light text-text border focus:border-primary focus:outline-none ${
+                nameCheckResult?.exists
+                  ? "border-danger"
+                  : nameCheckResult && !nameCheckResult.exists
+                  ? "border-success"
+                  : "border-border"
+              }`}
+              placeholder="Enter drill name..."
+            />
+            {isCheckingName && (
+              <div className="absolute inset-y-0 right-3 flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+              </div>
+            )}
+          </div>
+
+          {nameCheckResult?.exists && (
+            <div className="mt-2 p-3 bg-danger/10 border border-danger/20 rounded-lg">
+              <div className="text-sm text-danger font-medium mb-2">
+                ⚠️ A drill with this name already exists
+              </div>
+              <div className="text-sm text-text-muted mb-3">
+                <strong>{nameCheckResult.drill?.name}</strong>
+                <br />
+                {nameCheckResult.drill?.description}
+              </div>
+              <div className="text-xs text-text-muted">
+                Consider using a different name or check if this drill meets
+                your needs.
+              </div>
+            </div>
+          )}
+
+          {nameCheckResult &&
+            !nameCheckResult.exists &&
+            nameCheckResult.similarDrills &&
+            nameCheckResult.similarDrills.length > 0 && (
+              <div className="mt-2 p-3 bg-warning/10 border border-warning/20 rounded-lg">
+                <div className="text-sm text-warning font-medium mb-2">
+                  💡 Similar drills found
+                </div>
+                <div className="space-y-2">
+                  {nameCheckResult.similarDrills.slice(0, 3).map((drill) => (
+                    <div key={drill.id} className="text-sm">
+                      <a
+                        href={`/drills/${drill.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline font-medium"
+                      >
+                        {drill.name}
+                      </a>
+                      <div className="text-xs text-text-muted mt-1">
+                        {drill.description}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-xs text-text-muted mt-2">
+                  Make sure your drill is different from these existing ones.
+                </div>
+              </div>
+            )}
         </div>
 
         <div>
