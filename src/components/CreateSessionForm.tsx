@@ -70,11 +70,8 @@ export function CreateSessionForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name.trim() || selectedDrills.length === 0) {
-      showToast(
-        "Please provide a session name and select at least one drill",
-        "error"
-      );
+    if (!name.trim()) {
+      showToast("Please provide a session name", "error");
       return;
     }
 
@@ -127,7 +124,7 @@ export function CreateSessionForm({
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="e.g., Morning Practice, Backhand Focus Session"
+          placeholder="e.g., Morning Practice, Match vs John, Solo Training"
           required
         />
       </div>
@@ -183,16 +180,24 @@ export function CreateSessionForm({
           onChange={(e) => setNotes(e.target.value)}
           rows={3}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="How did the session go? Any observations or areas to focus on next time..."
+          placeholder="How did the session go? Any observations, match results, or areas to focus on next time..."
         />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Drills Practiced *
+          Drills Practiced (Optional)
         </label>
 
-        <div className="mb-4">
+        <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <p className="text-sm text-gray-600 mb-3">
+            {selectedDrills.length === 0
+              ? "No drills selected. You can log matches, solo practice, or other activities without specific drills."
+              : `${selectedDrills.length} drill${
+                  selectedDrills.length !== 1 ? "s" : ""
+                } selected.`}
+          </p>
+
           <Button
             type="button"
             variant="outline"
@@ -200,7 +205,9 @@ export function CreateSessionForm({
             className="w-full flex items-center justify-center gap-2 py-3"
           >
             <Plus className="w-4 h-4" />
-            Add Drills to Session
+            {selectedDrills.length === 0
+              ? "Add Drills to Session"
+              : "Add More Drills"}
           </Button>
         </div>
 

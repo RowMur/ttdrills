@@ -25,23 +25,25 @@ export async function POST(request: NextRequest) {
 
     // Parse the request body
     const body: CreateSessionRequest = await request.json();
-    const { name, notes, durationMinutes, date, sessionDrills } = body;
+    const { name, notes, durationMinutes, date, sessionDrills = [] } = body;
 
     // Validate required fields
-    if (!name || !sessionDrills || sessionDrills.length === 0) {
+    if (!name) {
       return NextResponse.json(
-        { error: "Session name and at least one drill are required" },
+        { error: "Session name is required" },
         { status: 400 }
       );
     }
 
-    // Validate that all drills have valid IDs
-    const invalidDrills = sessionDrills.filter((sd) => !sd.drillId);
-    if (invalidDrills.length > 0) {
-      return NextResponse.json(
-        { error: "All drills must have valid IDs" },
-        { status: 400 }
-      );
+    // Validate that all drills have valid IDs (if any drills are provided)
+    if (sessionDrills.length > 0) {
+      const invalidDrills = sessionDrills.filter((sd) => !sd.drillId);
+      if (invalidDrills.length > 0) {
+        return NextResponse.json(
+          { error: "All drills must have valid IDs" },
+          { status: 400 }
+        );
+      }
     }
 
     // Start a transaction to create session and session drills
@@ -73,28 +75,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create session drills
-    const sessionDrillsData = sessionDrills.map((sd) => ({
-      session_id: sessionData.id,
-      drill_id: sd.drillId,
-      duration_minutes: sd.durationMinutes,
-      notes: sd.notes,
-      rating: sd.rating,
-      repetitions: sd.repetitions || 1,
-    }));
+    // Create session drills (only if drills are provided)
+    if (sessionDrills.length > 0) {
+      const sessionDrillsData = sessionDrills.map((sd) => ({
+        session_id: sessionData.id,
+        drill_id: sd.drillId,
+        duration_minutes: sd.durationMinutes,
+        notes: sd.notes,
+        rating: sd.rating,
+        repetitions: sd.repetitions || 1,
+      }));
 
-    const { error: sessionDrillsError } = await supabase
-      .from("session_drills")
-      .insert(sessionDrillsData);
+      const { error: sessionDrillsError } = await supabase
+        .from("session_drills")
+        .insert(sessionDrillsData);
 
-    if (sessionDrillsError) {
-      console.error("Error creating session drills:", sessionDrillsError);
-      // Clean up the session if session drills creation fails
-      await supabase.from("sessions").delete().eq("id", sessionData.id);
-      return NextResponse.json(
-        { error: "Failed to create session drills" },
-        { status: 500 }
-      );
+      if (sessionDrillsError) {
+        console.error("Error creating session drills:", sessionDrillsError);
+        // Clean up the session if session drills creation fails
+        await supabase.from("sessions").delete().eq("id", sessionData.id);
+        return NextResponse.json(
+          { error: "Failed to create session drills" },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json(sessionData, { status: 201 });

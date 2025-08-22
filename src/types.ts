@@ -106,7 +106,7 @@ export type CreateSessionRequest = {
   notes?: string;
   durationMinutes?: number;
   date?: Date;
-  sessionDrills: CreateSessionDrillRequest[];
+  sessionDrills?: CreateSessionDrillRequest[];
 };
 
 export type CreateSessionDrillRequest = {
