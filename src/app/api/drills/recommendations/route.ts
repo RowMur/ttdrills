@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { getUserByEmail } from "@/lib/database";
 import { supabase } from "@/lib/supabase";
+import { generatePersonalizedRecommendations } from "@/lib/ai";
 
 // Database types for the recommendations API
 interface DatabaseSession {
   id: string;
   name: string;
   notes: string | null;
+  date: string;
   session_drills: DatabaseSessionDrill[];
 }
 
@@ -32,11 +34,6 @@ interface DatabaseDrill {
   categories: string[] | null;
   objectives: string | null;
   tips: string | null;
-}
-
-interface ScoredDrill extends DatabaseDrill {
-  score: number;
-  reason: string;
 }
 
 export async function GET() {
@@ -95,11 +92,6 @@ export async function GET() {
       );
     }
 
-    // Extract keywords from session names and notes
-    const keywords = extractKeywords(
-      (recentSessions as DatabaseSession[]) || []
-    );
-
     // Get all available drills
     const { data: allDrills, error: drillsError } = await supabase
       .from("drills")
@@ -116,22 +108,102 @@ export async function GET() {
       );
     }
 
-    // Score and rank drills based on user history
-    const scoredDrills = scoreDrills(
-      (allDrills as DatabaseDrill[]) || [],
-      keywords,
-      (recentSessions as DatabaseSession[]) || []
+    // Prepare user history for AI analysis
+    const userHistory = (recentSessions as DatabaseSession[]).flatMap(
+      (session) => {
+        const sessionData = {
+          sessionNotes: session.notes || "",
+          sessionName: session.name,
+          date: new Date(session.date || new Date()),
+        };
+
+        // If session has drills, include them
+        if (session.session_drills && session.session_drills.length > 0) {
+          return session.session_drills.map((sd) => ({
+            ...sessionData,
+            drillName: sd.drill?.[0]?.name || "Unknown Drill",
+            rating: sd.rating || undefined,
+            hasDrills: true,
+          }));
+        } else {
+          // For sessions without drills (practice matches, general training)
+          return [
+            {
+              ...sessionData,
+              drillName: "Practice Session",
+              rating: undefined,
+              hasDrills: false,
+            },
+          ];
+        }
+      }
     );
 
-    // Return top 6 recommendations
-    const recommendations = scoredDrills.slice(0, 6);
+    // Generate AI-powered recommendations
+    const aiRecommendations = await generatePersonalizedRecommendations(
+      userHistory,
+      (allDrills as DatabaseDrill[]).map((drill) => ({
+        id: drill.id,
+        name: drill.name,
+        description: drill.description,
+        difficulty: drill.difficulty,
+        categories: drill.categories || [],
+      }))
+    );
+    // Debug logging (remove in production)
+    console.log(
+      "Available drill IDs:",
+      (allDrills as DatabaseDrill[]).map((d) => ({ id: d.id, name: d.name }))
+    );
+    console.log("AI recommendations:", aiRecommendations);
+
+    // Combine AI recommendations with available drill data
+    const recommendations = aiRecommendations
+      .map((aiRec) => {
+        // First try exact ID match
+        let drill = (allDrills as DatabaseDrill[]).find(
+          (d) => d.id === aiRec.drillId
+        );
+
+        // If no exact match, try to find by name (fallback for AI mistakes)
+        if (!drill && aiRec.drillId) {
+          drill = (allDrills as DatabaseDrill[]).find(
+            (d) => d.name.toLowerCase() === aiRec.drillId.toLowerCase()
+          );
+        }
+
+        if (!drill) {
+          console.warn(
+            `AI recommended drill with invalid ID/name: "${aiRec.drillId}"`
+          );
+          return null;
+        }
+
+        return {
+          ...drill,
+          score:
+            aiRec.priority === "high"
+              ? 10
+              : aiRec.priority === "medium"
+              ? 7
+              : 4,
+          reason: aiRec.reason,
+          aiInsights: {
+            priority: aiRec.priority,
+            expectedOutcome: aiRec.expectedOutcome,
+            personalization: aiRec.personalization,
+          },
+        };
+      })
+      .filter(Boolean)
+      .slice(0, 6);
 
     return NextResponse.json({
       recommendations,
       analysis: {
-        keywords,
         sessionCount: recentSessions?.length || 0,
         timeRange: "30 days",
+        aiPowered: true,
       },
     });
   } catch (error) {
@@ -141,286 +213,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
-
-function extractKeywords(sessions: DatabaseSession[]): string[] {
-  const keywords = new Set<string>();
-
-  sessions.forEach((session) => {
-    // Extract from session name
-    if (session.name) {
-      const nameWords = session.name
-        .toLowerCase()
-        .split(/\s+/)
-        .filter((word: string) => word.length > 2)
-        .filter(
-          (word: string) =>
-            ![
-              "the",
-              "and",
-              "for",
-              "with",
-              "vs",
-              "match",
-              "session",
-              "practice",
-            ].includes(word)
-        );
-      nameWords.forEach((word: string) => keywords.add(word));
-    }
-
-    // Extract from session notes
-    if (session.notes) {
-      const noteWords = session.notes
-        .toLowerCase()
-        .split(/\s+/)
-        .filter((word: string) => word.length > 3)
-        .filter(
-          (word: string) =>
-            ![
-              "the",
-              "and",
-              "for",
-              "with",
-              "that",
-              "this",
-              "have",
-              "been",
-              "will",
-              "need",
-              "want",
-              "good",
-              "bad",
-              "well",
-              "poor",
-            ].includes(word)
-        );
-      noteWords.forEach((word: string) => keywords.add(word));
-    }
-
-    // Extract from session drill notes
-    if (session.session_drills) {
-      session.session_drills.forEach((drill: DatabaseSessionDrill) => {
-        if (drill.notes) {
-          const drillNoteWords = drill.notes
-            .toLowerCase()
-            .split(/\s+/)
-            .filter((word: string) => word.length > 3)
-            .filter(
-              (word: string) =>
-                ![
-                  "the",
-                  "and",
-                  "for",
-                  "with",
-                  "that",
-                  "this",
-                  "have",
-                  "been",
-                  "will",
-                  "need",
-                  "want",
-                  "good",
-                  "bad",
-                  "well",
-                  "poor",
-                ].includes(word)
-            );
-          drillNoteWords.forEach((word: string) => keywords.add(word));
-        }
-      });
-    }
-  });
-
-  return Array.from(keywords);
-}
-
-function scoreDrills(
-  drills: DatabaseDrill[],
-  keywords: string[],
-  sessions: DatabaseSession[]
-): ScoredDrill[] {
-  return drills
-    .map((drill) => {
-      let score = 0;
-      const drillText = `${drill.name} ${drill.description} ${
-        drill.objectives || ""
-      } ${drill.tips || ""} ${drill.categories?.join(" ") || ""}`.toLowerCase();
-
-      // Score based on keyword matches
-      keywords.forEach((keyword) => {
-        if (drillText.includes(keyword)) {
-          score += 2;
-        }
-      });
-
-      // Score based on difficulty progression
-      const userDifficulty = analyzeUserDifficulty(sessions);
-      if (userDifficulty === drill.difficulty) {
-        score += 3;
-      } else if (shouldProgressDifficulty(userDifficulty, drill.difficulty)) {
-        score += 2;
-      }
-
-      // Score based on category variety
-      const userCategories = analyzeUserCategories(sessions);
-      if (
-        drill.categories?.[0] &&
-        !userCategories.includes(drill.categories[0])
-      ) {
-        score += 1; // Encourage trying new categories
-      }
-
-      // Score based on recent performance
-      const recentPerformance = analyzeRecentPerformance(sessions, drill.id);
-      if (recentPerformance === "needs_work") {
-        score += 4; // Prioritize drills that need work
-      } else if (recentPerformance === "excellent") {
-        score += 1; // Slightly boost drills user excels at
-      }
-
-      // Bonus for beginner-friendly drills if user is new
-      if (sessions.length < 5 && drill.difficulty === "beginner") {
-        score += 2;
-      }
-
-      return {
-        ...drill,
-        score,
-        reason: generateRecommendationReason(
-          drill,
-          keywords,
-          userDifficulty,
-          recentPerformance
-        ),
-      };
-    })
-    .sort((a, b) => b.score - a.score);
-}
-
-function analyzeUserDifficulty(sessions: DatabaseSession[]): string {
-  if (sessions.length === 0) return "beginner";
-
-  const difficulties = sessions.flatMap(
-    (session) =>
-      session.session_drills
-        ?.map((drill: DatabaseSessionDrill) => drill.drill?.[0]?.difficulty)
-        .filter((diff): diff is string => diff !== undefined) || []
-  );
-
-  if (difficulties.length === 0) return "beginner";
-
-  const difficultyCounts = difficulties.reduce(
-    (acc: Record<string, number>, diff) => {
-      acc[diff] = (acc[diff] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
-
-  if (
-    difficultyCounts.advanced > difficultyCounts.intermediate &&
-    difficultyCounts.advanced > difficultyCounts.beginner
-  ) {
-    return "advanced";
-  } else if (difficultyCounts.intermediate > difficultyCounts.beginner) {
-    return "intermediate";
-  }
-
-  return "beginner";
-}
-
-function shouldProgressDifficulty(
-  userDifficulty: string,
-  drillDifficulty: string
-): boolean {
-  const progression = { beginner: 1, intermediate: 2, advanced: 3 };
-  return (
-    progression[drillDifficulty as keyof typeof progression] ===
-    progression[userDifficulty as keyof typeof progression] + 1
-  );
-}
-
-function analyzeUserCategories(sessions: DatabaseSession[]): string[] {
-  const categories = sessions
-    .flatMap(
-      (session) =>
-        session.session_drills?.map(
-          (drill: DatabaseSessionDrill) => drill.drill?.[0]?.categories
-        ) || []
-    )
-    .flat();
-
-  return [
-    ...new Set(
-      categories.filter(
-        (cat): cat is string => cat !== null && cat !== undefined
-      )
-    ),
-  ];
-}
-
-function analyzeRecentPerformance(
-  sessions: DatabaseSession[],
-  drillId: string
-): string {
-  const recentDrills = sessions.flatMap(
-    (session) =>
-      session.session_drills?.filter(
-        (drill: DatabaseSessionDrill) => drill.drill_id === drillId
-      ) || []
-  );
-
-  if (recentDrills.length === 0) return "new";
-
-  const recentRatings = recentDrills
-    .map((drill: DatabaseSessionDrill) => drill.rating)
-    .filter((r): r is number => r !== null && r !== undefined);
-
-  if (recentRatings.length === 0) return "new";
-
-  const avgRating =
-    recentRatings.reduce((sum, rating) => sum + rating, 0) /
-    recentRatings.length;
-
-  if (avgRating <= 2) return "needs_work";
-  if (avgRating >= 4) return "excellent";
-  return "good";
-}
-
-function generateRecommendationReason(
-  drill: DatabaseDrill,
-  keywords: string[],
-  userDifficulty: string,
-  recentPerformance: string
-): string {
-  const reasons = [];
-
-  if (
-    keywords.some(
-      (keyword) =>
-        drill.name.toLowerCase().includes(keyword) ||
-        drill.description.toLowerCase().includes(keyword)
-    )
-  ) {
-    reasons.push("Matches your recent training focus");
-  }
-
-  if (recentPerformance === "needs_work") {
-    reasons.push("Based on areas you're working on");
-  } else if (recentPerformance === "excellent") {
-    reasons.push("Builds on your strengths");
-  }
-
-  if (drill.difficulty === userDifficulty) {
-    reasons.push("Matches your current skill level");
-  } else if (shouldProgressDifficulty(userDifficulty, drill.difficulty)) {
-    reasons.push("Helps you progress to the next level");
-  }
-
-  if (reasons.length === 0) {
-    reasons.push("Great for skill development");
-  }
-
-  return reasons.join(" • ");
 }

@@ -8,6 +8,11 @@ import { Plus, Lightbulb, Clock, Calendar, Target } from "lucide-react";
 interface DrillRecommendation extends Drill {
   score: number;
   reason: string;
+  aiInsights?: {
+    priority: "high" | "medium" | "low";
+    expectedOutcome: string;
+    personalization: string;
+  };
 }
 
 interface PlanNextSessionProps {
@@ -109,8 +114,14 @@ export function PlanNextSession({ onCreateSession }: PlanNextSessionProps) {
           </h2>
           <Clock className="w-4 h-4 text-primary-light" />
           <span className="text-sm text-text-muted">
-            Based on your last 30 days
+            AI-powered recommendations
           </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 rounded-full">
+            <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+            <span className="text-xs text-primary font-medium">AI</span>
+          </div>
         </div>
         {selectedDrills.length > 0 && (
           <Button
@@ -191,9 +202,35 @@ export function PlanNextSession({ onCreateSession }: PlanNextSessionProps) {
 
                 <div className="flex items-start gap-2 mb-3">
                   <Lightbulb className="w-3 h-3 text-primary-light mt-0.5 flex-shrink-0" />
-                  <p className="text-xs text-text-muted italic leading-tight">
-                    {drill.reason}
-                  </p>
+                  <div className="flex-1">
+                    <p className="text-xs text-text-muted italic leading-tight mb-1">
+                      {drill.reason}
+                    </p>
+                    {drill.aiInsights && (
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1">
+                          <span
+                            className={`w-2 h-2 rounded-full ${
+                              drill.aiInsights.priority === "high"
+                                ? "bg-danger"
+                                : drill.aiInsights.priority === "medium"
+                                ? "bg-warning"
+                                : "bg-success"
+                            }`}
+                          />
+                          <span className="text-xs text-text-subtle capitalize">
+                            {drill.aiInsights.priority} priority
+                          </span>
+                        </div>
+                        <p className="text-xs text-text-subtle">
+                          {drill.aiInsights.expectedOutcome}
+                        </p>
+                        <p className="text-xs text-primary-light">
+                          {drill.aiInsights.personalization}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
