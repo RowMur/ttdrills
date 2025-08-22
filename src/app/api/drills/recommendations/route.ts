@@ -1,9 +1,45 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { getUserByEmail } from "@/lib/database";
 import { supabase } from "@/lib/supabase";
 
-export async function GET(request: NextRequest) {
+// Database types for the recommendations API
+interface DatabaseSession {
+  id: string;
+  name: string;
+  notes: string | null;
+  session_drills: DatabaseSessionDrill[];
+}
+
+interface DatabaseSessionDrill {
+  drill_id: string;
+  notes: string | null;
+  rating: number | null;
+  drill?: {
+    id: string;
+    name: string;
+    difficulty: string;
+    categories: string[] | null;
+  }[];
+}
+
+interface DatabaseDrill {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  difficulty: string;
+  categories: string[] | null;
+  objectives: string | null;
+  tips: string | null;
+}
+
+interface ScoredDrill extends DatabaseDrill {
+  score: number;
+  reason: string;
+}
+
+export async function GET() {
   try {
     // Get the authenticated user session
     const session = await getServerSession();
@@ -36,7 +72,13 @@ export async function GET(request: NextRequest) {
         session_drills (
           drill_id,
           notes,
-          rating
+          rating,
+          drill:drills (
+            id,
+            name,
+            difficulty,
+            categories
+          )
         )
       `
       )
@@ -54,7 +96,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Extract keywords from session names and notes
-    const keywords = extractKeywords(recentSessions || []);
+    const keywords = extractKeywords(
+      (recentSessions as DatabaseSession[]) || []
+    );
 
     // Get all available drills
     const { data: allDrills, error: drillsError } = await supabase
@@ -74,9 +118,9 @@ export async function GET(request: NextRequest) {
 
     // Score and rank drills based on user history
     const scoredDrills = scoreDrills(
-      allDrills || [],
+      (allDrills as DatabaseDrill[]) || [],
       keywords,
-      recentSessions || []
+      (recentSessions as DatabaseSession[]) || []
     );
 
     // Return top 6 recommendations
@@ -99,7 +143,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function extractKeywords(sessions: any[]): string[] {
+function extractKeywords(sessions: DatabaseSession[]): string[] {
   const keywords = new Set<string>();
 
   sessions.forEach((session) => {
@@ -156,7 +200,7 @@ function extractKeywords(sessions: any[]): string[] {
 
     // Extract from session drill notes
     if (session.session_drills) {
-      session.session_drills.forEach((drill: any) => {
+      session.session_drills.forEach((drill: DatabaseSessionDrill) => {
         if (drill.notes) {
           const drillNoteWords = drill.notes
             .toLowerCase()
@@ -192,18 +236,16 @@ function extractKeywords(sessions: any[]): string[] {
 }
 
 function scoreDrills(
-  drills: any[],
+  drills: DatabaseDrill[],
   keywords: string[],
-  sessions: any[]
-): any[] {
+  sessions: DatabaseSession[]
+): ScoredDrill[] {
   return drills
     .map((drill) => {
       let score = 0;
-      const drillText = `${drill.name} ${
-        drill.description
-      } ${drill.objectives?.join(" ")} ${drill.tips?.join(
-        " "
-      )} ${drill.categories?.join(" ")}`.toLowerCase();
+      const drillText = `${drill.name} ${drill.description} ${
+        drill.objectives || ""
+      } ${drill.tips || ""} ${drill.categories?.join(" ") || ""}`.toLowerCase();
 
       // Score based on keyword matches
       keywords.forEach((keyword) => {
@@ -222,7 +264,10 @@ function scoreDrills(
 
       // Score based on category variety
       const userCategories = analyzeUserCategories(sessions);
-      if (!userCategories.includes(drill.categories?.[0])) {
+      if (
+        drill.categories?.[0] &&
+        !userCategories.includes(drill.categories[0])
+      ) {
         score += 1; // Encourage trying new categories
       }
 
@@ -253,20 +298,25 @@ function scoreDrills(
     .sort((a, b) => b.score - a.score);
 }
 
-function analyzeUserDifficulty(sessions: any[]): string {
+function analyzeUserDifficulty(sessions: DatabaseSession[]): string {
   if (sessions.length === 0) return "beginner";
 
   const difficulties = sessions.flatMap(
     (session) =>
-      session.session_drills?.map((drill: any) => drill.difficulty) || []
+      session.session_drills
+        ?.map((drill: DatabaseSessionDrill) => drill.drill?.[0]?.difficulty)
+        .filter((diff): diff is string => diff !== undefined) || []
   );
 
   if (difficulties.length === 0) return "beginner";
 
-  const difficultyCounts = difficulties.reduce((acc: any, diff) => {
-    acc[diff] = (acc[diff] || 0) + 1;
-    return acc;
-  }, {});
+  const difficultyCounts = difficulties.reduce(
+    (acc: Record<string, number>, diff) => {
+      acc[diff] = (acc[diff] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   if (
     difficultyCounts.advanced > difficultyCounts.intermediate &&
@@ -291,30 +341,41 @@ function shouldProgressDifficulty(
   );
 }
 
-function analyzeUserCategories(sessions: any[]): string[] {
+function analyzeUserCategories(sessions: DatabaseSession[]): string[] {
   const categories = sessions
     .flatMap(
       (session) =>
-        session.session_drills?.map((drill: any) => drill.categories) || []
+        session.session_drills?.map(
+          (drill: DatabaseSessionDrill) => drill.drill?.[0]?.categories
+        ) || []
     )
     .flat();
 
-  return [...new Set(categories)];
+  return [
+    ...new Set(
+      categories.filter(
+        (cat): cat is string => cat !== null && cat !== undefined
+      )
+    ),
+  ];
 }
 
-function analyzeRecentPerformance(sessions: any[], drillId: string): string {
+function analyzeRecentPerformance(
+  sessions: DatabaseSession[],
+  drillId: string
+): string {
   const recentDrills = sessions.flatMap(
     (session) =>
       session.session_drills?.filter(
-        (drill: any) => drill.drill_id === drillId
+        (drill: DatabaseSessionDrill) => drill.drill_id === drillId
       ) || []
   );
 
   if (recentDrills.length === 0) return "new";
 
   const recentRatings = recentDrills
-    .map((drill: any) => drill.rating)
-    .filter((r) => r);
+    .map((drill: DatabaseSessionDrill) => drill.rating)
+    .filter((r): r is number => r !== null && r !== undefined);
 
   if (recentRatings.length === 0) return "new";
 
@@ -328,7 +389,7 @@ function analyzeRecentPerformance(sessions: any[], drillId: string): string {
 }
 
 function generateRecommendationReason(
-  drill: any,
+  drill: DatabaseDrill,
   keywords: string[],
   userDifficulty: string,
   recentPerformance: string

@@ -260,7 +260,28 @@ export async function GET(request: NextRequest) {
         createdAt: new Date(session.created_at),
         updatedAt: new Date(session.updated_at),
         sessionDrills:
-          (session as any).sessionDrills?.map((sd: any) => ({
+          (
+            session as {
+              sessionDrills?: Array<{
+                id: string;
+                session_id: string;
+                drill_id: string;
+                duration_minutes: number | null;
+                notes: string | null;
+                rating: number | null;
+                repetitions: number | null;
+                created_at: string;
+                drill?: {
+                  id: string;
+                  name: string;
+                  slug: string;
+                  description: string;
+                  difficulty: string;
+                  categories: string[] | null;
+                };
+              }>;
+            }
+          ).sessionDrills?.map((sd) => ({
             id: sd.id,
             sessionId: sd.session_id,
             drillId: sd.drill_id,
