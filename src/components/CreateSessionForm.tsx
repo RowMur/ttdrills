@@ -8,15 +8,18 @@ import {
 } from "@/types";
 import { Button } from "./Button";
 import { DrillSelectionModal } from "./DrillSelectionModal";
+
 import { Plus } from "lucide-react";
 import { useToast } from "@/components/Toast";
 
 interface CreateSessionFormProps {
   onSessionCreated: () => void;
+  preSelectedDrills?: Drill[];
 }
 
 export function CreateSessionForm({
   onSessionCreated,
+  preSelectedDrills = [],
 }: CreateSessionFormProps) {
   const { showToast } = useToast();
   const [name, setName] = useState("");
@@ -25,7 +28,19 @@ export function CreateSessionForm({
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedDrills, setSelectedDrills] = useState<
     Array<Drill & { sessionData: CreateSessionDrillRequest }>
-  >([]);
+  >(() => {
+    // Initialize with pre-selected drills if provided
+    return preSelectedDrills.map((drill) => ({
+      ...drill,
+      sessionData: {
+        drillId: drill.id!,
+        durationMinutes: undefined,
+        notes: "",
+        rating: undefined,
+        repetitions: 1,
+      },
+    }));
+  });
   const [showDrillModal, setShowDrillModal] = useState(false);
   const [loading, setLoading] = useState(false);
 

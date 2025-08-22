@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Session } from "@/types";
+import { Session, Drill } from "@/types";
 import { Button } from "@/components/Button";
 import { Modal } from "@/components/Modal";
 import { CreateSessionForm } from "@/components/CreateSessionForm";
 import { SessionCard } from "@/components/SessionCard";
 import { Pagination } from "@/components/Pagination";
 import { Main } from "@/components/Main";
+import { PlanNextSession } from "@/components/PlanNextSession";
 import Link from "next/link";
 
 export default function SessionsPage() {
@@ -16,6 +17,7 @@ export default function SessionsPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [preSelectedDrills, setPreSelectedDrills] = useState<Drill[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalSessions, setTotalSessions] = useState(0);
@@ -59,7 +61,13 @@ export default function SessionsPage() {
 
   const handleSessionCreated = () => {
     setShowCreateModal(false);
+    setPreSelectedDrills([]);
     fetchSessions();
+  };
+
+  const handleCreateSessionWithDrills = (selectedDrills: Drill[]) => {
+    setPreSelectedDrills(selectedDrills);
+    setShowCreateModal(true);
   };
 
   const handleSessionDeleted = (sessionId: string) => {
@@ -234,6 +242,11 @@ export default function SessionsPage() {
             </div>
           </div>
 
+          {/* Plan Next Session */}
+          <div className="mb-8">
+            <PlanNextSession onCreateSession={handleCreateSessionWithDrills} />
+          </div>
+
           {/* Sessions List */}
           <div className="space-y-4">
             {sessions.map((session) => (
@@ -265,7 +278,10 @@ export default function SessionsPage() {
         onClose={() => setShowCreateModal(false)}
         title="Log Training Session"
       >
-        <CreateSessionForm onSessionCreated={handleSessionCreated} />
+        <CreateSessionForm
+          onSessionCreated={handleSessionCreated}
+          preSelectedDrills={preSelectedDrills}
+        />
       </Modal>
     </Main>
   );
