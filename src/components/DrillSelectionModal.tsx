@@ -130,10 +130,12 @@ export function DrillSelectionModal({
                   }`}
                   onClick={() => handleDrillSelect(drill)}
                 >
-                  <div className="flex justify-between items-start mb-2">
+                  <div className="flex justify-between flex-wrap items-start mb-2">
                     <h3 className="font-medium text-text">{drill.name}</h3>
                     {isDrillSelected(drill) && (
-                      <span className="text-primary text-sm">✓ Selected</span>
+                      <span className="text-primary text-sm text-nowrap">
+                        ✓ Selected
+                      </span>
                     )}
                   </div>
                   <p className="text-sm text-text-muted line-clamp-2 mb-3">

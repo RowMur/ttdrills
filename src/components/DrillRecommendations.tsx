@@ -153,7 +153,6 @@ export function DrillRecommendations({
                 </div>
                 <p className="text-xs text-blue-600 italic">{drill.reason}</p>
               </div>
-
               {!isDrillSelected(drill) && (
                 <Button
                   type="button"

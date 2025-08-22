@@ -265,9 +265,9 @@ export function CreateSessionForm({
                 key={index}
                 className="border border-gray-200 rounded-lg p-4"
               >
-                <div className="flex justify-between items-start mb-3">
+                <div className="flex justify-between gap-2 items-start mb-1">
                   <div>
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-1">
                       <h4 className="font-medium text-gray-900">
                         {drill.name}
                       </h4>
@@ -275,24 +275,25 @@ export function CreateSessionForm({
                         href={`/drills/${drill.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-primary hover:text-primary-dark text-sm underline"
+                        className="text-primary text-nowrap hover:text-primary-dark text-sm underline"
                       >
                         View details →
                       </a>
                     </div>
-                    <p className="text-sm text-gray-600 line-clamp-2">
-                      {drill.description}
-                    </p>
                   </div>
                   <Button
                     type="button"
                     variant="danger"
                     size="sm"
                     onClick={() => handleRemoveDrill(index)}
+                    className="mb-2"
                   >
                     Remove
                   </Button>
                 </div>
+                <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                  {drill.description}
+                </p>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">

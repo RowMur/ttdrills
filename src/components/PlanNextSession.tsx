@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Drill } from "@/types";
 import { Button } from "./Button";
-import { Plus, Lightbulb, Clock, Calendar, Target } from "lucide-react";
+import { Plus, Lightbulb, Calendar, Target } from "lucide-react";
 import {
   trackAIRecommendationSelected,
   trackSessionFromAI,
@@ -127,16 +127,6 @@ export function PlanNextSession({ onCreateSession }: PlanNextSessionProps) {
           <h2 className="text-xl font-semibold text-text">
             Plan Your Next Session
           </h2>
-          <Clock className="w-4 h-4 text-primary-light" />
-          <span className="text-sm text-text-muted">
-            AI-powered recommendations
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 rounded-full">
-            <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-            <span className="text-xs text-primary font-medium">AI</span>
-          </div>
         </div>
         {selectedDrills.length > 0 && (
           <Button
@@ -190,13 +180,13 @@ export function PlanNextSession({ onCreateSession }: PlanNextSessionProps) {
         {recommendations.slice(0, 6).map((drill) => (
           <div
             key={drill.id}
-            className={`p-4 rounded-lg border transition-all duration-200 ${
+            className={`p-4 rounded-lg border transition-all duration-200 flex flex-col ${
               isDrillSelected(drill)
                 ? "bg-surface-light border-primary shadow-md"
                 : "bg-surface border-border hover:border-primary/50 hover:shadow-sm"
             }`}
           >
-            <div className="flex justify-between items-start mb-3">
+            <div className="flex justify-between items-start mb-3 grow">
               <div className="flex-1">
                 <h4 className="font-medium text-text mb-1">{drill.name}</h4>
                 <p className="text-sm text-text-muted mb-3 line-clamp-2">
