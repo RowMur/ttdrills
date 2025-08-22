@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { trackAICacheHit, trackAICacheMiss, trackAIError } from "./analytics";
 
 // Initialize OpenRouter client (compatible with OpenAI SDK)
 const openai = new OpenAI({
@@ -107,8 +108,11 @@ export async function analyzeSessionNotes(
   const cached = getFromCache<SessionAnalysis>(cacheKey);
   if (cached) {
     console.log("Cache hit: session analysis");
+    trackAICacheHit("session_analysis");
     return cached;
   }
+
+  trackAICacheMiss("session_analysis");
 
   try {
     const model = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
@@ -203,8 +207,11 @@ export async function generatePersonalizedRecommendations(
   const cached = getFromCache<AIRecommendation[]>(cacheKey);
   if (cached) {
     console.log("Cache hit: recommendations");
+    trackAICacheHit("recommendations");
     return cached;
   }
+
+  trackAICacheMiss("recommendations");
 
   try {
     // Analyze recent sessions
@@ -305,6 +312,10 @@ IMPORTANT: Return ONLY a JSON array of 3-6 recommendations. Do NOT use markdown 
     return recommendations as AIRecommendation[];
   } catch (error) {
     console.error("Error generating AI recommendations:", error);
+    trackAIError(
+      "recommendations_generation",
+      error instanceof Error ? error.message : "Unknown error"
+    );
     return [];
   }
 }
@@ -329,8 +340,11 @@ export async function generateRecommendationExplanation(
   const cached = getFromCache<string>(cacheKey);
   if (cached) {
     console.log("Cache hit: explanation");
+    trackAICacheHit("explanation");
     return cached;
   }
+
+  trackAICacheMiss("explanation");
 
   try {
     const response = await openai.chat.completions.create({
@@ -363,6 +377,10 @@ Make it personal and motivating.`,
     return explanation;
   } catch (error) {
     console.error("Error generating explanation:", error);
+    trackAIError(
+      "explanation_generation",
+      error instanceof Error ? error.message : "Unknown error"
+    );
     return "This drill is recommended based on your training history.";
   }
 }

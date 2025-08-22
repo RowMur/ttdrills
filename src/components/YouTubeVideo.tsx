@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { trackVideoView } from "@/lib/analytics";
+import { useState } from "react";
+// Note: Video play tracking removed - YouTube iframe doesn't provide reliable play event detection
+// If video tracking is needed, consider using YouTube Player API or tracking when user scrolls to video
 
 type Props = {
   videoUrl: string;
@@ -11,21 +12,12 @@ type Props = {
   drillSlug?: string;
 };
 
-export const YouTubeVideo = ({
-  videoUrl,
-  title,
-  startTime,
-  drillName,
-  drillSlug,
-}: Props) => {
+export const YouTubeVideo = ({ videoUrl, title, startTime }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
 
-  // Track video view when component mounts
-  useEffect(() => {
-    if (drillName && drillSlug) {
-      trackVideoView(drillName, drillSlug, videoUrl);
-    }
-  }, [drillName, drillSlug, videoUrl]);
+  // Note: Video tracking removed as YouTube iframe doesn't provide reliable play event detection
+  // The previous trackVideoView was firing on mount, not on actual play
+  // To track actual video plays, you would need to use YouTube Player API
 
   // Extract video ID from various YouTube URL formats
   const getVideoId = (url: string): string | null => {

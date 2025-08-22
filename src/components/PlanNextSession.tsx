@@ -4,6 +4,10 @@ import { useState, useEffect } from "react";
 import { Drill } from "@/types";
 import { Button } from "./Button";
 import { Plus, Lightbulb, Clock, Calendar, Target } from "lucide-react";
+import {
+  trackAIRecommendationSelected,
+  trackSessionFromAI,
+} from "@/lib/analytics";
 
 interface DrillRecommendation extends Drill {
   score: number;
@@ -53,6 +57,17 @@ export function PlanNextSession({ onCreateSession }: PlanNextSessionProps) {
   const handleAddDrill = (drill: Drill) => {
     if (!selectedDrills.some((selected) => selected.id === drill.id)) {
       setSelectedDrills([...selectedDrills, drill]);
+
+      // Track AI recommendation selected
+      const recommendation = recommendations.find((r) => r.id === drill.id);
+      if (recommendation) {
+        trackAIRecommendationSelected(
+          drill.name,
+          drill.slug,
+          recommendation.aiInsights?.priority || "medium",
+          recommendation.reason
+        );
+      }
     }
   };
 
@@ -125,7 +140,14 @@ export function PlanNextSession({ onCreateSession }: PlanNextSessionProps) {
         </div>
         {selectedDrills.length > 0 && (
           <Button
-            onClick={() => onCreateSession?.(selectedDrills)}
+            onClick={() => {
+              // Track session creation from AI recommendations
+              trackSessionFromAI(
+                selectedDrills.length,
+                selectedDrills.map((d) => d.name)
+              );
+              onCreateSession?.(selectedDrills);
+            }}
             className="bg-primary text-white hover:bg-primary-dark"
           >
             <Calendar className="w-4 h-4 mr-2" />

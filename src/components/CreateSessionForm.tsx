@@ -8,6 +8,11 @@ import {
 } from "@/types";
 import { Button } from "./Button";
 import { DrillSelectionModal } from "./DrillSelectionModal";
+import {
+  trackSessionCreation,
+  trackPracticeSession,
+  trackDrillRating,
+} from "@/lib/analytics";
 
 import { Plus } from "lucide-react";
 import { useToast } from "@/components/Toast";
@@ -80,6 +85,17 @@ export function CreateSessionForm({
       },
     };
     setSelectedDrills(updatedDrills);
+
+    // Track drill rating when user rates a drill
+    if (field === "rating" && value && typeof value === "number") {
+      const drill = updatedDrills[index];
+      trackDrillRating(
+        drill.name,
+        drill.slug,
+        value,
+        name.trim() || "Unnamed Session"
+      );
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -110,6 +126,22 @@ export function CreateSessionForm({
       });
 
       if (response.ok) {
+        // Track session creation
+        const hasDrills = selectedDrills.length > 0;
+        const hasNotes = notes.trim().length > 0;
+
+        if (hasDrills) {
+          trackSessionCreation(
+            name.trim(),
+            true,
+            selectedDrills.length,
+            hasNotes,
+            durationMinutes
+          );
+        } else {
+          trackPracticeSession(name.trim(), hasNotes, durationMinutes);
+        }
+
         showToast("Session logged successfully!", "success");
         onSessionCreated();
       } else {

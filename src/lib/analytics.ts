@@ -5,6 +5,7 @@ const safeCapture = (
   event: string,
   properties?: Record<string, string | number | boolean>
 ) => {
+  console.log("PostHog Event:", event, properties);
   try {
     // Only capture if PostHog is properly initialized
     if (posthog && typeof posthog.capture === "function") {
@@ -106,16 +107,106 @@ export const trackTimerComplete = (duration: number) => {
   });
 };
 
-// Track video views
-export const trackVideoView = (
+// Track video play (when user actually clicks play)
+export const trackVideoPlay = (
   drillName: string,
   drillSlug: string,
   videoUrl: string
 ) => {
-  safeCapture("video_viewed", {
+  safeCapture("video_played", {
     drill_name: drillName,
     drill_slug: drillSlug,
     video_url: videoUrl,
+  });
+};
+
+// Track session creation
+export const trackSessionCreation = (
+  sessionName: string,
+  hasDrills: boolean,
+  drillCount: number,
+  hasNotes: boolean,
+  durationMinutes?: number
+) => {
+  safeCapture("session_created", {
+    session_name: sessionName,
+    has_drills: hasDrills,
+    drill_count: drillCount,
+    duration_minutes: durationMinutes || 0,
+    has_notes: hasNotes,
+  });
+};
+
+// Track session deletion
+export const trackSessionDeletion = (
+  sessionName: string,
+  sessionId: string,
+  drillCount: number
+) => {
+  safeCapture("session_deleted", {
+    session_name: sessionName,
+    session_id: sessionId,
+    drill_count: drillCount,
+  });
+};
+
+// Note: Removed ai_recommendations_viewed event as it doesn't provide meaningful insights
+// Users might scroll past without engaging. Better to track actual interactions like:
+// - ai_recommendation_selected
+// - session_from_ai
+// - ai_recommendations_expanded (if we add this feature)
+
+// Track AI recommendation selected
+export const trackAIRecommendationSelected = (
+  drillName: string,
+  drillSlug: string,
+  priority: string,
+  reason: string
+) => {
+  safeCapture("ai_recommendation_selected", {
+    drill_name: drillName,
+    drill_slug: drillSlug,
+    priority,
+    reason,
+  });
+};
+
+// Track session logging from AI recommendations
+export const trackSessionFromAI = (
+  drillCount: number,
+  selectedDrills: string[]
+) => {
+  safeCapture("session_from_ai_recommendations", {
+    drill_count: drillCount,
+    selected_drills: selectedDrills.join(","),
+  });
+};
+
+// Track practice session logging (sessions without drills)
+export const trackPracticeSession = (
+  sessionName: string,
+  hasNotes: boolean,
+  durationMinutes?: number
+) => {
+  safeCapture("practice_session_logged", {
+    session_name: sessionName,
+    duration_minutes: durationMinutes || 0,
+    has_notes: hasNotes,
+  });
+};
+
+// Track drill rating in sessions
+export const trackDrillRating = (
+  drillName: string,
+  drillSlug: string,
+  rating: number,
+  sessionName: string
+) => {
+  safeCapture("drill_rated", {
+    drill_name: drillName,
+    drill_slug: drillSlug,
+    rating,
+    session_name: sessionName,
   });
 };
 
@@ -134,5 +225,26 @@ export const trackUserEngagement = (
   safeCapture("user_engagement", {
     action,
     ...details,
+  });
+};
+
+// Track AI cache operations
+export const trackAICacheHit = (cacheType: string) => {
+  safeCapture("ai_cache_hit", {
+    cache_type: cacheType,
+  });
+};
+
+export const trackAICacheMiss = (cacheType: string) => {
+  safeCapture("ai_cache_miss", {
+    cache_type: cacheType,
+  });
+};
+
+// Track AI API errors
+export const trackAIError = (errorType: string, errorMessage: string) => {
+  safeCapture("ai_error", {
+    error_type: errorType,
+    error_message: errorMessage,
   });
 };

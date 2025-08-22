@@ -6,6 +6,7 @@ import { Button } from "./Button";
 import { useToast } from "@/components/Toast";
 import { Modal } from "./Modal";
 import { AlertTriangle } from "lucide-react";
+import { trackSessionDeletion } from "@/lib/analytics";
 
 interface SessionCardProps {
   session: Session;
@@ -25,6 +26,13 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
       });
 
       if (response.ok) {
+        // Track session deletion
+        trackSessionDeletion(
+          session.name,
+          session.id!,
+          session.sessionDrills?.length || 0
+        );
+
         showToast("Session deleted successfully!", "success");
         onDelete(session.id!);
       } else {
