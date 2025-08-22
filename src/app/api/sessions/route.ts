@@ -248,8 +248,33 @@ export async function GET(request: NextRequest) {
       console.error("Error counting sessions:", countError);
     }
 
+    // Transform snake_case to camelCase for TypeScript
+    const transformedSessions =
+      sessions?.map((session) => ({
+        id: session.id,
+        userId: session.user_id,
+        name: session.name,
+        notes: session.notes,
+        durationMinutes: session.duration_minutes,
+        date: new Date(session.date),
+        createdAt: new Date(session.created_at),
+        updatedAt: new Date(session.updated_at),
+        sessionDrills:
+          (session as any).sessionDrills?.map((sd: any) => ({
+            id: sd.id,
+            sessionId: sd.session_id,
+            drillId: sd.drill_id,
+            durationMinutes: sd.duration_minutes,
+            notes: sd.notes,
+            rating: sd.rating,
+            repetitions: sd.repetitions,
+            createdAt: new Date(sd.created_at),
+            drill: sd.drill,
+          })) || [],
+      })) || [];
+
     return NextResponse.json({
-      sessions,
+      sessions: transformedSessions,
       pagination: {
         page,
         limit,
