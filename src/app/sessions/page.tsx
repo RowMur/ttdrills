@@ -65,6 +65,11 @@ export default function SessionsPage() {
     fetchSessions();
   };
 
+  const handleCloseModal = () => {
+    setShowCreateModal(false);
+    setPreSelectedDrills([]);
+  };
+
   const handleCreateSessionWithDrills = (selectedDrills: Drill[]) => {
     setPreSelectedDrills(selectedDrills);
     setShowCreateModal(true);
@@ -275,7 +280,7 @@ export default function SessionsPage() {
 
       <Modal
         isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
+        onClose={handleCloseModal}
         title="Log Training Session"
       >
         <CreateSessionForm
