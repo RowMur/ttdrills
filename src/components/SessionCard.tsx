@@ -5,7 +5,7 @@ import { Session } from "@/types";
 import { Button } from "./Button";
 import { useToast } from "@/components/Toast";
 import { Modal } from "./Modal";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Trash2 } from "lucide-react";
 import { trackSessionDeletion } from "@/lib/analytics";
 
 interface SessionCardProps {
@@ -91,14 +91,23 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
     <>
       <div className="bg-surface rounded-lg shadow-md border border-border overflow-hidden">
         <div className="p-4">
-          <div className="flex justify-between items-start mb-3">
+          <div className="flex gap-2 justify-between items-start mb-3">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-text mb-1">
-                {session.name}
-              </h3>
-              <p className="text-sm text-text-muted">
-                {formatDate(session.date)}
-              </p>
+              <div className="flex gap-2 mb-1">
+                <h3 className="text-lg font-semibold text-text">
+                  {session.name}
+                </h3>
+              </div>
+              <div className="flex gap-2 items-center">
+                <p className="text-sm text-text-muted">
+                  {formatDate(session.date)}
+                </p>
+                {session.isCompetitive && (
+                  <span className="px-2 h-fit py-1 text-xs rounded-full font-medium bg-orange-100 text-orange-800 border border-orange-200">
+                    Competitive
+                  </span>
+                )}
+              </div>
             </div>
             <div className="flex space-x-2">
               <Button
@@ -107,7 +116,7 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
                 onClick={() => setShowDeleteConfirmation(true)}
                 disabled={deleting}
               >
-                {deleting ? "Deleting..." : "Delete"}
+                <Trash2 className="w-4 h-4" />
               </Button>
             </div>
           </div>

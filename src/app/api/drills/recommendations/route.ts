@@ -10,6 +10,7 @@ interface DatabaseSession {
   name: string;
   notes: string | null;
   date: string;
+  is_competitive: boolean;
   session_drills: DatabaseSessionDrill[];
 }
 
@@ -66,6 +67,7 @@ export async function GET() {
         id,
         name,
         notes,
+        is_competitive,
         session_drills (
           drill_id,
           notes,
@@ -115,6 +117,7 @@ export async function GET() {
           sessionNotes: session.notes || "",
           sessionName: session.name,
           date: new Date(session.date || new Date()),
+          isCompetitive: session.is_competitive || false,
         };
 
         // If session has drills, include them
@@ -130,7 +133,9 @@ export async function GET() {
           return [
             {
               ...sessionData,
-              drillName: "Practice Session",
+              drillName: session.is_competitive
+                ? "Competitive Match"
+                : "Practice Session",
               rating: undefined,
               hasDrills: false,
             },

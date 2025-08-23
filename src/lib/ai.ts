@@ -179,6 +179,7 @@ export async function generatePersonalizedRecommendations(
     rating?: number;
     date: Date;
     hasDrills: boolean;
+    isCompetitive: boolean;
   }>,
   availableDrills: Array<{
     id: string;
@@ -224,11 +225,22 @@ export async function generatePersonalizedRecommendations(
 
     // Create a summary of user's recent activity
     const drillSessions = recentSessions.filter((s) => s.hasDrills);
-    const practiceSessions = recentSessions.filter((s) => !s.hasDrills);
+    const practiceSessions = recentSessions.filter(
+      (s) => !s.hasDrills && !s.isCompetitive
+    );
+    const competitiveSessions = recentSessions.filter((s) => s.isCompetitive);
+
+    // Analyze competitive sessions separately to identify high-priority weaknesses
+    const competitiveSessionAnalyses = await Promise.all(
+      competitiveSessions.map((session) =>
+        analyzeSessionNotes(session.sessionNotes)
+      )
+    );
 
     const userSummary = {
       recentDrills: drillSessions.map((s) => s.drillName),
       practiceSessions: practiceSessions.map((s) => s.sessionName),
+      competitiveSessions: competitiveSessions.map((s) => s.sessionName),
       averageRating:
         drillSessions
           .filter((s) => s.rating)
@@ -238,8 +250,13 @@ export async function generatePersonalizedRecommendations(
       challenges: sessionAnalyses.flatMap((a) => a.challenges),
       improvements: sessionAnalyses.flatMap((a) => a.improvements),
       weaknesses: sessionAnalyses.flatMap((a) => a.weaknesses),
+      // High-priority weaknesses from competitive sessions
+      competitiveWeaknesses: competitiveSessionAnalyses.flatMap(
+        (a) => a.weaknesses
+      ),
       practiceSessionCount: practiceSessions.length,
       drillSessionCount: drillSessions.length,
+      competitiveSessionCount: competitiveSessions.length,
     };
 
     const response = await openai.chat.completions.create({
@@ -252,16 +269,22 @@ export async function generatePersonalizedRecommendations(
 User Summary:
 - Recent drills: ${userSummary.recentDrills.join(", ")}
 - Practice sessions: ${userSummary.practiceSessions.join(", ")}
+- Competitive sessions: ${userSummary.competitiveSessions.join(", ")}
 - Drill sessions: ${userSummary.drillSessionCount}, Practice sessions: ${
             userSummary.practiceSessionCount
-          }
+          }, Competitive sessions: ${userSummary.competitiveSessionCount}
 - Average rating: ${userSummary.averageRating.toFixed(1)}/5
 - Skills practiced: ${[...new Set(userSummary.commonSkills)].join(", ")}
 - Challenges: ${[...new Set(userSummary.challenges)].join(", ")}
 - Improvements: ${[...new Set(userSummary.improvements)].join(", ")}
 - Weaknesses: ${[...new Set(userSummary.weaknesses)].join(", ")}
+- COMPETITIVE WEAKNESSES (HIGH PRIORITY): ${[
+            ...new Set(userSummary.competitiveWeaknesses),
+          ].join(", ")}
 
-Consider the user's practice session notes when recommending drills. If they mention specific weaknesses or areas for improvement in practice matches, recommend drills that target those areas. Prioritize drills that address their identified weaknesses.
+CRITICAL: Pay special attention to weaknesses identified in competitive sessions (competitive matches and tournaments). These weaknesses should be given HIGHEST PRIORITY when recommending drills, as they represent real competitive pressure situations where the player struggled.
+
+Consider the user's practice session notes when recommending drills. If they mention specific weaknesses or areas for improvement in practice matches, recommend drills that target those areas. Prioritize drills that address their identified weaknesses, with competitive session weaknesses getting the highest priority.
 
 Available Drills:
 ${availableDrills

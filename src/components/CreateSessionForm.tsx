@@ -31,6 +31,7 @@ export function CreateSessionForm({
   const [notes, setNotes] = useState("");
   const [durationMinutes, setDurationMinutes] = useState<number | undefined>();
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [isCompetitive, setIsCompetitive] = useState(false);
   const [selectedDrills, setSelectedDrills] = useState<
     Array<Drill & { sessionData: CreateSessionDrillRequest }>
   >(() => {
@@ -114,7 +115,10 @@ export function CreateSessionForm({
         notes: notes.trim() || undefined,
         durationMinutes,
         date: new Date(date),
-        sessionDrills: selectedDrills.map((d) => d.sessionData),
+        isCompetitive,
+        sessionDrills: isCompetitive
+          ? []
+          : selectedDrills.map((d) => d.sessionData),
       };
 
       const response = await fetch("/api/sessions", {
@@ -136,8 +140,12 @@ export function CreateSessionForm({
             true,
             selectedDrills.length,
             hasNotes,
-            durationMinutes
+            durationMinutes,
+            isCompetitive ? "competitive" : "practice"
           );
+        } else if (isCompetitive) {
+          // Track competitive sessions separately
+          trackPracticeSession(name.trim(), hasNotes, durationMinutes);
         } else {
           trackPracticeSession(name.trim(), hasNotes, durationMinutes);
         }
@@ -193,6 +201,36 @@ export function CreateSessionForm({
       </div>
 
       <div>
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="isCompetitive"
+            checked={isCompetitive}
+            onChange={(e) => {
+              setIsCompetitive(e.target.checked);
+              // Clear selected drills if switching to competitive
+              if (e.target.checked) {
+                setSelectedDrills([]);
+              }
+            }}
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+          <label
+            htmlFor="isCompetitive"
+            className="ml-2 block text-sm text-gray-900"
+          >
+            This was a competitive match or tournament
+          </label>
+        </div>
+        {isCompetitive && (
+          <p className="mt-2 text-sm text-orange-600">
+            💡 Competitive sessions focus on match analysis and don&apos;t
+            include specific drill practice.
+          </p>
+        )}
+      </div>
+
+      <div>
         <label
           htmlFor="duration"
           className="block text-sm font-medium text-gray-700 mb-2"
@@ -231,135 +269,141 @@ export function CreateSessionForm({
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Drills Practiced (Optional)
-        </label>
+      {!isCompetitive && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Drills Practiced (Optional)
+          </label>
 
-        <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-600 mb-3">
-            {selectedDrills.length === 0
-              ? "No drills selected. You can log matches, solo practice, or other activities without specific drills."
-              : `${selectedDrills.length} drill${
-                  selectedDrills.length !== 1 ? "s" : ""
-                } selected.`}
-          </p>
+          <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <p className="text-sm text-gray-600 mb-3">
+              {selectedDrills.length === 0
+                ? "No drills selected. You can log practice sessions without specific drills."
+                : `${selectedDrills.length} drill${
+                    selectedDrills.length !== 1 ? "s" : ""
+                  } selected.`}
+            </p>
 
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setShowDrillModal(true)}
-            className="w-full flex items-center justify-center gap-2 py-3"
-          >
-            <Plus className="w-4 h-4" />
-            {selectedDrills.length === 0
-              ? "Add Drills to Session"
-              : "Add More Drills"}
-          </Button>
-        </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowDrillModal(true)}
+              className="w-full flex items-center justify-center gap-2 py-3"
+            >
+              <Plus className="w-4 h-4" />
+              {selectedDrills.length === 0
+                ? "Add Drills to Session"
+                : "Add More Drills"}
+            </Button>
+          </div>
 
-        {selectedDrills.length > 0 && (
-          <div className="space-y-4">
-            {selectedDrills.map((drill, index) => (
-              <div
-                key={index}
-                className="border border-gray-200 rounded-lg p-4"
-              >
-                <div className="flex justify-between gap-2 items-start mb-1">
-                  <div>
-                    <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-1">
-                      <h4 className="font-medium text-gray-900">
-                        {drill.name}
-                      </h4>
-                      <a
-                        href={`/drills/${drill.slug}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary text-nowrap hover:text-primary-dark text-sm underline"
+          {selectedDrills.length > 0 && (
+            <div className="space-y-4">
+              {selectedDrills.map((drill, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-lg p-4"
+                >
+                  <div className="flex justify-between gap-2 items-start mb-1">
+                    <div>
+                      <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-1">
+                        <h4 className="font-medium text-gray-900">
+                          {drill.name}
+                        </h4>
+                        <a
+                          href={`/drills/${drill.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary text-nowrap hover:text-primary-dark text-sm underline"
+                        >
+                          View details →
+                        </a>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      size="sm"
+                      onClick={() => handleRemoveDrill(index)}
+                      className="mb-2"
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                  <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                    {drill.description}
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-2">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        How long did you practice this? (min)
+                      </label>
+                      <input
+                        type="number"
+                        value={drill.sessionData.durationMinutes || ""}
+                        onChange={(e) =>
+                          handleUpdateDrillData(
+                            index,
+                            "durationMinutes",
+                            e.target.value
+                              ? parseInt(e.target.value)
+                              : undefined
+                          )
+                        }
+                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="e.g., 15"
+                        min="1"
+                      />
+                    </div>
+
+                    <div className="col-span-2">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        How did it go?
+                      </label>
+                      <select
+                        value={drill.sessionData.rating || ""}
+                        onChange={(e) =>
+                          handleUpdateDrillData(
+                            index,
+                            "rating",
+                            e.target.value
+                              ? parseInt(e.target.value)
+                              : undefined
+                          )
+                        }
+                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                       >
-                        View details →
-                      </a>
+                        <option value="">No rating</option>
+                        <option value="1">1 - Poor</option>
+                        <option value="2">2 - Fair</option>
+                        <option value="3">3 - Good</option>
+                        <option value="4">4 - Very Good</option>
+                        <option value="5">5 - Excellent</option>
+                      </select>
+                    </div>
+
+                    <div className="col-span-2">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Any thoughts on this drill?
+                      </label>
+                      <textarea
+                        value={drill.sessionData.notes || ""}
+                        onChange={(e) =>
+                          handleUpdateDrillData(index, "notes", e.target.value)
+                        }
+                        rows={2}
+                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="What went well? What needs work? Any observations..."
+                      />
                     </div>
                   </div>
-                  <Button
-                    type="button"
-                    variant="danger"
-                    size="sm"
-                    onClick={() => handleRemoveDrill(index)}
-                    className="mb-2"
-                  >
-                    Remove
-                  </Button>
                 </div>
-                <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-                  {drill.description}
-                </p>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      How long did you practice this? (min)
-                    </label>
-                    <input
-                      type="number"
-                      value={drill.sessionData.durationMinutes || ""}
-                      onChange={(e) =>
-                        handleUpdateDrillData(
-                          index,
-                          "durationMinutes",
-                          e.target.value ? parseInt(e.target.value) : undefined
-                        )
-                      }
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      placeholder="e.g., 15"
-                      min="1"
-                    />
-                  </div>
-
-                  <div className="col-span-2">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      How did it go?
-                    </label>
-                    <select
-                      value={drill.sessionData.rating || ""}
-                      onChange={(e) =>
-                        handleUpdateDrillData(
-                          index,
-                          "rating",
-                          e.target.value ? parseInt(e.target.value) : undefined
-                        )
-                      }
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    >
-                      <option value="">No rating</option>
-                      <option value="1">1 - Poor</option>
-                      <option value="2">2 - Fair</option>
-                      <option value="3">3 - Good</option>
-                      <option value="4">4 - Very Good</option>
-                      <option value="5">5 - Excellent</option>
-                    </select>
-                  </div>
-
-                  <div className="col-span-2">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Any thoughts on this drill?
-                    </label>
-                    <textarea
-                      value={drill.sessionData.notes || ""}
-                      onChange={(e) =>
-                        handleUpdateDrillData(index, "notes", e.target.value)
-                      }
-                      rows={2}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      placeholder="What went well? What needs work? Any observations..."
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="flex justify-end space-x-3">
         <Button

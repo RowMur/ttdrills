@@ -25,7 +25,14 @@ export async function POST(request: NextRequest) {
 
     // Parse the request body
     const body: CreateSessionRequest = await request.json();
-    const { name, notes, durationMinutes, date, sessionDrills = [] } = body;
+    const {
+      name,
+      notes,
+      durationMinutes,
+      date,
+      isCompetitive,
+      sessionDrills = [],
+    } = body;
 
     // Validate required fields
     if (!name) {
@@ -55,6 +62,7 @@ export async function POST(request: NextRequest) {
         notes,
         duration_minutes: durationMinutes,
         date: date || new Date().toISOString().split("T")[0],
+        is_competitive: isCompetitive,
       })
       .select()
       .single();
@@ -257,6 +265,7 @@ export async function GET(request: NextRequest) {
         notes: session.notes,
         durationMinutes: session.duration_minutes,
         date: new Date(session.date),
+        isCompetitive: session.is_competitive || false,
         createdAt: new Date(session.created_at),
         updatedAt: new Date(session.updated_at),
         sessionDrills:

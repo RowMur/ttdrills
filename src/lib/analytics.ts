@@ -126,7 +126,8 @@ export const trackSessionCreation = (
   hasDrills: boolean,
   drillCount: number,
   hasNotes: boolean,
-  durationMinutes?: number
+  durationMinutes?: number,
+  sessionType?: string
 ) => {
   safeCapture("session_created", {
     session_name: sessionName,
@@ -134,6 +135,7 @@ export const trackSessionCreation = (
     drill_count: drillCount,
     duration_minutes: durationMinutes || 0,
     has_notes: hasNotes,
+    session_type: sessionType || "practice",
   });
 };
 
@@ -192,6 +194,31 @@ export const trackPracticeSession = (
     session_name: sessionName,
     duration_minutes: durationMinutes || 0,
     has_notes: hasNotes,
+  });
+};
+
+// Track competitive session logging
+export const trackCompetitiveSession = (
+  sessionName: string,
+  sessionType: string,
+  matchResult: string,
+  opponentName: string,
+  hasNotes: boolean,
+  tournamentName?: string,
+  matchScore?: string,
+  competitiveLevel?: string,
+  durationMinutes?: number
+) => {
+  safeCapture("competitive_session_logged", {
+    session_name: sessionName,
+    session_type: sessionType,
+    match_result: matchResult,
+    opponent_name: opponentName,
+    has_notes: hasNotes,
+    duration_minutes: durationMinutes || 0,
+    ...(tournamentName && { tournament_name: tournamentName }),
+    ...(matchScore && { match_score: matchScore }),
+    ...(competitiveLevel && { competitive_level: competitiveLevel }),
   });
 };
 

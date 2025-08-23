@@ -84,6 +84,7 @@ export type Session = {
   notes?: string;
   durationMinutes?: number;
   date: Date;
+  isCompetitive: boolean;
   createdAt: Date;
   updatedAt: Date;
   sessionDrills?: SessionDrill[];
@@ -106,6 +107,7 @@ export type CreateSessionRequest = {
   notes?: string;
   durationMinutes?: number;
   date?: Date;
+  isCompetitive: boolean;
   sessionDrills?: CreateSessionDrillRequest[];
 };
 
