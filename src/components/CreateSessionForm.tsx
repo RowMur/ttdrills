@@ -16,6 +16,7 @@ import {
 
 import { Plus } from "lucide-react";
 import { useToast } from "@/components/Toast";
+import { useAutoResizeTextarea } from "@/hooks/useAutoResizeTextarea";
 
 interface CreateSessionFormProps {
   onSessionCreated: () => void;
@@ -49,6 +50,7 @@ export function CreateSessionForm({
   });
   const [showDrillModal, setShowDrillModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { textareaRef, adjustHeight } = useAutoResizeTextarea();
 
   const handleAddDrill = (drill: Drill) => {
     if (!drill.id) {
@@ -263,10 +265,14 @@ export function CreateSessionForm({
         </label>
         <textarea
           id="notes"
+          ref={textareaRef}
           value={notes}
-          onChange={(e) => setNotes(e.target.value)}
+          onChange={(e) => {
+            setNotes(e.target.value);
+            adjustHeight();
+          }}
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none overflow-hidden"
           placeholder="How did the session go? Any observations, match results, or areas to focus on next time..."
         />
       </div>
@@ -391,11 +397,15 @@ export function CreateSessionForm({
                       </label>
                       <textarea
                         value={drill.sessionData.notes || ""}
-                        onChange={(e) =>
-                          handleUpdateDrillData(index, "notes", e.target.value)
-                        }
+                        onChange={(e) => {
+                          handleUpdateDrillData(index, "notes", e.target.value);
+                          // Auto-resize this specific textarea
+                          const textarea = e.target;
+                          textarea.style.height = "auto";
+                          textarea.style.height = `${textarea.scrollHeight}px`;
+                        }}
                         rows={2}
-                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none overflow-hidden"
                         placeholder="What went well? What needs work? Any observations..."
                       />
                     </div>

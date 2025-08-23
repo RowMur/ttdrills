@@ -5,6 +5,7 @@ import { Session } from "@/types";
 import { Button } from "./Button";
 import { useToast } from "@/components/Toast";
 import { Modal } from "./Modal";
+import { useAutoResizeTextarea } from "@/hooks/useAutoResizeTextarea";
 import { Edit, Save, Trash2, Clock } from "lucide-react";
 
 interface DraftSessionManagerProps {
@@ -25,6 +26,7 @@ export const DraftSessionManager = forwardRef<
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [notes, setNotes] = useState("");
   const [durationMinutes, setDurationMinutes] = useState<number | undefined>();
+  const { textareaRef, adjustHeight } = useAutoResizeTextarea();
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -278,10 +280,14 @@ export const DraftSessionManager = forwardRef<
               Notes
             </label>
             <textarea
+              ref={textareaRef}
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={4}
-              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-surface text-text"
+              onChange={(e) => {
+                setNotes(e.target.value);
+                adjustHeight();
+              }}
+              rows={3}
+              className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-surface text-text resize-none overflow-hidden"
               placeholder="Add your observations, match results, or areas to focus on..."
             />
           </div>
