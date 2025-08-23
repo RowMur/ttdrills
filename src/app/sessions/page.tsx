@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { Session, Drill } from "@/types";
 import { Button } from "@/components/Button";
@@ -10,10 +10,12 @@ import { SessionCard } from "@/components/SessionCard";
 import { Pagination } from "@/components/Pagination";
 import { Main } from "@/components/Main";
 import { PlanNextSession } from "@/components/PlanNextSession";
+import { DraftSessionManager } from "@/components/DraftSessionManager";
 import Link from "next/link";
 
 export default function SessionsPage() {
   const { status } = useSession();
+  const draftManagerRef = useRef<{ refresh: () => void }>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -63,6 +65,8 @@ export default function SessionsPage() {
     setShowCreateModal(false);
     setPreSelectedDrills([]);
     fetchSessions();
+    // Refresh draft UI when a session is created
+    draftManagerRef.current?.refresh();
   };
 
   const handleCloseModal = () => {
@@ -112,6 +116,13 @@ export default function SessionsPage() {
 
   return (
     <Main>
+      {/* Draft Session Manager - Prominent at top */}
+      <DraftSessionManager
+        ref={draftManagerRef}
+        onDraftComplete={fetchSessions}
+        onDraftDeleted={fetchSessions}
+      />
+
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-text">Training Sessions</h1>
@@ -253,7 +264,7 @@ export default function SessionsPage() {
           </div>
 
           {/* Sessions List */}
-          <div className="space-y-4">
+          <div className="space-y-4" data-sessions-container>
             {sessions.map((session) => (
               <SessionCard
                 key={session.id}

@@ -103,8 +103,13 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
                   {formatDate(session.date)}
                 </p>
                 {session.isCompetitive && (
-                  <span className="px-2 h-fit py-1 text-xs rounded-full font-medium bg-orange-100 text-orange-800 border border-orange-200">
+                  <span className="px-2 h-fit py-1 text-xs rounded-full font-medium bg-warning/20 text-warning border border-warning/30">
                     Competitive
+                  </span>
+                )}
+                {session.isDraft && (
+                  <span className="px-2 h-fit py-1 text-xs rounded-full font-medium bg-info/20 text-info border border-info/30">
+                    Draft
                   </span>
                 )}
               </div>

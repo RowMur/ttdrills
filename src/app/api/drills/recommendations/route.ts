@@ -11,6 +11,7 @@ interface DatabaseSession {
   notes: string | null;
   date: string;
   is_competitive: boolean;
+  is_draft: boolean;
   session_drills: DatabaseSessionDrill[];
 }
 
@@ -68,6 +69,7 @@ export async function GET() {
         name,
         notes,
         is_competitive,
+        is_draft,
         session_drills (
           drill_id,
           notes,
@@ -82,6 +84,7 @@ export async function GET() {
       `
       )
       .eq("user_id", user.id)
+      .eq("is_draft", false) // Exclude draft sessions from recommendations
       .gte("date", thirtyDaysAgo.toISOString().split("T")[0])
       .order("date", { ascending: false })
       .limit(20);
@@ -118,6 +121,7 @@ export async function GET() {
           sessionName: session.name,
           date: new Date(session.date || new Date()),
           isCompetitive: session.is_competitive || false,
+          isDraft: session.is_draft || false,
         };
 
         // If session has drills, include them

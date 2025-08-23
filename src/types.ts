@@ -85,6 +85,7 @@ export type Session = {
   durationMinutes?: number;
   date: Date;
   isCompetitive: boolean;
+  isDraft: boolean;
   createdAt: Date;
   updatedAt: Date;
   sessionDrills?: SessionDrill[];
@@ -108,6 +109,7 @@ export type CreateSessionRequest = {
   durationMinutes?: number;
   date?: Date;
   isCompetitive: boolean;
+  isDraft?: boolean;
   sessionDrills?: CreateSessionDrillRequest[];
 };
 
@@ -121,4 +123,9 @@ export type CreateSessionDrillRequest = {
 
 export type UpdateSessionRequest = Partial<CreateSessionRequest> & {
   id: string;
+};
+
+export type UpdateDraftSessionRequest = {
+  notes?: string;
+  durationMinutes?: number;
 };

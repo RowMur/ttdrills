@@ -180,6 +180,7 @@ export async function generatePersonalizedRecommendations(
     date: Date;
     hasDrills: boolean;
     isCompetitive: boolean;
+    isDraft: boolean;
   }>,
   availableDrills: Array<{
     id: string;
@@ -226,9 +227,11 @@ export async function generatePersonalizedRecommendations(
     // Create a summary of user's recent activity
     const drillSessions = recentSessions.filter((s) => s.hasDrills);
     const practiceSessions = recentSessions.filter(
-      (s) => !s.hasDrills && !s.isCompetitive
+      (s) => !s.hasDrills && !s.isCompetitive && !s.isDraft
     );
-    const competitiveSessions = recentSessions.filter((s) => s.isCompetitive);
+    const competitiveSessions = recentSessions.filter(
+      (s) => s.isCompetitive && !s.isDraft
+    );
 
     // Analyze competitive sessions separately to identify high-priority weaknesses
     const competitiveSessionAnalyses = await Promise.all(

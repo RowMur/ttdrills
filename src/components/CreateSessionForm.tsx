@@ -116,6 +116,7 @@ export function CreateSessionForm({
         durationMinutes,
         date: new Date(date),
         isCompetitive,
+        isDraft: false, // Default to false, will be set by action buttons
         sessionDrills: isCompetitive
           ? []
           : selectedDrills.map((d) => d.sessionData),
@@ -225,7 +226,8 @@ export function CreateSessionForm({
         {isCompetitive && (
           <p className="mt-2 text-sm text-orange-600">
             💡 Competitive sessions focus on match analysis and don&apos;t
-            include specific drill practice.
+            include specific drill practice. For long tournaments, you can save
+            as draft and continue logging throughout the day.
           </p>
         )}
       </div>
@@ -405,16 +407,70 @@ export function CreateSessionForm({
         </div>
       )}
 
-      <div className="flex justify-end space-x-3">
+      <div className="flex justify-end gap-3 flex-wrap">
         <Button
           type="button"
           variant="secondary"
           onClick={() => onSessionCreated()}
           disabled={loading}
+          className="text-nowrap grow"
         >
           Cancel
         </Button>
-        <Button type="submit" variant="primary" disabled={loading}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={async () => {
+            if (!name.trim()) {
+              showToast("Please provide a session name", "error");
+              return;
+            }
+            setLoading(true);
+            try {
+              const sessionData: CreateSessionRequest = {
+                name: name.trim(),
+                notes: notes.trim() || undefined,
+                durationMinutes,
+                date: new Date(date),
+                isCompetitive,
+                isDraft: true,
+                sessionDrills: isCompetitive
+                  ? []
+                  : selectedDrills.map((d) => d.sessionData),
+              };
+              const response = await fetch("/api/sessions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(sessionData),
+              });
+              if (response.ok) {
+                showToast(
+                  "Draft session saved! You can continue logging later.",
+                  "success"
+                );
+                onSessionCreated();
+              } else {
+                const error = await response.json();
+                showToast(`Failed to save draft: ${error.error}`, "error");
+              }
+            } catch (error) {
+              console.error("Error saving draft session:", error);
+              showToast("Failed to save draft session", "error");
+            } finally {
+              setLoading(false);
+            }
+          }}
+          disabled={loading}
+          className="border-warning text-warning hover:bg-warning/10 grow sm:grow-0"
+        >
+          {loading ? "Saving..." : "Save as Draft"}
+        </Button>
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={loading}
+          className="grow sm:grow-0"
+        >
           {loading ? "Logging..." : "Log Session"}
         </Button>
       </div>

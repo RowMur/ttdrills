@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
       durationMinutes,
       date,
       isCompetitive,
+      isDraft = false,
       sessionDrills = [],
     } = body;
 
@@ -40,6 +41,34 @@ export async function POST(request: NextRequest) {
         { error: "Session name is required" },
         { status: 400 }
       );
+    }
+
+    // Check if user already has a draft session (only one draft allowed per user)
+    if (isDraft) {
+      const { data: existingDraft, error: draftError } = await supabase
+        .from("sessions")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("is_draft", true)
+        .single();
+
+      if (draftError && draftError.code !== "PGRST116") {
+        console.error("Error checking for existing draft:", draftError);
+        return NextResponse.json(
+          { error: "Failed to check for existing draft session" },
+          { status: 500 }
+        );
+      }
+
+      if (existingDraft) {
+        return NextResponse.json(
+          {
+            error:
+              "You already have a draft session. Please complete or delete it first.",
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // Validate that all drills have valid IDs (if any drills are provided)
@@ -63,6 +92,7 @@ export async function POST(request: NextRequest) {
         duration_minutes: durationMinutes,
         date: date || new Date().toISOString().split("T")[0],
         is_competitive: isCompetitive,
+        is_draft: isDraft,
       })
       .select()
       .single();
@@ -145,8 +175,12 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get("sortOrder") || "desc";
     const offset = (page - 1) * limit;
 
-    // Build the query - first get sessions
-    let query = supabase.from("sessions").select("*").eq("user_id", user.id);
+    // Build the query - first get sessions (exclude draft sessions from main list)
+    let query = supabase
+      .from("sessions")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("is_draft", false);
 
     // Apply sorting with fallback to created_at for consistent ordering
     if (sortBy === "duration") {
@@ -246,11 +280,12 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Get total count for pagination
+    // Get total count for pagination (exclude draft sessions)
     const { count, error: countError } = await supabase
       .from("sessions")
       .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id);
+      .eq("user_id", user.id)
+      .eq("is_draft", false);
 
     if (countError) {
       console.error("Error counting sessions:", countError);
@@ -266,6 +301,7 @@ export async function GET(request: NextRequest) {
         durationMinutes: session.duration_minutes,
         date: new Date(session.date),
         isCompetitive: session.is_competitive || false,
+        isDraft: session.is_draft || false,
         createdAt: new Date(session.created_at),
         updatedAt: new Date(session.updated_at),
         sessionDrills:
