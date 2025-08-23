@@ -42,19 +42,19 @@ const ToastItem = ({ toast, onRemove }: ToastProps) => {
   const getBackgroundColor = () => {
     switch (toast.type) {
       case "success":
-        return "bg-success/10 border-success/20";
+        return "bg-success/30 border-success/50";
       case "error":
-        return "bg-danger/10 border-danger/20";
+        return "bg-danger/30 border-danger/50";
       case "warning":
-        return "bg-warning/10 border-warning/20";
+        return "bg-warning/30 border-warning/50";
       case "info":
-        return "bg-primary/10 border-primary/20";
+        return "bg-primary/30 border-primary/50";
     }
   };
 
   return (
     <div
-      className={`flex items-start gap-3 p-4 rounded-lg border ${getBackgroundColor()} shadow-lg max-w-sm`}
+      className={`flex items-start gap-3 p-4 rounded-lg border ${getBackgroundColor()} shadow-lg max-w-sm backdrop-blur-sm`}
     >
       {getIcon()}
       <div className="flex-1">
