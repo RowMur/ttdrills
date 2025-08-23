@@ -80,10 +80,22 @@ export default function SessionsPage() {
   };
 
   const handleSessionDeleted = (sessionId: string) => {
-    setSessions(sessions.filter((s) => s.id !== sessionId));
-    if (sessions.length === 1 && currentPage > 1) {
+    // Remove from local state immediately for responsive UI
+    const updatedSessions = sessions.filter((s) => s.id !== sessionId);
+    setSessions(updatedSessions);
+
+    // Update total sessions count
+    setTotalSessions((prev) => Math.max(0, prev - 1));
+
+    // Handle pagination if we're on a page that might now be empty
+    if (updatedSessions.length === 0 && currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
+
+    // Refresh data from server to update stats and ensure consistency
+    setTimeout(() => {
+      fetchSessions();
+    }, 100);
   };
 
   if (status === "loading") {
