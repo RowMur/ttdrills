@@ -123,49 +123,21 @@ export default function SessionsPage() {
         onDraftDeleted={fetchSessions}
       />
 
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-8 flex-wrap gap-y-2 gap-x-8">
         <div>
           <h1 className="text-3xl font-bold text-text">Training Sessions</h1>
           <p className="text-text-muted mt-2">
             Track your table tennis practice sessions and progress
           </p>
         </div>
-        <Button variant="success" onClick={() => setShowCreateModal(true)}>
+        <Button
+          variant="success"
+          onClick={() => setShowCreateModal(true)}
+          className="text-nowrap grow sm:grow-0"
+        >
           Log Session
         </Button>
       </div>
-
-      {/* Sorting Controls */}
-      {sessions.length > 0 && (
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center space-x-4">
-            <label className="text-sm font-medium text-text">Sort by:</label>
-            <select
-              value={sortBy}
-              onChange={(e) =>
-                setSortBy(
-                  e.target.value as "date" | "name" | "duration" | "created_at"
-                )
-              }
-              className="px-3 py-1 text-sm border border-border rounded bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="date">Date</option>
-              <option value="name">Name</option>
-              <option value="duration">Duration</option>
-              <option value="created_at">Created</option>
-            </select>
-            <button
-              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="p-1 text-text-muted hover:text-text transition-colors"
-            >
-              {sortOrder === "asc" ? "↑" : "↓"}
-            </button>
-          </div>
-          <div className="text-sm text-text-muted">
-            {totalSessions} session{totalSessions !== 1 ? "s" : ""} total
-          </div>
-        </div>
-      )}
 
       {loading ? (
         <div className="flex justify-center py-12">
@@ -262,6 +234,46 @@ export default function SessionsPage() {
           <div className="mb-8">
             <PlanNextSession onCreateSession={handleCreateSessionWithDrills} />
           </div>
+
+          {/* Sorting Controls */}
+          {sessions.length > 0 && (
+            <div className="flex justify-between items-center mb-6 flex-wrap gap-y-2 gap-x-8">
+              <div className="flex items-center space-x-4">
+                <label className="text-sm font-medium text-text text-nowrap">
+                  Sort by:
+                </label>
+                <select
+                  value={sortBy}
+                  onChange={(e) =>
+                    setSortBy(
+                      e.target.value as
+                        | "date"
+                        | "name"
+                        | "duration"
+                        | "created_at"
+                    )
+                  }
+                  className="px-3 py-1 text-sm border border-border rounded bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="date">Date</option>
+                  <option value="name">Name</option>
+                  <option value="duration">Duration</option>
+                  <option value="created_at">Created</option>
+                </select>
+                <button
+                  onClick={() =>
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                  }
+                  className="p-1 text-text-muted hover:text-text transition-colors"
+                >
+                  {sortOrder === "asc" ? "↑" : "↓"}
+                </button>
+              </div>
+              <div className="text-sm text-text-muted text-nowrap">
+                {totalSessions} session{totalSessions !== 1 ? "s" : ""} total
+              </div>
+            </div>
+          )}
 
           {/* Sessions List */}
           <div className="space-y-4" data-sessions-container>

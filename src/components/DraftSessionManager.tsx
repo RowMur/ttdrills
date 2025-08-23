@@ -4,6 +4,7 @@ import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Session } from "@/types";
 import { Button } from "./Button";
 import { useToast } from "@/components/Toast";
+import { Modal } from "./Modal";
 import { Edit, Save, Trash2, Clock } from "lucide-react";
 
 interface DraftSessionManagerProps {
@@ -21,6 +22,7 @@ export const DraftSessionManager = forwardRef<
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [notes, setNotes] = useState("");
   const [durationMinutes, setDurationMinutes] = useState<number | undefined>();
 
@@ -140,14 +142,6 @@ export const DraftSessionManager = forwardRef<
   };
 
   const deleteDraftSession = async () => {
-    if (
-      !confirm(
-        "Are you sure you want to delete your draft session? This cannot be undone."
-      )
-    ) {
-      return;
-    }
-
     try {
       setSaving(true);
       const response = await fetch("/api/sessions/draft", {
@@ -167,6 +161,7 @@ export const DraftSessionManager = forwardRef<
       showToast("Failed to delete draft session", "error");
     } finally {
       setSaving(false);
+      setShowDeleteConfirmation(false);
     }
   };
 
@@ -205,7 +200,7 @@ export const DraftSessionManager = forwardRef<
           <Button
             variant="danger"
             size="sm"
-            onClick={deleteDraftSession}
+            onClick={() => setShowDeleteConfirmation(true)}
             disabled={saving}
             className="text-danger border-danger hover:bg-danger/10"
           >
@@ -346,6 +341,48 @@ export const DraftSessionManager = forwardRef<
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteConfirmation}
+        onClose={() => setShowDeleteConfirmation(false)}
+        title="Delete Draft Session"
+        showCloseButton={true}
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-danger/20 rounded-lg flex-shrink-0">
+              <Trash2 className="w-5 h-5 text-danger" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-text mb-2">
+                Delete Draft Session?
+              </h3>
+              <p className="text-text-muted">
+                Are you sure you want to delete your draft session? This action
+                cannot be undone and all your progress will be lost.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteConfirmation(false)}
+              disabled={saving}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={deleteDraftSession}
+              disabled={saving}
+            >
+              {saving ? "Deleting..." : "Delete Draft"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 });
