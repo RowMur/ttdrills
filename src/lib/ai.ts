@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { unstable_cache } from "next/cache";
 import { trackAICacheHit, trackAICacheMiss, trackAIError } from "./analytics";
 
 // Initialize OpenRouter client (compatible with OpenAI SDK)
@@ -11,17 +12,11 @@ const openai = new OpenAI({
   },
 });
 
-// Simple in-memory cache (for production, consider Redis or similar)
-const cache = new Map<
-  string,
-  { data: unknown; timestamp: number; ttl: number }
->();
-
-// Cache configuration
-const CACHE_TTL = {
-  SESSION_ANALYSIS: 24 * 60 * 60 * 1000, // 24 hours
-  RECOMMENDATIONS: 6 * 60 * 60 * 1000, // 6 hours
-  EXPLANATIONS: 12 * 60 * 60 * 1000, // 12 hours
+// Cache configuration using Next.js unstable_cache
+const CACHE_CONFIG = {
+  SESSION_ANALYSIS: { revalidate: 86400 }, // 24 hours
+  RECOMMENDATIONS: { revalidate: 21600 }, // 6 hours
+  EXPLANATIONS: { revalidate: 43200 }, // 12 hours
 };
 
 // Utility function to clean AI response content
@@ -32,42 +27,9 @@ function cleanAIResponse(content: string): string {
     .trim();
 }
 
-// Cache utility functions
+// Cache key generator
 function getCacheKey(prefix: string, data: string): string {
   return `${prefix}:${Buffer.from(data).toString("base64").slice(0, 32)}`;
-}
-
-function getFromCache<T>(key: string): T | null {
-  const cached = cache.get(key);
-  if (!cached) return null;
-
-  const now = Date.now();
-  if (now - cached.timestamp > cached.ttl) {
-    cache.delete(key);
-    return null;
-  }
-
-  return cached.data as T;
-}
-
-function setCache<T>(key: string, data: T, ttl: number): void {
-  cache.set(key, {
-    data,
-    timestamp: Date.now(),
-    ttl,
-  });
-
-  // Clean up old entries (keep cache size manageable)
-  if (cache.size > 1000) {
-    const entries = Array.from(cache.entries());
-    entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
-    entries.slice(0, 100).forEach(([key]) => cache.delete(key));
-    console.log(
-      `AI Cache: Cleaned up 100 old entries. Current size: ${cache.size}`
-    );
-  }
-
-  console.log(`AI Cache: Stored entry. Current size: ${cache.size}`);
 }
 
 export interface SessionAnalysis {
@@ -105,23 +67,18 @@ export async function analyzeSessionNotes(
 
   // Check cache first
   const cacheKey = getCacheKey("session_analysis", notes);
-  const cached = getFromCache<SessionAnalysis>(cacheKey);
-  if (cached) {
-    console.log("Cache hit: session analysis");
-    trackAICacheHit("session_analysis");
-    return cached;
-  }
-
-  trackAICacheMiss("session_analysis");
-
-  try {
-    const model = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
-    const response = await openai.chat.completions.create({
-      model,
-      messages: [
-        {
-          role: "system",
-          content: `You are a table tennis coach analyzing a player's session notes. Extract key insights about:
+  const cached = unstable_cache(
+    async () => {
+      console.log("Cache miss: session analysis");
+      trackAICacheMiss("session_analysis");
+      try {
+        const model = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
+        const response = await openai.chat.completions.create({
+          model,
+          messages: [
+            {
+              role: "system",
+              content: `You are a table tennis coach analyzing a player's session notes. Extract key insights about:
 - Skills practiced or mentioned
 - Player's mood and energy level
 - Areas they focused on
@@ -140,35 +97,40 @@ IMPORTANT: Return ONLY a JSON object with these fields. Do NOT use markdown form
   "improvements": ["improvements they noticed"],
   "weaknesses": ["specific weaknesses or areas needing work"]
 }`,
-        },
-        {
-          role: "user",
-          content: `Analyze this session note: "${notes}"`,
-        },
-      ],
-      temperature: 0.3,
-    });
+            },
+            {
+              role: "user",
+              content: `Analyze this session note: "${notes}"`,
+            },
+          ],
+          temperature: 0.3,
+        });
 
-    const analysis = JSON.parse(
-      cleanAIResponse(response.choices[0].message.content || "{}")
-    );
+        const analysis = JSON.parse(
+          cleanAIResponse(response.choices[0].message.content || "{}")
+        );
+        return analysis;
+      } catch (error) {
+        console.error("Error analyzing session notes:", error);
+        return {
+          skills: [],
+          mood: "neutral",
+          energyLevel: "medium",
+          focusAreas: [],
+          challenges: [],
+          improvements: [],
+          weaknesses: [],
+        };
+      }
+    },
+    [cacheKey],
+    CACHE_CONFIG.SESSION_ANALYSIS
+  );
 
-    // Cache the result
-    setCache(cacheKey, analysis, CACHE_TTL.SESSION_ANALYSIS);
-
-    return analysis as SessionAnalysis;
-  } catch (error) {
-    console.error("Error analyzing session notes:", error);
-    return {
-      skills: [],
-      mood: "neutral",
-      energyLevel: "medium",
-      focusAreas: [],
-      challenges: [],
-      improvements: [],
-      weaknesses: [],
-    };
-  }
+  const result = await cached();
+  console.log("Cache hit: session analysis");
+  trackAICacheHit("session_analysis");
+  return result;
 }
 
 export async function generatePersonalizedRecommendations(
@@ -206,84 +168,81 @@ export async function generatePersonalizedRecommendations(
   });
 
   const cacheKey = getCacheKey("recommendations", historyHash);
-  const cached = getFromCache<AIRecommendation[]>(cacheKey);
-  if (cached) {
-    console.log("Cache hit: recommendations");
-    trackAICacheHit("recommendations");
-    return cached;
-  }
+  const cached = unstable_cache(
+    async () => {
+      console.log("Cache miss: recommendations");
+      trackAICacheMiss("recommendations");
+      try {
+        // Analyze recent sessions
+        const recentSessions = userHistory.slice(-5); // Last 5 sessions
+        const sessionAnalyses = await Promise.all(
+          recentSessions.map((session) =>
+            analyzeSessionNotes(session.sessionNotes)
+          )
+        );
+        // Debug logging (remove in production)
+        console.log(sessionAnalyses);
 
-  trackAICacheMiss("recommendations");
+        // Create a summary of user's recent activity
+        const drillSessions = recentSessions.filter((s) => s.hasDrills);
+        const practiceSessions = recentSessions.filter(
+          (s) => !s.hasDrills && !s.isCompetitive && !s.isDraft
+        );
+        const competitiveSessions = recentSessions.filter(
+          (s) => s.isCompetitive && !s.isDraft
+        );
 
-  try {
-    // Analyze recent sessions
-    const recentSessions = userHistory.slice(-5); // Last 5 sessions
-    const sessionAnalyses = await Promise.all(
-      recentSessions.map((session) => analyzeSessionNotes(session.sessionNotes))
-    );
-    // Debug logging (remove in production)
-    console.log(sessionAnalyses);
+        // Analyze competitive sessions separately to identify high-priority weaknesses
+        const competitiveSessionAnalyses = await Promise.all(
+          competitiveSessions.map((session) =>
+            analyzeSessionNotes(session.sessionNotes)
+          )
+        );
 
-    // Create a summary of user's recent activity
-    const drillSessions = recentSessions.filter((s) => s.hasDrills);
-    const practiceSessions = recentSessions.filter(
-      (s) => !s.hasDrills && !s.isCompetitive && !s.isDraft
-    );
-    const competitiveSessions = recentSessions.filter(
-      (s) => s.isCompetitive && !s.isDraft
-    );
+        const userSummary = {
+          recentDrills: drillSessions.map((s) => s.drillName),
+          practiceSessions: practiceSessions.map((s) => s.sessionName),
+          competitiveSessions: competitiveSessions.map((s) => s.sessionName),
+          averageRating:
+            drillSessions
+              .filter((s) => s.rating)
+              .reduce((sum, s) => sum + (s.rating || 0), 0) /
+              drillSessions.filter((s) => s.rating).length || 0,
+          commonSkills: sessionAnalyses.flatMap((a) => a.skills),
+          challenges: sessionAnalyses.flatMap((a) => a.challenges),
+          improvements: sessionAnalyses.flatMap((a) => a.improvements),
+          weaknesses: sessionAnalyses.flatMap((a) => a.weaknesses),
+          // High-priority weaknesses from competitive sessions
+          competitiveWeaknesses: competitiveSessionAnalyses.flatMap(
+            (a) => a.weaknesses
+          ),
+          practiceSessionCount: practiceSessions.length,
+          drillSessionCount: drillSessions.length,
+          competitiveSessionCount: competitiveSessions.length,
+        };
 
-    // Analyze competitive sessions separately to identify high-priority weaknesses
-    const competitiveSessionAnalyses = await Promise.all(
-      competitiveSessions.map((session) =>
-        analyzeSessionNotes(session.sessionNotes)
-      )
-    );
-
-    const userSummary = {
-      recentDrills: drillSessions.map((s) => s.drillName),
-      practiceSessions: practiceSessions.map((s) => s.sessionName),
-      competitiveSessions: competitiveSessions.map((s) => s.sessionName),
-      averageRating:
-        drillSessions
-          .filter((s) => s.rating)
-          .reduce((sum, s) => sum + (s.rating || 0), 0) /
-          drillSessions.filter((s) => s.rating).length || 0,
-      commonSkills: sessionAnalyses.flatMap((a) => a.skills),
-      challenges: sessionAnalyses.flatMap((a) => a.challenges),
-      improvements: sessionAnalyses.flatMap((a) => a.improvements),
-      weaknesses: sessionAnalyses.flatMap((a) => a.weaknesses),
-      // High-priority weaknesses from competitive sessions
-      competitiveWeaknesses: competitiveSessionAnalyses.flatMap(
-        (a) => a.weaknesses
-      ),
-      practiceSessionCount: practiceSessions.length,
-      drillSessionCount: drillSessions.length,
-      competitiveSessionCount: competitiveSessions.length,
-    };
-
-    const response = await openai.chat.completions.create({
-      model: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are a table tennis coach creating personalized drill recommendations. 
+        const response = await openai.chat.completions.create({
+          model: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: `You are a table tennis coach creating personalized drill recommendations. 
 
 User Summary:
 - Recent drills: ${userSummary.recentDrills.join(", ")}
 - Practice sessions: ${userSummary.practiceSessions.join(", ")}
 - Competitive sessions: ${userSummary.competitiveSessions.join(", ")}
 - Drill sessions: ${userSummary.drillSessionCount}, Practice sessions: ${
-            userSummary.practiceSessionCount
-          }, Competitive sessions: ${userSummary.competitiveSessionCount}
+                userSummary.practiceSessionCount
+              }, Competitive sessions: ${userSummary.competitiveSessionCount}
 - Average rating: ${userSummary.averageRating.toFixed(1)}/5
 - Skills practiced: ${[...new Set(userSummary.commonSkills)].join(", ")}
 - Challenges: ${[...new Set(userSummary.challenges)].join(", ")}
 - Improvements: ${[...new Set(userSummary.improvements)].join(", ")}
 - Weaknesses: ${[...new Set(userSummary.weaknesses)].join(", ")}
 - COMPETITIVE WEAKNESSES (HIGH PRIORITY): ${[
-            ...new Set(userSummary.competitiveWeaknesses),
-          ].join(", ")}
+                ...new Set(userSummary.competitiveWeaknesses),
+              ].join(", ")}
 
 CRITICAL: Pay special attention to weaknesses identified in competitive sessions (competitive matches and tournaments). These weaknesses should be given HIGHEST PRIORITY when recommending drills, as they represent real competitive pressure situations where the player struggled.
 
@@ -318,32 +277,37 @@ Example correct response:
 ]
 
 IMPORTANT: Return ONLY a JSON array of 3-6 recommendations. Do NOT use markdown formatting, code blocks, or any other formatting. Just return the raw JSON array.`,
-        },
-        {
-          role: "user",
-          content:
-            "Generate personalized drill recommendations for this player.",
-        },
-      ],
-      temperature: 0.7,
-    });
+            },
+            {
+              role: "user",
+              content:
+                "Generate personalized drill recommendations for this player.",
+            },
+          ],
+          temperature: 0.7,
+        });
 
-    const recommendations = JSON.parse(
-      cleanAIResponse(response.choices[0].message.content || "[]")
-    );
+        const recommendations = JSON.parse(
+          cleanAIResponse(response.choices[0].message.content || "[]")
+        );
+        return recommendations;
+      } catch (error) {
+        console.error("Error generating AI recommendations:", error);
+        trackAIError(
+          "recommendations_generation",
+          error instanceof Error ? error.message : "Unknown error"
+        );
+        return [];
+      }
+    },
+    [cacheKey],
+    CACHE_CONFIG.RECOMMENDATIONS
+  );
 
-    // Cache the result
-    setCache(cacheKey, recommendations, CACHE_TTL.RECOMMENDATIONS);
-
-    return recommendations as AIRecommendation[];
-  } catch (error) {
-    console.error("Error generating AI recommendations:", error);
-    trackAIError(
-      "recommendations_generation",
-      error instanceof Error ? error.message : "Unknown error"
-    );
-    return [];
-  }
+  const result = await cached();
+  console.log("Cache hit: recommendations");
+  trackAICacheHit("recommendations");
+  return result;
 }
 
 export async function generateRecommendationExplanation(
@@ -363,71 +327,50 @@ export async function generateRecommendationExplanation(
   });
 
   const cacheKey = getCacheKey("explanation", contextHash);
-  const cached = getFromCache<string>(cacheKey);
-  if (cached) {
-    console.log("Cache hit: explanation");
-    trackAICacheHit("explanation");
-    return cached;
-  }
-
-  trackAICacheMiss("explanation");
-
-  try {
-    const response = await openai.chat.completions.create({
-      model: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are a table tennis coach explaining why a specific drill is recommended to a player. Be encouraging, specific, and personal. Keep explanations under 100 words.`,
-        },
-        {
-          role: "user",
-          content: `Explain why "${drillName}" (${drillDescription}) is recommended for a player who:
+  const cached = unstable_cache(
+    async () => {
+      console.log("Cache miss: explanation");
+      trackAICacheMiss("explanation");
+      try {
+        const response = await openai.chat.completions.create({
+          model: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: `You are a table tennis coach explaining why a specific drill is recommended to a player. Be encouraging, specific, and personal. Keep explanations under 100 words.`,
+            },
+            {
+              role: "user",
+              content: `Explain why "${drillName}" (${drillDescription}) is recommended for a player who:
 - Recently practiced: ${userContext.recentSessions.join(", ")}
 - Average rating: ${userContext.averageRating.toFixed(1)}/5
 - Common challenges: ${userContext.commonChallenges.join(", ")}
 
 Make it personal and motivating.`,
-        },
-      ],
-      temperature: 0.8,
-    });
+            },
+          ],
+          temperature: 0.8,
+        });
 
-    const explanation =
-      response.choices[0].message.content ||
-      "This drill will help improve your game!";
+        const explanation =
+          response.choices[0].message.content ||
+          "This drill will help improve your game!";
+        return explanation;
+      } catch (error) {
+        console.error("Error generating explanation:", error);
+        trackAIError(
+          "explanation_generation",
+          error instanceof Error ? error.message : "Unknown error"
+        );
+        return "This drill is recommended based on your training history.";
+      }
+    },
+    [cacheKey],
+    CACHE_CONFIG.EXPLANATIONS
+  );
 
-    // Cache the result
-    setCache(cacheKey, explanation, CACHE_TTL.EXPLANATIONS);
-
-    return explanation;
-  } catch (error) {
-    console.error("Error generating explanation:", error);
-    trackAIError(
-      "explanation_generation",
-      error instanceof Error ? error.message : "Unknown error"
-    );
-    return "This drill is recommended based on your training history.";
-  }
-}
-
-// Cache management functions
-export function clearCache(): void {
-  cache.clear();
-}
-
-export function getCacheStats(): {
-  size: number;
-  entries: Array<{ key: string; age: number }>;
-} {
-  const now = Date.now();
-  const entries = Array.from(cache.entries()).map(([key, value]) => ({
-    key,
-    age: now - value.timestamp,
-  }));
-
-  return {
-    size: cache.size,
-    entries: entries.sort((a, b) => b.age - a.age).slice(0, 10), // Top 10 oldest entries
-  };
+  const result = await cached();
+  console.log("Cache hit: explanation");
+  trackAICacheHit("explanation");
+  return result;
 }
