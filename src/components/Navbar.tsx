@@ -46,14 +46,12 @@ export const Navbar = () => {
 
           {/* Right side - Search and Auth */}
           <div className="flex items-center gap-4">
-            {/* Search - hidden on small screens and homepage */}
-            {!isHomePage && (
-              <div className="hidden lg:block">
-                <Suspense fallback={<div className="text-xs">Loading...</div>}>
-                  <Searchbox />
-                </Suspense>
-              </div>
-            )}
+            {/* Search - hidden on small screens */}
+            <div className="hidden lg:block">
+              <Suspense fallback={<div className="text-xs">Loading...</div>}>
+                <Searchbox />
+              </Suspense>
+            </div>
 
             {/* Mobile menu button */}
             <button
