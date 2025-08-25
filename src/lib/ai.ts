@@ -29,7 +29,49 @@ function cleanAIResponse(content: string): string {
 
 // Cache key generator
 function getCacheKey(prefix: string, data: string): string {
-  return `${prefix}:${Buffer.from(data).toString("base64").slice(0, 32)}`;
+  return `${prefix}:${Buffer.from(data)
+    .toString("base64")
+    .slice(0, 32)}${Math.random().toString()}`;
+}
+
+// Helpers to robustly parse AI JSON output
+function normalizeSmartQuotes(input: string): string {
+  return input.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
+}
+
+function extractJsonArray(text: string): string | null {
+  const first = text.indexOf("[");
+  const last = text.lastIndexOf("]");
+  if (first !== -1 && last !== -1 && last > first) {
+    return text.slice(first, last + 1);
+  }
+  return null;
+}
+
+function parseAiJsonArray(content: string): unknown[] {
+  const cleaned = cleanAIResponse(normalizeSmartQuotes(content));
+  try {
+    const parsed = JSON.parse(cleaned);
+    if (Array.isArray(parsed)) return parsed;
+    if (parsed && typeof parsed === "object") {
+      const obj = parsed as Record<string, unknown>;
+      const arr = obj["recommendations"];
+      if (Array.isArray(arr)) return arr as unknown[];
+    }
+  } catch {
+    // fall through
+  }
+  const arraySlice = extractJsonArray(cleaned);
+  if (arraySlice) {
+    const candidate = arraySlice.replace(/,\s*([}\]])/g, "$1");
+    const parsed = JSON.parse(candidate);
+    if (Array.isArray(parsed)) return parsed;
+  }
+  throw new Error("invalid_json_array");
+}
+
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
 }
 
 export interface SessionAnalysis {
@@ -106,9 +148,11 @@ IMPORTANT: Return ONLY a JSON object with these fields. Do NOT use markdown form
           temperature: 0.3,
         });
 
-        const analysis = JSON.parse(
-          cleanAIResponse(response.choices[0].message.content || "{}")
+        const clean = cleanAIResponse(
+          response.choices[0].message.content || "{}"
         );
+        // console.log("clean", clean);
+        const analysis = JSON.parse(clean);
         return analysis;
       } catch (error) {
         const message =
@@ -170,11 +214,30 @@ export async function generatePersonalizedRecommendations(
       try {
         // Analyze recent sessions
         const recentSessions = userHistory.slice(-5); // Last 5 sessions
-        const sessionAnalyses = await Promise.all(
+        const sessionAnalysesResults = await Promise.allSettled(
           recentSessions.map((session) =>
             analyzeSessionNotes(session.sessionNotes)
           )
         );
+        const sessionAnalyses = sessionAnalysesResults.flatMap((res, idx) => {
+          if (res.status === "fulfilled") {
+            return [res.value];
+          }
+          const message =
+            res.reason instanceof Error
+              ? res.reason.message
+              : String(res.reason ?? "Unknown error");
+          console.error(
+            "Session analysis item failed (recent session %d): %s",
+            idx,
+            message
+          );
+          trackAIError("session_analysis_item", message);
+          return [] as never[];
+        });
+        if (!sessionAnalyses.length) {
+          throw new Error("session_analysis_all_failed");
+        }
 
         // Create a summary of user's recent activity
         const drillSessions = recentSessions.filter((s) => s.hasDrills);
@@ -186,10 +249,28 @@ export async function generatePersonalizedRecommendations(
         );
 
         // Analyze competitive sessions separately to identify high-priority weaknesses
-        const competitiveSessionAnalyses = await Promise.all(
+        const competitiveAnalysesResults = await Promise.allSettled(
           competitiveSessions.map((session) =>
             analyzeSessionNotes(session.sessionNotes)
           )
+        );
+        const competitiveSessionAnalyses = competitiveAnalysesResults.flatMap(
+          (res, idx) => {
+            if (res.status === "fulfilled") {
+              return [res.value];
+            }
+            const message =
+              res.reason instanceof Error
+                ? res.reason.message
+                : String(res.reason ?? "Unknown error");
+            console.error(
+              "Session analysis item failed (competitive session %d): %s",
+              idx,
+              message
+            );
+            trackAIError("competitive_session_analysis_item", message);
+            return [] as never[];
+          }
         );
 
         const userSummary = {
@@ -270,6 +351,12 @@ Example correct response:
 ]
 
 IMPORTANT: Return ONLY a JSON array of 3-6 recommendations. Do NOT use markdown formatting, code blocks, or any other formatting. Just return the raw JSON array.`,
+              // Reinforce field requirements to reduce malformed output
+            },
+            {
+              role: "system",
+              content:
+                'All fields are REQUIRED for each recommendation. If unsure about priority, set "priority" to "medium".',
             },
             {
               role: "user",
@@ -280,9 +367,33 @@ IMPORTANT: Return ONLY a JSON array of 3-6 recommendations. Do NOT use markdown 
           temperature: 0.7,
         });
 
-        const recommendations = JSON.parse(
-          cleanAIResponse(response.choices[0].message.content || "[]")
-        );
+        const rawContent = response.choices[0].message.content || "[]";
+        const parsed = parseAiJsonArray(rawContent);
+        const recommendations = parsed
+          .filter((item) => isObjectRecord(item))
+          .map((item) => {
+            const priority =
+              item["priority"] === "high" ||
+              item["priority"] === "medium" ||
+              item["priority"] === "low"
+                ? (item["priority"] as "high" | "medium" | "low")
+                : "medium";
+            return {
+              drillId: String((item["drillId"] ?? item["id"] ?? "") as string),
+              reason: String((item["reason"] ?? "") as string),
+              priority,
+              expectedOutcome: String(
+                (item["expectedOutcome"] ?? item["outcome"] ?? "") as string
+              ),
+              personalization: String(
+                (item["personalization"] ?? item["tips"] ?? "") as string
+              ),
+            } as AIRecommendation;
+          })
+          .filter((r: AIRecommendation) => r.drillId && r.reason);
+        if (!recommendations.length) {
+          throw new Error("empty_recommendations_after_parse");
+        }
         return recommendations;
       } catch (error) {
         const message =
