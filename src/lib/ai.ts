@@ -29,9 +29,7 @@ function cleanAIResponse(content: string): string {
 
 // Cache key generator
 function getCacheKey(prefix: string, data: string): string {
-  return `${prefix}:${Buffer.from(data)
-    .toString("base64")
-    .slice(0, 32)}${Math.random().toString()}`;
+  return `${prefix}:${Buffer.from(data).toString("base64").slice(0, 32)}`;
 }
 
 // Helpers to robustly parse AI JSON output
