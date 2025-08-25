@@ -115,8 +115,8 @@ export default function Home() {
             Drill Library
           </h3>
           <p className="text-text-subtle">
-            Access hundreds of drills with interactive diagrams, video
-            demonstrations, and detailed instructions.
+            Access drills with interactive diagrams, video demonstrations, and
+            detailed instructions.
           </p>
         </div>
 
