@@ -159,12 +159,6 @@ export async function GET() {
         categories: drill.categories || [],
       }))
     );
-    // Debug logging (remove in production)
-    console.log(
-      "Available drill IDs:",
-      (allDrills as DatabaseDrill[]).map((d) => ({ id: d.id, name: d.name }))
-    );
-    console.log("AI recommendations:", aiRecommendations);
 
     // Combine AI recommendations with available drill data
     const recommendations = aiRecommendations

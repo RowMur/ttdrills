@@ -111,16 +111,11 @@ IMPORTANT: Return ONLY a JSON object with these fields. Do NOT use markdown form
         );
         return analysis;
       } catch (error) {
-        console.error("Error analyzing session notes:", error);
-        return {
-          skills: [],
-          mood: "neutral",
-          energyLevel: "medium",
-          focusAreas: [],
-          challenges: [],
-          improvements: [],
-          weaknesses: [],
-        };
+        const message =
+          error instanceof Error ? error.message : "Unknown error";
+        console.error("AI session analysis step failed:", message);
+        trackAIError("session_analysis", message);
+        throw new Error(`session_analysis_failed: ${message}`);
       }
     },
     [cacheKey],
@@ -180,8 +175,6 @@ export async function generatePersonalizedRecommendations(
             analyzeSessionNotes(session.sessionNotes)
           )
         );
-        // Debug logging (remove in production)
-        console.log(sessionAnalyses);
 
         // Create a summary of user's recent activity
         const drillSessions = recentSessions.filter((s) => s.hasDrills);
@@ -292,12 +285,11 @@ IMPORTANT: Return ONLY a JSON array of 3-6 recommendations. Do NOT use markdown 
         );
         return recommendations;
       } catch (error) {
-        console.error("Error generating AI recommendations:", error);
-        trackAIError(
-          "recommendations_generation",
-          error instanceof Error ? error.message : "Unknown error"
-        );
-        return [];
+        const message =
+          error instanceof Error ? error.message : "Unknown error";
+        console.error("AI recommendations generation step failed:", message);
+        trackAIError("recommendations_generation", message);
+        throw new Error(`recommendations_generation_failed: ${message}`);
       }
     },
     [cacheKey],
@@ -357,12 +349,11 @@ Make it personal and motivating.`,
           "This drill will help improve your game!";
         return explanation;
       } catch (error) {
-        console.error("Error generating explanation:", error);
-        trackAIError(
-          "explanation_generation",
-          error instanceof Error ? error.message : "Unknown error"
-        );
-        return "This drill is recommended based on your training history.";
+        const message =
+          error instanceof Error ? error.message : "Unknown error";
+        console.error("AI explanation generation step failed:", message);
+        trackAIError("explanation_generation", message);
+        throw new Error(`explanation_generation_failed: ${message}`);
       }
     },
     [cacheKey],
